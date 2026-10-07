@@ -23,6 +23,44 @@ export default {
       rows: 3,
       group: 'general',
     },
+    {
+      name: 'localized',
+      type: 'object',
+      title: 'Contenu multilingue',
+      group: 'general',
+      fields: [
+        {
+          name: 'en',
+          type: 'object',
+          title: 'English',
+          fields: [
+            { name: 'siteName', type: 'string', title: 'Site name' },
+            { name: 'tagline', type: 'string', title: 'Tagline' },
+            { name: 'description', type: 'text', title: 'Description', rows: 5 },
+          ],
+        },
+        {
+          name: 'fr',
+          type: 'object',
+          title: 'Francais',
+          fields: [
+            { name: 'siteName', type: 'string', title: 'Nom du site' },
+            { name: 'tagline', type: 'string', title: 'Slogan' },
+            { name: 'description', type: 'text', title: 'Description', rows: 5 },
+          ],
+        },
+        {
+          name: 'it',
+          type: 'object',
+          title: 'Italiano',
+          fields: [
+            { name: 'siteName', type: 'string', title: 'Nome del sito' },
+            { name: 'tagline', type: 'string', title: 'Slogan' },
+            { name: 'description', type: 'text', title: 'Descrizione', rows: 5 },
+          ],
+        },
+      ],
+    },
     { name: 'logo', type: 'image', title: 'Logo', group: 'general' },
     {
       name: 'favicon',
