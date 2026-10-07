@@ -1,0 +1,32 @@
+{
+  "common": {
+    "siteName": "ANABO ROADTRIP MADAGASCAR",
+    "tagline": "Votre expert en circuits privés à Madagascar",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "readMore": "En savoir plus",
+    "contactUs": "Nous contacter",
+    "getQuote": "Demander un devis",
+    "whatsapp": "Contacter par WhatsApp",
+    "email": "Envoyer un email"
+  },
+  "nav": {
+    "home": "Accueil",
+    "circuits": "Circuits",
+    "customTrips": "Sur-mesure",
+    "about": "À propos",
+    "gallery": "Galerie",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "home": {
+    "heroTitle": "Découvrez Madagascar autrement",
+    "heroSubtitle": "Circuits privés, roadtrips et voyages sur mesure avec chauffeur-guide",
+    "featuredCircuits": "Nos circuits phares",
+    "testimonials": "Ils nous ont fait confiance",
+    "ctaTitle": "Prêt à vivre l'aventure ?"
+  },
+  "footer": {
+    "copyright": "© 2026 ANABO ROADTRIP MADAGASCAR. Tous droits réservés."
+  }
+}

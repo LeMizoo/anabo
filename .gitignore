@@ -1,0 +1,49 @@
+# Dépendances
+node_modules/
+.pnp
+.pnp.js
+
+# Builds
+.next/
+out/
+dist/
+build/
+
+# Environnement
+.env
+.env.local
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Sanity
+.sanity/
+studio/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# Divers
+*.tsbuildinfo
+next-env.d.ts
+.cache/
+.vercel
+
+# Uploads (dossier local avec les images — trop volumineux pour Git)
+uploads/

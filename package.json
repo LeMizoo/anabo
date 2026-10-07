@@ -1,0 +1,24 @@
+{
+  "name": "anabo-roadtrip",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ANABO ROADTRIP MADAGASCAR — Application web Next.js + Sanity",
+  "author": "Tovoniaina RAHENDRISON",
+  "license": "UNLICENSED",
+  "scripts": {
+    "install:all": "npm install && cd web && npm install && cd ../studio && npm install",
+    "dev:web": "cd web && npm run dev",
+    "dev:studio": "cd studio && npm run dev",
+    "build:web": "cd web && npm run build",
+    "build:studio": "cd studio && npm run build",
+    "deploy:studio": "cd studio && npm run deploy"
+  },
+  "workspaces": [
+    "web",
+    "studio"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

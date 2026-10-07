@@ -1,0 +1,32 @@
+{
+  "common": {
+    "siteName": "ANABO ROADTRIP MADAGASCAR",
+    "tagline": "Your expert in private tours in Madagascar",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "readMore": "Learn more",
+    "contactUs": "Contact us",
+    "getQuote": "Request a quote",
+    "whatsapp": "Contact via WhatsApp",
+    "email": "Send an email"
+  },
+  "nav": {
+    "home": "Home",
+    "circuits": "Tours",
+    "customTrips": "Custom trips",
+    "about": "About",
+    "gallery": "Gallery",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "home": {
+    "heroTitle": "Discover Madagascar differently",
+    "heroSubtitle": "Private tours, roadtrips and tailor-made trips with a driver-guide",
+    "featuredCircuits": "Our featured tours",
+    "testimonials": "They trusted us",
+    "ctaTitle": "Ready for an adventure?"
+  },
+  "footer": {
+    "copyright": "© 2026 ANABO ROADTRIP MADAGASCAR. All rights reserved."
+  }
+}
