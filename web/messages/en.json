@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "home": "Home",
+    "madagascar": "Madagascar",
+    "tourIdeas": "Tour Ideas",
+    "tripGuidelines": "Trip Guidelines",
+    "aboutUs": "About Us",
+    "contact": "Contact"
+  },
+  "common": {
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "madagascar": "Madagascar"
+  },
+  "home": {
+    "eyebrow": "ANABO ROADTRIP MADAGASCAR",
+    "fallbackTitle": "Discover Madagascar with a local driver guide",
+    "fallbackDescription": "Explore Madagascar through authentic road trips and tailor-made journeys."
+  },
+  "footer": {
+    "navigation": "Navigation",
+    "contact": "Contact",
+    "country": "Madagascar"
+  }
+}

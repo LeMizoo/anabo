@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "home": "Home",
+    "madagascar": "Madagascar",
+    "tourIdeas": "Idee di viaggio",
+    "tripGuidelines": "Consigli di viaggio",
+    "aboutUs": "Chi siamo",
+    "contact": "Contatti"
+  },
+  "common": {
+    "navigation": "Navigazione",
+    "contact": "Contatti",
+    "madagascar": "Madagascar"
+  },
+  "home": {
+    "eyebrow": "ANABO ROADTRIP MADAGASCAR",
+    "fallbackTitle": "Scopri il Madagascar con una guida-autista locale",
+    "fallbackDescription": "Esplora il Madagascar attraverso roadtrip autentici e viaggi su misura."
+  },
+  "footer": {
+    "navigation": "Navigazione",
+    "contact": "Contatti",
+    "country": "Madagascar"
+  }
+}
