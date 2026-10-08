@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
@@ -25,10 +26,13 @@ export async function HomeHero({ hero }: HomeHeroProps) {
   return (
     <section className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-gray-900">
       {backgroundImage && (
-        <img
+        <Image
           src={backgroundImage}
           alt={hero.backgroundImage?.alt || ''}
-          className="absolute inset-0 -z-20 h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover"
         />
       )}
 

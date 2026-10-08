@@ -56,7 +56,7 @@ export default async function HomePage({ params }: Props) {
           ANABO ROADTRIP MADAGASCAR
         </h1>
         <p className="mt-4 text-gray-600">
-          Le contenu de la page d'accueil n'est pas encore configuré.
+          Le contenu de la page d&apos;accueil n&apos;est pas encore configuré.
         </p>
       </section>
     )

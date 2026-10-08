@@ -60,6 +60,79 @@ export const homePageQuery = `
   }
 `
 
+export const pageBySlugQuery = `
+  *[_type == "page" && slug.current == $slug && pageType != "home"][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    pageType,
+    excerpt,
+    featuredImage{
+      ...,
+      asset->,
+      alt
+    },
+    seo{
+      metaTitle,
+      metaDescription,
+      keywords,
+      ogImage{
+        ...,
+        asset->,
+        alt
+      },
+      canonicalUrl,
+      noIndex
+    },
+    modules[]{
+      _type,
+
+      _type == "heroBlock" => {
+        title,
+        subtitle,
+        backgroundImage{
+          ...,
+          asset->,
+          alt
+        },
+        overlay,
+        alignment,
+        ctaPrimary{
+          label,
+          link
+        },
+        ctaSecondary{
+          label,
+          link
+        }
+      },
+
+      _type == "textMediaBlock" => {
+        title,
+        content,
+        image{
+          ...,
+          asset->,
+          alt
+        },
+        imagePosition,
+        cta{
+          label,
+          link
+        }
+      },
+
+      _type == "ctaBlock" => {
+        title,
+        description,
+        buttonLabel,
+        buttonLink,
+        variant
+      }
+    }
+  }
+`
+
 export const featuredTestimonialQuery = `
   *[_type == "testimonial" && featured == true][0]{
     _id,

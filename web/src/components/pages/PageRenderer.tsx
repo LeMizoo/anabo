@@ -1,0 +1,30 @@
+import type { PageModule } from '@/lib/types'
+import { HeroSection } from './HeroSection'
+import { TextMediaSection } from './TextMediaSection'
+import { CtaSection } from './CtaSection'
+
+type Props = {
+  modules?: PageModule[]
+}
+
+export function PageRenderer({ modules = [] }: Props) {
+  return (
+    <>
+      {modules.map((module, index) => {
+        switch (module._type) {
+          case 'heroBlock':
+            return <HeroSection key={index} block={module} />
+
+          case 'textMediaBlock':
+            return <TextMediaSection key={index} block={module} />
+
+          case 'ctaBlock':
+            return <CtaSection key={index} block={module} />
+
+          default:
+            return null
+        }
+      })}
+    </>
+  )
+}

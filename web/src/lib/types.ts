@@ -37,8 +37,15 @@ export interface SanityImage {
   asset?: {
     _id?: string
     url?: string
+    [key: string]: unknown
   }
   alt?: string
+  [key: string]: unknown
+}
+
+export interface PageCta {
+  label?: string
+  link?: string
 }
 
 export interface HeroBlock {
@@ -48,14 +55,48 @@ export interface HeroBlock {
   backgroundImage?: SanityImage
   overlay?: boolean
   alignment?: 'left' | 'center' | 'right'
-  ctaPrimary?: {
-    label?: string
-    link?: string
-  }
-  ctaSecondary?: {
-    label?: string
-    link?: string
-  }
+  ctaPrimary?: PageCta
+  ctaSecondary?: PageCta
+}
+
+export interface TextMediaBlock {
+  _type: 'textMediaBlock'
+  title?: string
+  content?: unknown[]
+  image?: SanityImage
+  imagePosition?: 'left' | 'right'
+  cta?: PageCta
+}
+
+export interface CtaBlock {
+  _type: 'ctaBlock'
+  title?: string
+  description?: string
+  buttonLabel?: string
+  buttonLink?: string
+  variant?: 'primary' | 'secondary'
+}
+
+export type PageModule = HeroBlock | TextMediaBlock | CtaBlock
+
+export interface PageSeo {
+  metaTitle?: string
+  metaDescription?: string
+  keywords?: string[]
+  ogImage?: SanityImage
+  canonicalUrl?: string
+  noIndex?: boolean
+}
+
+export interface Page {
+  _id: string
+  title: string
+  slug?: string
+  pageType?: string
+  excerpt?: string
+  featuredImage?: SanityImage
+  seo?: PageSeo
+  modules?: PageModule[]
 }
 
 export interface HomePage {

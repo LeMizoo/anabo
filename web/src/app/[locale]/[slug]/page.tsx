@@ -1,0 +1,90 @@
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
+import { sanityClient } from '@/lib/sanity'
+import { pageBySlugQuery } from '@/lib/queries'
+import { locales, type Locale } from '@/lib/i18n'
+import type { Page } from '@/lib/types'
+import { PageRenderer } from '@/components/pages/PageRenderer'
+
+type Props = {
+  params: Promise<{
+    locale: string
+    slug: string
+  }>
+}
+
+async function getPage(slug: string) {
+  return sanityClient.fetch<Page | null>(
+    pageBySlugQuery,
+    { slug },
+  )
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { locale: localeParam, slug } = await params
+
+  if (!locales.includes(localeParam as Locale)) {
+    return {}
+  }
+
+  const page = await getPage(slug)
+
+  if (!page) {
+    return {}
+  }
+
+  const seo = page.seo
+
+  return {
+    title: seo?.metaTitle || page.title,
+    description: seo?.metaDescription || page.excerpt,
+    keywords: seo?.keywords,
+    alternates: seo?.canonicalUrl
+      ? {
+          canonical: seo.canonicalUrl,
+        }
+      : undefined,
+    robots: seo?.noIndex
+      ? {
+          index: false,
+          follow: false,
+        }
+      : undefined,
+    openGraph: {
+      title: seo?.metaTitle || page.title,
+      description: seo?.metaDescription || page.excerpt,
+      url: seo?.canonicalUrl,
+      images: seo?.ogImage
+        ? [
+            {
+              url: seo.ogImage.asset?.url || '',
+              alt: seo.ogImage.alt || page.title,
+            },
+          ]
+        : undefined,
+    },
+  }
+}
+
+export default async function PageBySlug({
+  params,
+}: Props) {
+  const { locale: localeParam, slug } = await params
+
+  if (!locales.includes(localeParam as Locale)) {
+    notFound()
+  }
+
+  setRequestLocale(localeParam as Locale)
+
+  const page = await getPage(slug)
+
+  if (!page) {
+    notFound()
+  }
+
+  return <PageRenderer modules={page.modules} />
+}
