@@ -1,5 +1,6 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { HomeHero } from '@/components/home/HomeHero'
 import { sanityClient } from '@/lib/sanity'
 import { homePageQuery } from '@/lib/queries'
@@ -8,6 +9,25 @@ import type { HomePage } from '@/lib/types'
 
 type Props = {
   params: Promise<{ locale: string }>
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { locale: localeParam } = await params
+
+  if (!locales.includes(localeParam as Locale)) {
+    return {}
+  }
+
+  setRequestLocale(localeParam as Locale)
+
+  const t = await getTranslations('metadata')
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  }
 }
 
 export default async function HomePage({ params }: Props) {

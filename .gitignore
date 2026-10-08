@@ -47,3 +47,5 @@ next-env.d.ts
 
 # Uploads (dossier local avec les images — trop volumineux pour Git)
 uploads/
+deploy-roadtrip.tar.gz
+deploy-roadtrip/

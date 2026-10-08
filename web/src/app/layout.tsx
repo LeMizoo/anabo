@@ -1,19 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
 import './globals.css'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-poppins',
-  display: 'swap',
-})
+import { inter, poppins } from '@/lib/fonts'
 
 export const metadata: Metadata = {
   title: {
@@ -23,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'Circuits privés, roadtrips et voyages sur mesure à Madagascar avec chauffeur-guide.',
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://anabo.mg'
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://anabo.mg',
   ),
 }
 
