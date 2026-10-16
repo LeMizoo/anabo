@@ -14,11 +14,11 @@ type Props = {
   }>
 }
 
-async function getPage(slug: string) {
-  return sanityClient.fetch<Page | null>(
-    pageBySlugQuery,
-    { slug },
-  )
+async function getPage(slug: string, locale: Locale) {
+  return sanityClient.fetch<Page | null>(pageBySlugQuery, {
+    slug,
+    locale,
+  })
 }
 
 export async function generateMetadata({
@@ -30,7 +30,8 @@ export async function generateMetadata({
     return {}
   }
 
-  const page = await getPage(slug)
+  const locale = localeParam as Locale
+  const page = await getPage(slug, locale)
 
   if (!page) {
     return {}
@@ -69,18 +70,18 @@ export async function generateMetadata({
   }
 }
 
-export default async function PageBySlug({
-  params,
-}: Props) {
+export default async function PageBySlug({ params }: Props) {
   const { locale: localeParam, slug } = await params
 
   if (!locales.includes(localeParam as Locale)) {
     notFound()
   }
 
-  setRequestLocale(localeParam as Locale)
+  const locale = localeParam as Locale
 
-  const page = await getPage(slug)
+  setRequestLocale(locale)
+
+  const page = await getPage(slug, locale)
 
   if (!page) {
     notFound()

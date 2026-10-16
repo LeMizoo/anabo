@@ -88,10 +88,14 @@ export interface PageSeo {
   noIndex?: boolean
 }
 
+export type PageLanguage = 'fr' | 'en' | 'it'
+
 export interface Page {
   _id: string
   title: string
   slug?: string
+  language?: PageLanguage
+  translationGroup?: string
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
@@ -103,6 +107,8 @@ export interface HomePage {
   _id: string
   title: string
   slug?: string
+  language?: PageLanguage
+  translationGroup?: string
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage

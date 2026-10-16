@@ -27,6 +27,8 @@ export const homePageQuery = `
     _id,
     title,
     "slug": slug.current,
+    language,
+    translationGroup,
     pageType,
     excerpt,
     featuredImage{
@@ -61,10 +63,12 @@ export const homePageQuery = `
 `
 
 export const pageBySlugQuery = `
-  *[_type == "page" && slug.current == $slug && pageType != "home"][0]{
+  *[_type == "page" && slug.current == $slug && language == $locale && pageType != "home"][0]{
     _id,
     title,
     "slug": slug.current,
+    language,
+    translationGroup,
     pageType,
     excerpt,
     featuredImage{

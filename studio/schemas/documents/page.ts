@@ -23,6 +23,33 @@ export default {
       group: 'content',
     },
     {
+      name: 'language',
+      type: 'string',
+      title: 'Langue',
+      description:
+        'Langue de cette version de la page. Chaque langue a son propre document, relié aux autres via le champ « Groupe de traduction ».',
+      options: {
+        list: [
+          { title: '🇫🇷 Français', value: 'fr' },
+          { title: '🇬🇧 English', value: 'en' },
+          { title: '🇮🇹 Italiano', value: 'it' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'fr',
+      validation: (Rule: any) => Rule.required(),
+      group: 'content',
+    },
+    {
+      name: 'translationGroup',
+      type: 'string',
+      title: 'Groupe de traduction',
+      description:
+        'Identifiant partagé par toutes les versions linguistiques de la même page. Exemple : « madagascar » pour les documents fr, en et it de la page Madagascar. Doit être identique dans les trois documents.',
+      validation: (Rule: any) => Rule.required(),
+      group: 'content',
+    },
+    {
       name: 'pageType',
       type: 'string',
       title: 'Type de page',
@@ -83,7 +110,24 @@ export default {
     select: {
       title: 'title',
       subtitle: 'pageType',
+      language: 'language',
       media: 'featuredImage',
+    },
+    prepare(selection: any) {
+      const { title, subtitle, language } = selection
+      const langLabel =
+        language === 'fr'
+          ? '🇫🇷 FR'
+          : language === 'en'
+            ? '🇬🇧 EN'
+            : language === 'it'
+              ? '🇮🇹 IT'
+              : '—'
+      return {
+        title: title,
+        subtitle: `${langLabel} · ${subtitle || ''}`,
+        media: selection.media,
+      }
     },
   },
 }
