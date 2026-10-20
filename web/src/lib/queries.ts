@@ -133,6 +133,13 @@ export const pageBySlugQuery = `
         buttonLink,
         variant
       }
+,
+      _type == "contactFormBlock" => {
+        title,
+        description,
+        formType,
+        showWhatsapp
+      }
     }
   }
 `

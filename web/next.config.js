@@ -5,6 +5,15 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  outputFileTracingIncludes: {
+    '/': [
+      './messages/**/*',
+      '../node_modules/next-intl/**/*',
+      '../node_modules/use-intl/**/*',
+      '../node_modules/@formatjs/**/*',
+      '../node_modules/negotiator/**/*',
+    ],
+  },
   images: {
     remotePatterns: [
       {

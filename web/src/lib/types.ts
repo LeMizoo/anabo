@@ -1,44 +1,23 @@
-// web/src/lib/types.ts
-
 export interface SiteSettings {
   _id: string
   siteName?: string
   tagline?: string
   description?: string
   localized?: {
-    en?: {
-      siteName?: string
-      tagline?: string
-      description?: string
-    }
-    fr?: {
-      siteName?: string
-      tagline?: string
-      description?: string
-    }
-    it?: {
-      siteName?: string
-      tagline?: string
-      description?: string
-    }
+    en?: { siteName?: string; tagline?: string; description?: string }
+    fr?: { siteName?: string; tagline?: string; description?: string }
+    it?: { siteName?: string; tagline?: string; description?: string }
   }
   contactEmail?: string
   contactPhone?: string
   whatsappNumber?: string
   address?: string
-  socialLinks?: {
-    platform?: string
-    url?: string
-  }[]
+  socialLinks?: { platform?: string; url?: string }[]
 }
 
 export interface SanityImage {
   _id?: string
-  asset?: {
-    _id?: string
-    url?: string
-    [key: string]: unknown
-  }
+  asset?: { _id?: string; url?: string; [key: string]: unknown }
   alt?: string
   [key: string]: unknown
 }
@@ -77,7 +56,19 @@ export interface CtaBlock {
   variant?: 'primary' | 'secondary'
 }
 
-export type PageModule = HeroBlock | TextMediaBlock | CtaBlock
+export interface ContactFormBlock {
+  _type: 'contactFormBlock'
+  title?: string
+  description?: string
+  formType?: 'contact' | 'quote'
+  showWhatsapp?: boolean
+}
+
+export type PageModule =
+  | HeroBlock
+  | TextMediaBlock
+  | CtaBlock
+  | ContactFormBlock
 
 export interface PageSeo {
   metaTitle?: string

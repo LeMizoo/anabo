@@ -2,6 +2,7 @@ import type { PageModule } from '@/lib/types'
 import { HeroSection } from './HeroSection'
 import { TextMediaSection } from './TextMediaSection'
 import { CtaSection } from './CtaSection'
+import { ContactForm } from './ContactForm'
 
 type Props = {
   modules?: PageModule[]
@@ -20,6 +21,9 @@ export function PageRenderer({ modules = [] }: Props) {
 
           case 'ctaBlock':
             return <CtaSection key={index} block={module} />
+
+          case 'contactFormBlock':
+            return <ContactForm key={index} block={module} />
 
           default:
             return null
