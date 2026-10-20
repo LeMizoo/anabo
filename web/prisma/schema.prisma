@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuoteStatus {
+  NOUVEAU
+  CONTACTE
+  DEVIS_ENVOYE
+  CONFIRME
+  PERDU
+}
+
+enum AdminRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+model QuoteRequest {
+  id        String      @id @default(cuid()) @db.VarChar(30)
+  reference String      @unique @db.VarChar(32)
+  status    QuoteStatus @default(NOUVEAU)
+  locale    String      @default("fr") @db.VarChar(2)
+
+  firstName String  @db.VarChar(100)
+  lastName  String  @db.VarChar(100)
+  email     String  @db.VarChar(191)
+  phone     String  @db.VarChar(40)
+  country   String? @db.VarChar(100)
+
+  circuitSlug  String?   @db.VarChar(191)
+  circuitTitle String?   @db.VarChar(191)
+  startDate    DateTime? @db.Date
+  endDate      DateTime? @db.Date
+  adults       Int       @default(2)
+  children     Int       @default(0)
+  message      String?   @db.Text
+  adminNotes   String?   @db.Text
+
+  contactedAt DateTime?
+  quoteSentAt DateTime?
+  confirmedAt DateTime?
+  lostAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+  @@index([circuitSlug])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid()) @db.VarChar(30)
+  email        String    @unique @db.VarChar(191)
+  name         String    @db.VarChar(150)
+  passwordHash String    @db.VarChar(255)
+  role         AdminRole @default(ADMIN)
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

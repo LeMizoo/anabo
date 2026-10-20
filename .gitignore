@@ -49,3 +49,8 @@ next-env.d.ts
 uploads/
 deploy-roadtrip.tar.gz
 deploy-roadtrip/
+
+# Backups locaux (gardés sur disque, hors Git)
+roadtrip-deploy-*.tar.gz
+web/next.config.js.bak*
+web/prisma/.env.backup-*
