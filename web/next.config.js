@@ -1,4 +1,5 @@
 const createNextIntlPlugin = require('next-intl/plugin')
+const { PrismaPlugin } = require('@prisma/nextjs-monorepo-workaround-plugin')
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
@@ -12,7 +13,15 @@ const nextConfig = {
       '../node_modules/use-intl/**/*',
       '../node_modules/@formatjs/**/*',
       '../node_modules/negotiator/**/*',
+      '../node_modules/.prisma/client/**/*',
+      '../node_modules/@prisma/client/**/*',
     ],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()]
+    }
+    return config
   },
   images: {
     remotePatterns: [
