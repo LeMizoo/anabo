@@ -1,3 +1,5 @@
+import { isUniqueOtherThanLanguage } from '../../lib/isUniqueOtherThanLanguage'
+
 export default {
   name: 'page',
   title: 'Page',
@@ -18,7 +20,11 @@ export default {
       name: 'slug',
       type: 'slug',
       title: 'URL',
-      options: { source: 'title', maxLength: 96 },
+      options: {
+        source: 'title',
+        maxLength: 96,
+        isUnique: isUniqueOtherThanLanguage,
+      },
       validation: (Rule: any) => Rule.required(),
       group: 'content',
     },

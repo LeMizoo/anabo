@@ -4,6 +4,25 @@ export default {
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
+    
+    // 👇 NOUVEAU : Sélecteur de police pour ce titre spécifique 👇
+    {
+      name: 'titleFont',
+      type: 'string',
+      title: 'Police du titre',
+      description: 'Choisissez la police à utiliser pour ce titre.',
+      options: {
+        list: [
+          { title: 'Par défaut (Sans-serif / Inter)', value: 'font-sans' },
+          { title: 'Élégante (Serif / Playfair)', value: 'font-serif' },
+          { title: 'Moderne (Poppins)', value: 'font-poppins' },
+        ],
+        layout: 'radio', // Affiche des boutons radio au lieu d'un menu déroulant
+      },
+      initialValue: 'font-sans',
+    },
+    // 👆 FIN DU NOUVEAU CHAMP 👆
+
     {
       name: 'content',
       type: 'array',
@@ -17,10 +36,17 @@ export default {
             { title: 'H3', value: 'h3' },
             { title: 'Citation', value: 'blockquote' },
           ],
+          // Listes personnalisées (y compris les coches)
+          lists: [
+            { title: 'Puces', value: 'bullet' },
+            { title: 'Numérotée', value: 'number' },
+            { title: 'Points clés (Coches)', value: 'checkmarks' },
+          ],
           marks: {
             decorators: [
               { title: 'Gras', value: 'strong' },
               { title: 'Italique', value: 'em' },
+              { title: 'Souligné', value: 'underline' },
             ],
             annotations: [
               {
@@ -47,7 +73,7 @@ export default {
     {
       name: 'imagePosition',
       type: 'string',
-      title: 'Position de l\'image',
+      title: "Position de l'image",
       options: {
         list: [
           { title: 'Gauche', value: 'left' },

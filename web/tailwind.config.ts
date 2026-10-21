@@ -38,7 +38,12 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        // On garde 'display' pour Poppins
         display: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        // 👇 On ajoute l'alias exact utilisé dans Sanity 👇
+        poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        // 👇 On ajoute Playfair pour les titres élégants 👇
+        serif: ['var(--font-playfair)', 'Georgia', 'serif'],
       },
       container: {
         center: true,

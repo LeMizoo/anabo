@@ -41,6 +41,7 @@ export interface HeroBlock {
 export interface TextMediaBlock {
   _type: 'textMediaBlock'
   title?: string
+  titleFont?: string // 👈 Ajouté ici
   content?: unknown[]
   image?: SanityImage
   imagePosition?: 'left' | 'right'
