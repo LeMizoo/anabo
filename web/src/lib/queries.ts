@@ -113,6 +113,7 @@ export const pageBySlugQuery = `
 
       _type == "textMediaBlock" => {
         title,
+        titleFont,
         content,
         image{
           ...,
@@ -132,8 +133,8 @@ export const pageBySlugQuery = `
         buttonLabel,
         buttonLink,
         variant
-      }
-,
+      },
+
       _type == "contactFormBlock" => {
         title,
         description,
@@ -158,5 +159,29 @@ export const featuredTestimonialQuery = `
     source,
     date,
     featured
+  }
+`
+
+// 👇 NOUVELLE REQUÊTE POUR LA PAGE TOUR IDEAS 👇
+export const tourIdeasQuery = `
+  *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(pageType desc, title asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    pageType,
+    excerpt,
+    featuredImage{
+      ...,
+      asset->,
+      alt
+    }
+  }
+`
+
+// 👇 NOUVELLE REQUÊTE POUR LE MENU DÉROULANT DU FORMULAIRE 👇
+export const circuitsQuery = `
+  *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
+    "slug": slug.current,
+    title
   }
 `

@@ -41,7 +41,7 @@ export interface HeroBlock {
 export interface TextMediaBlock {
   _type: 'textMediaBlock'
   title?: string
-  titleFont?: string // 👈 Ajouté ici
+  titleFont?: string
   content?: unknown[]
   image?: SanityImage
   imagePosition?: 'left' | 'right'
@@ -117,4 +117,10 @@ export interface Testimonial {
   source?: string
   date?: string
   featured?: boolean
+}
+
+// 👇 NOUVEAU TYPE POUR LE MENU DÉROULANT 👇
+export interface Circuit {
+  slug: string
+  title: string
 }

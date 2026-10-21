@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import { sanityClient } from '@/lib/sanity'
-import { pageBySlugQuery } from '@/lib/queries'
+import { pageBySlugQuery, circuitsQuery } from '@/lib/queries' // 👈 Ajout de circuitsQuery
 import { locales, type Locale } from '@/lib/i18n'
-import type { Page } from '@/lib/types'
+import type { Page, Circuit } from '@/lib/types' // 👈 Ajout de Circuit
 import { PageRenderer } from '@/components/pages/PageRenderer'
 
 type Props = {
@@ -87,5 +87,9 @@ export default async function PageBySlug({ params }: Props) {
     notFound()
   }
 
-  return <PageRenderer modules={page.modules} />
+  // 👇 NOUVEAU : Récupération des circuits pour le formulaire
+  const circuits = await sanityClient.fetch<Circuit[]>(circuitsQuery, { locale })
+
+  // 👇 On passe les circuits au PageRenderer
+  return <PageRenderer modules={page.modules} circuits={circuits} />
 }

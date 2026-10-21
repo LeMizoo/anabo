@@ -1,4 +1,4 @@
-import type { PageModule } from '@/lib/types'
+import type { PageModule, Circuit } from '@/lib/types' // 👈 Ajout de Circuit
 import { HeroSection } from './HeroSection'
 import { TextMediaSection } from './TextMediaSection'
 import { CtaSection } from './CtaSection'
@@ -6,9 +6,10 @@ import { ContactForm } from './ContactForm'
 
 type Props = {
   modules?: PageModule[] | null
+  circuits?: Circuit[] // 👈 Ajout de la prop optionnelle
 }
 
-export function PageRenderer({ modules }: Props) {
+export function PageRenderer({ modules, circuits = [] }: Props) {
   const safeModules = Array.isArray(modules) ? modules : []
 
   return (
@@ -25,7 +26,8 @@ export function PageRenderer({ modules }: Props) {
             return <CtaSection key={index} block={module} />
 
           case 'contactFormBlock':
-            return <ContactForm key={index} block={module} />
+            // 👇 On passe les circuits au formulaire
+            return <ContactForm key={index} block={module} circuits={circuits} />
 
           default:
             return null
