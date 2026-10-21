@@ -5,13 +5,15 @@ import { CtaSection } from './CtaSection'
 import { ContactForm } from './ContactForm'
 
 type Props = {
-  modules?: PageModule[]
+  modules?: PageModule[] | null
 }
 
-export function PageRenderer({ modules = [] }: Props) {
+export function PageRenderer({ modules }: Props) {
+  const safeModules = Array.isArray(modules) ? modules : []
+
   return (
     <>
-      {modules.map((module, index) => {
+      {safeModules.map((module, index) => {
         switch (module._type) {
           case 'heroBlock':
             return <HeroSection key={index} block={module} />
