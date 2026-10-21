@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
+import { sendQuoteEmails } from '@/lib/email'
 
 export const runtime = 'nodejs'
 
@@ -117,6 +118,28 @@ export async function POST(request: Request) {
       },
     })
 
+    // Envoi des e-mails (ne bloque pas la réponse en cas d'échec Resend)
+    try {
+      await sendQuoteEmails({
+        reference: quote.reference,
+        locale: data.locale,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        country: data.country || null,
+        circuitSlug: data.circuitSlug || null,
+        circuitTitle: data.circuitTitle || null,
+        startDate,
+        endDate,
+        adults: data.adults,
+        children: data.children,
+        message: data.message || null,
+      })
+    } catch (emailErr) {
+      console.error('[api/quotes] Email send failed:', emailErr)
+    }
+
     return NextResponse.json(
       {
         success: true,
@@ -125,7 +148,8 @@ export async function POST(request: Request) {
       },
       { status: 201 },
     )
-  } catch {
+  } catch (err) {
+    console.error('[api/quotes] Prisma error:', err)
     return NextResponse.json(
       { error: 'Impossible d’enregistrer la demande pour le moment.' },
       { status: 500 },
