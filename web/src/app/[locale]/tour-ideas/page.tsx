@@ -5,9 +5,20 @@ import { sanityClient, getImageUrl } from '@/lib/sanity'
 import { tourIdeasQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
+import type { SanityImage } from '@/lib/types' // 👈 Import du type
 
 type Props = {
   params: Promise<{ locale: string }>
+}
+
+// 👈 On définit un type pour la réponse de Sanity au lieu de "any"
+type TourIdea = {
+  _id: string
+  title: string
+  slug: string
+  pageType: string
+  excerpt?: string
+  featuredImage?: SanityImage
 }
 
 export default async function TourIdeasPage({ params }: Props) {
@@ -17,11 +28,10 @@ export default async function TourIdeasPage({ params }: Props) {
   const locale = localeParam as Locale
   setRequestLocale(locale)
 
-  const tours = await sanityClient.fetch<any[]>(tourIdeasQuery, { locale })
+  const tours = await sanityClient.fetch<TourIdea[]>(tourIdeasQuery, { locale })
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
-      {/* En-tête */}
       <div className="bg-white py-16 text-center">
         <h1 className="text-4xl font-serif text-[#06245F] md:text-5xl">Idées de circuits à Madagascar</h1>
         <p className="mx-auto mt-6 max-w-3xl text-gray-600">
@@ -29,7 +39,6 @@ export default async function TourIdeasPage({ params }: Props) {
         </p>
       </div>
 
-      {/* Grille des cartes */}
       <div className="container-custom mx-auto mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {tours.map((tour) => (
           <Link 
@@ -47,7 +56,7 @@ export default async function TourIdeasPage({ params }: Props) {
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gray-200 text-gray-400">
-                  Pas d'image
+                  Pas d&apos;image {/* 👈 Correction de l'apostrophe */}
                 </div>
               )}
             </div>

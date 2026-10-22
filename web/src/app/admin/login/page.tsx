@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { Suspense, useState, type FormEvent } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function AdminLoginPage() {
+// 1. On crée un composant séparé pour le formulaire
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/admin/demandes'
@@ -88,5 +89,18 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+// 2. Le composant principal (page) enveloppe le formulaire dans Suspense
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gray-100">
+        <p className="text-gray-500">Chargement...</p>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }

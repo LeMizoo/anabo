@@ -32,7 +32,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        // Mettre à jour la date de dernière connexion
         await prisma.adminUser.update({
           where: { id: user.id },
           data: { lastLoginAt: new Date() },
@@ -50,15 +49,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role
+        // 👈 On étend le type natif de NextAuth pour éviter le any
+        token.role = (user as { role?: string }).role
         token.id = user.id
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = token.role
-        ;(session.user as any).id = token.id
+        // 👈 On étend le type natif de NextAuth pour éviter le any
+        ;(session.user as { role?: string }).role = token.role as string
+        ;(session.user as { id?: string }).id = token.id as string
       }
       return session
     },
