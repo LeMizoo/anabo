@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { sanityClient } from '@/lib/sanity'
@@ -34,17 +35,22 @@ export async function Footer() {
     <footer className="border-t bg-gray-950 text-white">
       <div className="container-custom py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          
+          {/* Logo et description */}
           <div className="lg:col-span-2">
             <Link
               href={`/${locale}`}
-              className="inline-flex items-baseline"
+              className="inline-block"
             >
-              <span className="text-2xl font-bold tracking-tight text-white">
-                ANABO
-              </span>
-              <span className="ml-1 text-sm font-medium tracking-wide text-gray-400">
-                ROADTRIP
-              </span>
+              <Image
+                src="/images/logo.svg"
+                alt="ANABO ROADTRIP"
+                width={180}
+                height={60}
+                className="h-16 w-auto object-contain brightness-0 invert" 
+                /* Note: brightness-0 invert rend le logo blanc pour le fond noir. 
+                   Supprimez cette classe si votre logo est déjà clair. */
+              />
             </Link>
 
             {tagline && (
@@ -60,6 +66,7 @@ export async function Footer() {
             )}
           </div>
 
+          {/* Liens de navigation */}
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wider">
               {t('navigation')}
@@ -78,6 +85,7 @@ export async function Footer() {
             </nav>
           </div>
 
+          {/* Contact */}
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wider">
               {t('contact')}
@@ -114,6 +122,7 @@ export async function Footer() {
           </div>
         </div>
 
+        {/* Copyright */}
         <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {siteName}

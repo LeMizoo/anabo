@@ -1,3 +1,4 @@
+import 'flag-icons/css/flag-icons.min.css'
 import type { Metadata } from 'next'
 import './globals.css'
 import { inter, poppins, playfair } from '@/lib/fonts'
@@ -20,7 +21,6 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    // 👇 Ajout de playfair.variable ici 👇
     <html lang="fr" className={`${inter.variable} ${poppins.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
@@ -16,10 +17,11 @@ const navigation = [
   { key: 'contact', href: '/contact' },
 ]
 
+// 👇 Modification ici : Drapeau UK pour l'anglais
 const locales = [
-  { code: 'en', label: 'EN' },
-  { code: 'fr', label: 'FR' },
-  { code: 'it', label: 'IT' },
+  { code: 'en', label: 'EN', flagClass: 'fi fi-gb' }, 
+  { code: 'fr', label: 'FR', flagClass: 'fi fi-fr' },
+  { code: 'it', label: 'IT', flagClass: 'fi fi-it' },
 ]
 
 export function Header() {
@@ -46,19 +48,24 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur">
       <div className="container-custom">
         <div className="flex h-20 items-center justify-between">
+          
+          {/* Logo */}
           <Link
             href={getHref('')}
             className="flex items-center"
             onClick={() => setMobileOpen(false)}
           >
-            <span className="font-display text-xl font-bold tracking-tight text-primary-700 sm:text-2xl">
-              ANABO
-            </span>
-            <span className="ml-1 text-sm font-medium tracking-wide text-gray-500">
-              ROADTRIP
-            </span>
+            <Image
+              src="/images/logo.svg"
+              alt="ANABO ROADTRIP"
+              width={150}
+              height={50}
+              className="h-12 w-auto object-contain"
+              priority
+            />
           </Link>
 
+          {/* Navigation Desktop */}
           <nav className="hidden items-center gap-6 lg:flex">
             {navigation.map((item) => {
               const href = getHref(item.href)
@@ -84,6 +91,7 @@ export function Header() {
             })}
           </nav>
 
+          {/* Langues Desktop */}
           <div className="hidden items-center gap-2 lg:flex">
             {locales.map((locale) => {
               const active = currentLocale === locale.code
@@ -93,18 +101,20 @@ export function Header() {
                   key={locale.code}
                   href={changeLocale(locale.code)}
                   className={cn(
-                    'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                    'flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
                     active
                       ? 'bg-primary-600 text-white'
                       : 'text-gray-600 hover:bg-gray-100',
                   )}
                 >
+                  <span className={cn(locale.flagClass, 'rounded-sm')} style={{ width: '18px', height: '13px', backgroundSize: 'cover' }}></span>
                   {locale.label}
                 </Link>
               )
             })}
           </div>
 
+          {/* Bouton Burger Mobile */}
           <button
             type="button"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -120,6 +130,7 @@ export function Header() {
           </button>
         </div>
 
+        {/* Menu Mobile */}
         {mobileOpen && (
           <div className="border-t py-4 lg:hidden">
             <nav className="flex flex-col">
@@ -158,12 +169,13 @@ export function Header() {
                     href={changeLocale(locale.code)}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      'rounded-full px-4 py-2 text-xs font-semibold',
+                      'flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold',
                       active
                         ? 'bg-primary-600 text-white'
                         : 'bg-gray-100 text-gray-700',
                     )}
                   >
+                    <span className={cn(locale.flagClass, 'rounded-sm')} style={{ width: '18px', height: '13px', backgroundSize: 'cover' }}></span>
                     {locale.label}
                   </Link>
                 )

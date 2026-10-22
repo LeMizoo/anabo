@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import { sanityClient } from '@/lib/sanity'
-import { pageBySlugQuery, circuitsQuery } from '@/lib/queries' // 👈 Ajout de circuitsQuery
+import { pageBySlugQuery, circuitsQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
-import type { Page, Circuit } from '@/lib/types' // 👈 Ajout de Circuit
+import type { Page, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 
 type Props = {
@@ -15,10 +15,11 @@ type Props = {
 }
 
 async function getPage(slug: string, locale: Locale) {
-  return sanityClient.fetch<Page | null>(pageBySlugQuery, {
-    slug,
-    locale,
-  })
+  return sanityClient.fetch<Page | null>(
+    pageBySlugQuery,
+    { slug, locale },
+    { cache: 'no-store' } // 👈 Ajout crucial pour ne pas perdre les mises à jour
+  )
 }
 
 export async function generateMetadata({
@@ -87,9 +88,22 @@ export default async function PageBySlug({ params }: Props) {
     notFound()
   }
 
-  // 👇 NOUVEAU : Récupération des circuits pour le formulaire
-  const circuits = await sanityClient.fetch<Circuit[]>(circuitsQuery, { locale })
+  // Récupération des circuits pour le formulaire
+  let circuits = await sanityClient.fetch<Circuit[]>(
+    circuitsQuery,
+    { locale },
+    { cache: 'no-store' }
+  )
 
-  // 👇 On passe les circuits au PageRenderer
+  // 👇 SÉCURITÉ : Si aucun circuit n'est trouvé dans la langue actuelle (ex: EN ou IT),
+  // on va chercher les circuits en FR pour que le menu s'affiche quand même.
+  if (!circuits || circuits.length === 0) {
+    circuits = await sanityClient.fetch<Circuit[]>(
+      circuitsQuery,
+      { locale: 'fr' },
+      { cache: 'no-store' }
+    )
+  }
+
   return <PageRenderer modules={page.modules} circuits={circuits} />
 }
