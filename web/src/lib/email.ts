@@ -2,13 +2,11 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-// Expéditeur : adresse de test Resend (obligatoire avant vérification du domaine)
-const FROM_EMAIL = process.env.NODE_ENV === 'production' 
-  ? 'ANABO Roadtrip <onboarding@resend.dev>'
-  : 'ANABO Roadtrip <onboarding@resend.dev>'
+// 1. CORRECTION : On utilise votre domaine vérifié au lieu de onboarding@resend.dev
+const FROM_EMAIL = 'ANABO Roadtrip <contact@anabo.mg>'
 
-// Destinataire des notifications internes
-const ADMIN_EMAIL = process.env.CONTACT_EMAIL || 'mytrip.mada@gmail.com'
+// 2. CORRECTION : On met votre vraie adresse de réception par défaut
+const ADMIN_EMAIL = process.env.CONTACT_EMAIL || 'contact@anabo.mg'
 
 type QuoteData = {
   reference: string
@@ -99,11 +97,12 @@ function buildClientEmail(data: QuoteData) {
 export async function sendQuoteEmails(data: QuoteData) {
   const errors: string[] = []
 
-  // 1. Notification admin
+  // 1. Notification admin (vers contact@anabo.mg)
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
+      replyTo: data.email, // TRÈS UTILE : Si vous cliquez sur "Répondre", ça répondra directement au client !
       subject: `[ANABO] Nouvelle demande de devis — ${data.reference}`,
       html: buildAdminEmail(data),
     })
@@ -117,6 +116,7 @@ export async function sendQuoteEmails(data: QuoteData) {
     await resend.emails.send({
       from: FROM_EMAIL,
       to: data.email,
+      replyTo: ADMIN_EMAIL, // Si le client répond, ça vous arrive sur contact@anabo.mg
       subject: clientEmail.subject,
       html: clientEmail.html,
     })

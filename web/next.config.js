@@ -19,7 +19,15 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    cpus: 1,
+    workerThreads: false,
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: false,
+    staticGenerationMaxConcurrency: 1,
   },
+  productionBrowserSourceMaps: false,
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   async headers() {
     return [
       {

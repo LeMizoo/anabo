@@ -15,6 +15,10 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
+// Les pages sont régénérées toutes les 5 minutes : le contenu Sanity
+// (footer, coordonnées, etc.) se met à jour sans rebuild.
+export const revalidate = 300
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
 }

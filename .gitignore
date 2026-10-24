@@ -54,3 +54,8 @@ deploy-roadtrip/
 roadtrip-deploy-*.tar.gz
 web/next.config.js.bak*
 web/prisma/.env.backup-*
+
+# Builds et sauvegardes
+*.tar.gz
+.env*.bak
+.env.local.off
