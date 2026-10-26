@@ -25,6 +25,17 @@ type QuoteData = {
   message?: string | null
 }
 
+// Fonction de sécurité pour échapper les caractères HTML
+function escapeHtml(unsafe: string | null | undefined): string {
+  if (!unsafe) return ''
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 function formatDate(date?: Date | null): string {
   if (!date) return '—'
   return new Intl.DateTimeFormat('fr-FR', {
@@ -36,21 +47,21 @@ function formatDate(date?: Date | null): string {
 
 function buildAdminEmail(data: QuoteData) {
   return `
-    <h2>Nouvelle demande de devis — ${data.reference}</h2>
-    <p><strong>Langue :</strong> ${data.locale.toUpperCase()}</p>
-    <p><strong>Client :</strong> ${data.firstName} ${data.lastName}</p>
-    <p><strong>E-mail :</strong> <a href="mailto:${data.email}">${data.email}</a></p>
-    <p><strong>Téléphone :</strong> ${data.phone}</p>
-    <p><strong>Pays :</strong> ${data.country || '—'}</p>
+    <h2>Nouvelle demande de devis — ${escapeHtml(data.reference)}</h2>
+    <p><strong>Langue :</strong> ${escapeHtml(data.locale.toUpperCase())}</p>
+    <p><strong>Client :</strong> ${escapeHtml(data.firstName)} ${escapeHtml(data.lastName)}</p>
+    <p><strong>E-mail :</strong> <a href="mailto:${escapeHtml(data.email)}">${escapeHtml(data.email)}</a></p>
+    <p><strong>Téléphone :</strong> ${escapeHtml(data.phone)}</p>
+    <p><strong>Pays :</strong> ${escapeHtml(data.country) || '—'}</p>
     <hr />
-    <p><strong>Circuit :</strong> ${data.circuitTitle || data.circuitSlug || '—'}</p>
+    <p><strong>Circuit :</strong> ${escapeHtml(data.circuitTitle) || escapeHtml(data.circuitSlug) || '—'}</p>
     <p><strong>Dates :</strong> ${formatDate(data.startDate)} → ${formatDate(data.endDate)}</p>
     <p><strong>Voyageurs :</strong> ${data.adults} adulte(s), ${data.children} enfant(s)</p>
     <hr />
     <p><strong>Message :</strong></p>
-    <p>${data.message ? data.message.replace(/\n/g, '<br />') : '—'}</p>
+    <p>${data.message ? escapeHtml(data.message).replace(/\n/g, '<br />') : '—'}</p>
     <hr />
-    <p style="color:#888;font-size:12px;">Référence : ${data.reference}</p>
+    <p style="color:#888;font-size:12px;">Référence : ${escapeHtml(data.reference)}</p>
   `
 }
 
@@ -63,26 +74,26 @@ function buildClientEmail(data: QuoteData) {
 
   const bodies: Record<string, (d: QuoteData) => string> = {
     fr: (d) => `
-      <p>Bonjour ${d.firstName},</p>
+      <p>Bonjour ${escapeHtml(d.firstName)},</p>
       <p>Nous avons bien reçu votre demande de devis et vous remercions de votre confiance.</p>
-      <p><strong>Référence :</strong> ${d.reference}</p>
-      ${d.circuitTitle ? `<p><strong>Circuit :</strong> ${d.circuitTitle}</p>` : ''}
+      <p><strong>Référence :</strong> ${escapeHtml(d.reference)}</p>
+      ${d.circuitTitle ? `<p><strong>Circuit :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Notre équipe vous répondra sous 24 à 48 heures ouvrées.</p>
       <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>
     `,
     en: (d) => `
-      <p>Hello ${d.firstName},</p>
+      <p>Hello ${escapeHtml(d.firstName)},</p>
       <p>We have received your quote request and thank you for your trust.</p>
-      <p><strong>Reference:</strong> ${d.reference}</p>
-      ${d.circuitTitle ? `<p><strong>Tour:</strong> ${d.circuitTitle}</p>` : ''}
+      <p><strong>Reference:</strong> ${escapeHtml(d.reference)}</p>
+      ${d.circuitTitle ? `<p><strong>Tour:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Our team will reply within 24 to 48 business hours.</p>
       <p>See you soon,<br />The ANABO Roadtrip Madagascar team</p>
     `,
     it: (d) => `
-      <p>Ciao ${d.firstName},</p>
+      <p>Ciao ${escapeHtml(d.firstName)},</p>
       <p>Abbiamo ricevuto la tua richiesta di preventivo e ti ringraziamo per la fiducia.</p>
-      <p><strong>Riferimento:</strong> ${d.reference}</p>
-      ${d.circuitTitle ? `<p><strong>Tour:</strong> ${d.circuitTitle}</p>` : ''}
+      <p><strong>Riferimento:</strong> ${escapeHtml(d.reference)}</p>
+      ${d.circuitTitle ? `<p><strong>Tour:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Il nostro team risponderà entro 24-48 ore lavorative.</p>
       <p>A presto,<br />Il team ANABO Roadtrip Madagascar</p>
     `,
@@ -103,7 +114,7 @@ export async function sendQuoteEmails(data: QuoteData) {
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       replyTo: data.email, // TRÈS UTILE : Si vous cliquez sur "Répondre", ça répondra directement au client !
-      subject: `[ANABO] Nouvelle demande de devis — ${data.reference}`,
+      subject: `[ANABO] Nouvelle demande de devis — ${escapeHtml(data.reference)}`,
       html: buildAdminEmail(data),
     })
   } catch (err) {
