@@ -11,6 +11,7 @@ import tripadvisorBlock from './objects/blocks/tripadvisorBlock'
 import ctaBlock from './objects/blocks/ctaBlock'
 import faqBlock from './objects/blocks/faqBlock'
 import contactFormBlock from './objects/blocks/contactFormBlock'
+import slider3dBlock from './objects/blocks/slider3dBlock'
 
 export const schemaTypes = [
   page,
@@ -25,4 +26,5 @@ export const schemaTypes = [
   ctaBlock,
   faqBlock,
   contactFormBlock,
+  slider3dBlock,
 ]

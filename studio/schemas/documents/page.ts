@@ -102,6 +102,7 @@ export default {
         { type: 'ctaBlock' },
         { type: 'faqBlock' },
         { type: 'contactFormBlock' },
+        { type: 'slider3dBlock' },
       ],
       group: 'content',
     },

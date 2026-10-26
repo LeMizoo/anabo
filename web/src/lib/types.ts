@@ -65,11 +65,29 @@ export interface ContactFormBlock {
   showWhatsapp?: boolean
 }
 
+export interface Slider3DSlide {
+  title?: string
+  subtitle?: string
+  alt?: string
+  linkLabel?: string
+  linkUrl?: string
+  imageUrl?: string
+}
+
+export interface Slider3DBlock {
+  _type: 'slider3dBlock'
+  title?: string
+  autoplay?: boolean
+  interval?: number
+  slides?: Slider3DSlide[]
+}
+
 export type PageModule =
   | HeroBlock
   | TextMediaBlock
   | CtaBlock
   | ContactFormBlock
+  | Slider3DBlock
 
 export interface PageSeo {
   metaTitle?: string
@@ -104,7 +122,7 @@ export interface HomePage {
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
-  modules?: HeroBlock[]
+  modules?: (HeroBlock | Slider3DBlock | ContactFormBlock)[]
 }
 
 export interface Testimonial {

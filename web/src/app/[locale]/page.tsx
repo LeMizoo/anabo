@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { HomeHero } from '@/components/home/HomeHero'
+import { PageRenderer } from '@/components/pages/PageRenderer'
 import { sanityClient } from '@/lib/sanity'
 import { homePageQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
-import type { HomePage } from '@/lib/types'
+import type { HomePage, HeroBlock } from '@/lib/types'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -46,7 +47,11 @@ export default async function HomePage({ params }: Props) {
   )
 
   const hero = homePage?.modules?.find(
-    (module) => module._type === 'heroBlock',
+    (module): module is HeroBlock => module._type === 'heroBlock',
+  )
+
+  const otherModules = (homePage?.modules ?? []).filter(
+    (module) => module._type !== 'heroBlock',
   )
 
   if (!hero) {
@@ -62,5 +67,10 @@ export default async function HomePage({ params }: Props) {
     )
   }
 
-  return <HomeHero hero={hero} />
+  return (
+    <>
+      <HomeHero hero={hero} />
+      <PageRenderer modules={otherModules} />
+    </>
+  )
 }

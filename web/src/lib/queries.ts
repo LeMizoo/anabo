@@ -57,6 +57,27 @@ export const homePageQuery = `
           label,
           link
         }
+      },
+
+      _type == "slider3dBlock" => {
+        title,
+        autoplay,
+        interval,
+        slides[]{
+          title,
+          subtitle,
+          alt,
+          linkLabel,
+          linkUrl,
+          "imageUrl": image.asset->url
+        }
+      },
+
+      _type == "contactFormBlock" => {
+        title,
+        description,
+        formType,
+        showWhatsapp
       }
     }
   }
@@ -140,6 +161,20 @@ export const pageBySlugQuery = `
         description,
         formType,
         showWhatsapp
+      },
+
+      _type == "slider3dBlock" => {
+        title,
+        autoplay,
+        interval,
+        slides[]{
+          title,
+          subtitle,
+          alt,
+          linkLabel,
+          linkUrl,
+          "imageUrl": image.asset->url
+        }
       }
     }
   }
