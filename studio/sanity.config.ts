@@ -1,7 +1,7 @@
-
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import { assist } from '@sanity/assist'
 import { schemaTypes } from './schemas/schema'
 
 export default defineConfig({
@@ -12,6 +12,14 @@ export default defineConfig({
   plugins: [
     structureTool(),
     visionTool({ defaultApiVersion: '2024-10-06' }),
+    assist({
+      translate: {
+        document: {
+          languageField: 'language',
+          documentTypes: ['page'],
+        },
+      },
+    }),
   ],
   schema: {
     types: schemaTypes,
