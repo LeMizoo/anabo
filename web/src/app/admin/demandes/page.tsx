@@ -1,97 +1,156 @@
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminDemandesPage() {
-  const session = await auth()
-  
-  if (!session) {
-    redirect('/admin/login')
-  }
+// Nombre d'éléments par page
+const ITEMS_PER_PAGE = 10
 
-  const quotes = await prisma.quoteRequest.findMany({
-    orderBy: { createdAt: 'desc' },
-  })
+type Props = {
+  searchParams: Promise<{ page?: string }>
+}
+
+export default async function AdminDemandesPage({ searchParams }: Props) {
+  const session = await auth()
+  if (!session) redirect('/admin/login')
+
+  // Récupération du numéro de page depuis l'URL (par défaut page 1)
+  const { page } = await searchParams
+  const currentPage = Math.max(1, Number(page) || 1)
+
+  // Calcul des éléments à ignorer pour Prisma
+  const skip = (currentPage - 1) * ITEMS_PER_PAGE
+
+  // Récupération des données paginées et du total
+  const [quotes, totalQuotes] = await Promise.all([
+    prisma.quoteRequest.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: ITEMS_PER_PAGE,
+    }),
+    prisma.quoteRequest.count(),
+  ])
+
+  const totalPages = Math.ceil(totalQuotes / ITEMS_PER_PAGE)
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="mx-auto max-w-6xl">
+        {/* 👇 En-tête avec bouton de déconnexion 👇 */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#06245F]">Demandes de devis</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-2xl font-bold text-[#06245F]">Demandes de devis</h1>
+            <p className="mt-1 text-sm text-gray-500">
               Connecté en tant que <strong>{session.user?.name}</strong> ({session.user?.email})
             </p>
           </div>
+          
           <form action={async () => {
             'use server'
             const { signOut } = await import('@/lib/auth')
             await signOut({ redirectTo: '/admin/login' })
           }}>
-            <button className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">
+            <button className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 sm:w-auto">
               Déconnexion
             </button>
           </form>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-100 text-gray-700">
-              <tr>
-                <th className="px-4 py-3">Référence</th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Client</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3">Circuit</th>
-                <th className="px-4 py-3">Voyageurs</th>
-                <th className="px-4 py-3">Statut</th>
-                <th className="px-4 py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {quotes.length === 0 && (
+        {/* Tableau avec défilement horizontal */}
+        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full min-w-[800px] text-left text-sm text-gray-500">
+              <thead className="bg-gray-50 text-xs uppercase text-gray-700">
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                    Aucune demande pour le moment.
-                  </td>
+                  <th className="px-4 py-3 whitespace-nowrap">Référence</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Date</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Client</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Circuit</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Voyageurs</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Statut</th>
+                  <th className="px-4 py-3 text-right whitespace-nowrap">Action</th>
                 </tr>
-              )}
-              {quotes.map((q) => (
-                <tr key={q.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono text-xs">{q.reference}</td>
-                  <td className="px-4 py-3">{new Date(q.createdAt).toLocaleDateString('fr-FR')}</td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{q.firstName} {q.lastName}</div>
-                    <div className="text-xs text-gray-500">{q.country || '—'}</div>
-                  </td>
-                  <td className="px-4 py-3 text-xs">
-                    <div>{q.email}</div>
-                    <div>{q.phone}</div>
-                  </td>
-                  <td className="px-4 py-3 text-xs">
-                    {q.circuitTitle || q.circuitSlug || '—'}
-                  </td>
-                  <td className="px-4 py-3 text-xs">
-                    {q.adults} ad. / {q.children} enf.
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
-                      {q.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/demandes/${q.id}`} className="text-blue-600 hover:underline">
-                      Voir
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {quotes.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                      Aucune demande pour le moment.
+                    </td>
+                  </tr>
+                ) : (
+                  quotes.map((quote) => (
+                    <tr key={quote.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{quote.reference}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {new Date(quote.createdAt).toLocaleDateString('fr-FR')}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-gray-900">{quote.firstName} {quote.lastName}</div>
+                        <div className="text-xs text-gray-500 truncate max-w-[150px]" title={quote.email}>
+                          {quote.email}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 max-w-[200px] truncate" title={quote.circuitTitle || quote.circuitSlug || ''}>
+                        {quote.circuitTitle || quote.circuitSlug || '—'}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {quote.adults} ad. / {quote.children} enf.
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 whitespace-nowrap">
+                          {quote.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          href={`/admin/demandes/${quote.id}`}
+                          className="font-medium text-blue-600 hover:underline"
+                        >
+                          Voir
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p className="text-sm text-gray-600">
+              Page <span className="font-medium">{currentPage}</span> sur <span className="font-medium">{totalPages}</span>
+              {' '}({totalQuotes} demandes au total)
+            </p>
+            <div className="flex gap-2">
+              <Link
+                href={`/admin/demandes?page=${currentPage - 1}`}
+                className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition ${
+                  currentPage <= 1
+                    ? 'pointer-events-none bg-gray-100 text-gray-400'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Précédent
+              </Link>
+              <Link
+                href={`/admin/demandes?page=${currentPage + 1}`}
+                className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition ${
+                  currentPage >= totalPages
+                    ? 'pointer-events-none bg-gray-100 text-gray-400'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Suivant
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
