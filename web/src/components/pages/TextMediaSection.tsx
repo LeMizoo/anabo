@@ -1,6 +1,9 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
+import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
@@ -69,14 +72,20 @@ export function TextMediaSection({ block }: Props) {
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
   const imageFirst = block.imagePosition === 'left'
   const titleFontClass = block.titleFont || 'font-sans'
-
-  // Si le bloc n'a pas d'image, on centre le texte mais on lui laisse plus de place (max-w-5xl)
   const isTextOnly = !imageUrl
 
   return (
-    <section className="container-custom py-16 md:py-24">
-      <div className={`grid items-start gap-10 ${isTextOnly ? 'max-w-5xl mx-auto' : 'md:grid-cols-2'}`}>
-        <div className={imageFirst ? 'md:order-2' : 'md:order-1'}>
+    <section className="container-custom py-16 md:py-24 overflow-hidden">
+      <div className={`grid items-center gap-10 md:gap-16 ${isTextOnly ? 'max-w-5xl mx-auto' : 'md:grid-cols-2'}`}>
+        
+        {/* Bloc Texte avec animation */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className={imageFirst ? 'md:order-2' : 'md:order-1'}
+        >
           {block.title && (
             <h2 className={`text-3xl font-bold text-[#06245F] md:text-4xl ${titleFontClass}`}>
               {block.title}
@@ -84,7 +93,6 @@ export function TextMediaSection({ block }: Props) {
           )}
 
           {block.content && block.content.length > 0 && (
-            // 👇 On retire 'max-w-prose', le texte prendra toute la largeur de son conteneur
             <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed">
               <PortableText
                 value={block.content as never}
@@ -102,20 +110,27 @@ export function TextMediaSection({ block }: Props) {
               {block.cta.label}
             </Link>
           )}
-        </div>
+        </motion.div>
 
+        {/* Bloc Image avec animation */}
         {imageUrl && (
-          <div className={imageFirst ? 'md:order-1' : 'md:order-2'}>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+          <motion.div 
+            initial={{ opacity: 0, x: imageFirst ? -40 : 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+            className={imageFirst ? 'md:order-1' : 'md:order-2'}
+          >
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl">
               <Image
                 src={imageUrl}
                 alt={block.image?.alt || ''}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
+                className="object-cover transition-transform duration-700 hover:scale-105"
               />
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

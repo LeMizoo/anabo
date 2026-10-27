@@ -27,6 +27,43 @@ export interface PageCta {
   link?: string
 }
 
+// 👇 NOUVEAUX TYPES POUR LES BLOCS 👇
+export interface PuzzleItem {
+  _key: string
+  image: SanityImage
+  size: 'small' | 'wide' | 'tall' | 'large'
+  caption?: string
+}
+
+export interface PuzzleGalleryBlock {
+  _type: 'puzzleGalleryBlock'
+  title?: string
+  items?: PuzzleItem[]
+}
+
+export interface AlternatingBlock {
+  _type: 'alternatingBlock'
+  title: string
+  subtitle?: string
+  content?: unknown[]
+  image?: SanityImage
+  imagePosition?: 'left' | 'right'
+  backgroundColor?: 'white' | 'cream'
+}
+
+export interface FeaturesBlock {
+  _type: 'featuresBlock'
+  title?: string
+  content?: string
+  features?: {
+    _key: string
+    title: string
+    description: string
+    icon?: string
+  }[]
+}
+// 👇 FIN DES NOUVEAUX TYPES 👇
+
 export interface HeroBlock {
   _type: 'heroBlock'
   title: string
@@ -82,12 +119,16 @@ export interface Slider3DBlock {
   slides?: Slider3DSlide[]
 }
 
+// 👇 MISE À JOUR DE L'UNION PAGE MODULE 👇
 export type PageModule =
   | HeroBlock
   | TextMediaBlock
   | CtaBlock
   | ContactFormBlock
   | Slider3DBlock
+  | PuzzleGalleryBlock
+  | AlternatingBlock
+  | FeaturesBlock
 
 export interface PageSeo {
   metaTitle?: string
@@ -113,6 +154,7 @@ export interface Page {
   modules?: PageModule[]
 }
 
+// 👇 MISE À JOUR DE HOME PAGE POUR ACCEPTER LES NOUVEAUX BLOCS 👇
 export interface HomePage {
   _id: string
   title: string
@@ -122,7 +164,14 @@ export interface HomePage {
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
-  modules?: (HeroBlock | Slider3DBlock | ContactFormBlock)[]
+  modules?: (
+    | HeroBlock
+    | Slider3DBlock
+    | ContactFormBlock
+    | PuzzleGalleryBlock
+    | AlternatingBlock
+    | FeaturesBlock
+  )[]
 }
 
 export interface Testimonial {

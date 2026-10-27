@@ -12,6 +12,10 @@ import ctaBlock from './objects/blocks/ctaBlock'
 import faqBlock from './objects/blocks/faqBlock'
 import contactFormBlock from './objects/blocks/contactFormBlock'
 import slider3dBlock from './objects/blocks/slider3dBlock'
+// 👇 NOUVEAUX IMPORTS 👇
+import puzzleGalleryBlock from './objects/blocks/puzzleGalleryBlock'
+import alternatingBlock from './objects/blocks/alternatingBlock'
+import featuresBlock from './objects/blocks/featuresBlock'
 
 export const schemaTypes = [
   page,
@@ -27,4 +31,8 @@ export const schemaTypes = [
   faqBlock,
   contactFormBlock,
   slider3dBlock,
+  // 👇 NOUVEAUX BLOCS AJOUTÉS AU TABLEAU 👇
+  puzzleGalleryBlock,
+  alternatingBlock,
+  featuresBlock,
 ]

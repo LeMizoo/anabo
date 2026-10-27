@@ -1,0 +1,25 @@
+export default {
+  name: 'alternatingBlock',
+  title: 'Texte et Image (Alterné)',
+  type: 'object',
+  fields: [
+    { name: 'title', type: 'string', title: 'Titre' },
+    { name: 'subtitle', type: 'string', title: 'Sous-titre (italique)' },
+    { name: 'content', type: 'array', of: [{ type: 'block' }], title: 'Contenu' },
+    { name: 'image', type: 'image', title: 'Image', options: { hotspot: true }, fields: [{ name: 'alt', type: 'string', title: 'Alt' }] },
+    { 
+      name: 'imagePosition', 
+      type: 'string', 
+      title: 'Position de l\'image', 
+      options: { list: [{ title: 'Gauche', value: 'left' }, { title: 'Droite', value: 'right' }], layout: 'radio' },
+      initialValue: 'right'
+    },
+    { 
+      name: 'backgroundColor', 
+      type: 'string', 
+      title: 'Couleur de fond', 
+      options: { list: [{ title: 'Blanc', value: 'white' }, { title: 'Beige', value: 'cream' }], layout: 'radio' },
+      initialValue: 'white'
+    }
+  ]
+}
