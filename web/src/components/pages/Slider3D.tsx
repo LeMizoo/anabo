@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 
 type Slide = {
   title?: string
@@ -22,6 +24,7 @@ type Props = {
 }
 
 export function Slider3D({ block }: Props) {
+  const t = useTranslations('slider')
   const slides = (block.slides ?? []).filter((s) => s.imageUrl)
   const n = slides.length
   const autoplay = block.autoplay ?? true
@@ -30,8 +33,8 @@ export function Slider3D({ block }: Props) {
 
   useEffect(() => {
     if (!autoplay || n < 2) return
-    const t = setInterval(() => setActive((a) => (a + 1) % n), interval * 1000)
-    return () => clearInterval(t)
+    const timer = setInterval(() => setActive((a) => (a + 1) % n), interval * 1000)
+    return () => clearInterval(timer)
   }, [autoplay, interval, n])
 
   if (n === 0) return null
@@ -65,23 +68,27 @@ export function Slider3D({ block }: Props) {
                   pointerEvents: abs > 2 ? 'none' : 'auto',
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={`${s.imageUrl}?w=900&auto=format`}
                   alt={s.alt || s.title || ''}
-                  className="h-full w-full object-cover"
-                  loading={i === 0 ? 'eager' : 'lazy'}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 70vw, 60vw"
+                  priority={i === 0}
                 />
+                
                 {(s.title || s.subtitle) && (
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
                     {s.title && <h3 className="text-xl font-semibold">{s.title}</h3>}
                     {s.subtitle && <p className="mt-1 text-sm">{s.subtitle}</p>}
+                    
+                    {/* 👇 Utilisation de la traduction ici 👇 */}
                     {s.linkUrl && i === active && (
                       <Link
                         href={s.linkUrl}
                         className="mt-3 inline-block text-sm underline"
                       >
-                        {s.linkLabel || 'En savoir plus'}
+                        {s.linkLabel || t('learnMore')}
                       </Link>
                     )}
                   </div>

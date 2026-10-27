@@ -9,7 +9,6 @@ type Props = {
   block: TextMediaBlock
 }
 
-// 1. Définition des composants personnalisés typés pour Portable Text
 const portableTextComponents: PortableTextComponents = {
   list: {
     bullet: ({ children }: { children?: ReactNode }) => (
@@ -71,9 +70,12 @@ export function TextMediaSection({ block }: Props) {
   const imageFirst = block.imagePosition === 'left'
   const titleFontClass = block.titleFont || 'font-sans'
 
+  // Si le bloc n'a pas d'image, on affiche le texte sur toute la largeur (centré)
+  const isTextOnly = !imageUrl
+
   return (
     <section className="container-custom py-16 md:py-24">
-      <div className={`grid items-center gap-10 md:grid-cols-2 ${imageFirst ? '' : ''}`}>
+      <div className={`grid items-center gap-10 ${isTextOnly ? 'max-w-4xl mx-auto' : 'md:grid-cols-2'}`}>
         <div className={imageFirst ? 'md:order-2' : 'md:order-1'}>
           {block.title && (
             <h2 className={`text-3xl font-bold text-[#06245F] md:text-4xl ${titleFontClass}`}>
@@ -82,7 +84,7 @@ export function TextMediaSection({ block }: Props) {
           )}
 
           {block.content && block.content.length > 0 && (
-            <div className="prose mt-6 max-w-none">
+            <div className="prose mt-6 max-w-prose">
               <PortableText
                 value={block.content as never}
                 onMissingComponent={false}

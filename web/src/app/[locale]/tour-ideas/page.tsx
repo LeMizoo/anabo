@@ -1,17 +1,16 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { setRequestLocale } from 'next-intl/server'
+import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { sanityClient, getImageUrl } from '@/lib/sanity'
 import { tourIdeasQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
-import type { SanityImage } from '@/lib/types' // 👈 Import du type
+import type { SanityImage } from '@/lib/types'
 
 type Props = {
   params: Promise<{ locale: string }>
 }
 
-// 👈 On définit un type pour la réponse de Sanity au lieu de "any"
 type TourIdea = {
   _id: string
   title: string
@@ -24,25 +23,27 @@ type TourIdea = {
 export default async function TourIdeasPage({ params }: Props) {
   const { locale: localeParam } = await params
   if (!locales.includes(localeParam as Locale)) notFound()
-  
+
   const locale = localeParam as Locale
   setRequestLocale(locale)
+
+  const t = await getTranslations('tourIdeas')
 
   const tours = await sanityClient.fetch<TourIdea[]>(tourIdeasQuery, { locale })
 
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <div className="bg-white py-16 text-center">
-        <h1 className="text-4xl font-serif text-[#06245F] md:text-5xl">Idées de circuits à Madagascar</h1>
+        <h1 className="text-4xl font-serif text-[#06245F] md:text-5xl">{t('title')}</h1>
         <p className="mx-auto mt-6 max-w-3xl text-gray-600">
-          Découvrez nos suggestions de voyages. Composez un circuit qui correspond parfaitement à vos envies.
+          {t('subtitle')}
         </p>
       </div>
 
       <div className="container-custom mx-auto mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {tours.map((tour) => (
-          <Link 
-            key={tour._id} 
+          <Link
+            key={tour._id}
             href={`/${locale}/${tour.slug}`}
             className="group flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition hover:shadow-xl"
           >
@@ -56,11 +57,11 @@ export default async function TourIdeasPage({ params }: Props) {
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gray-200 text-gray-400">
-                  Pas d&apos;image {/* 👈 Correction de l'apostrophe */}
+                  {t('noImage')}
                 </div>
               )}
             </div>
-            
+
             <div className="flex flex-1 flex-col p-6">
               <h2 className="text-xl font-bold text-[#06245F]">{tour.title}</h2>
               {tour.excerpt && (
@@ -70,7 +71,7 @@ export default async function TourIdeasPage({ params }: Props) {
               )}
               <div className="mt-6">
                 <span className="inline-flex rounded bg-[#E0A01C] px-4 py-2 text-sm font-semibold text-white transition group-hover:bg-[#c98b13]">
-                  {tour.pageType === 'custom-trip' ? 'Créer mon voyage' : 'Plus de détails'}
+                  {tour.pageType === 'custom-trip' ? t('createTrip') : t('details')}
                 </span>
               </div>
             </div>

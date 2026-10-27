@@ -25,5 +25,37 @@
   "metadata": {
     "title": "ANABO Roadtrip Madagascar | Chauffeur-guide",
     "description": "Découvrez Madagascar avec un chauffeur-guide local. Explorez l'île à travers des road trips authentiques et des voyages sur mesure."
+  },
+  "tourIdeas": {
+    "title": "Idées de circuits à Madagascar",
+    "subtitle": "Découvrez nos suggestions de voyages. Composez un circuit qui correspond parfaitement à vos envies.",
+    "createTrip": "Créer mon voyage",
+    "details": "Plus de détails",
+    "noImage": "Pas d'image"
+  },
+  "slider": {
+    "learnMore": "En savoir plus"
+  },
+  "contactForm": {
+    "circuit": "Circuit principal souhaité",
+    "circuitDefault": "Sur-mesure / Je ne sais pas encore",
+    "circuitExtras": "Souhaitez-vous ajouter une extension ?",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Adresse e-mail",
+    "phone": "Téléphone / WhatsApp",
+    "country": "Pays de résidence",
+    "startDate": "Date de départ souhaitée",
+    "endDate": "Date de retour souhaitée",
+    "adults": "Nombre d’adultes",
+    "children": "Nombre d’enfants",
+    "message": "Votre message",
+    "submit": "Envoyer le message",
+    "submitQuote": "Demander un devis",
+    "sending": "Envoi en cours…",
+    "success": "Votre demande a bien été enregistrée.",
+    "reference": "Référence de votre demande",
+    "error": "Une erreur est survenue. Veuillez réessayer.",
+    "required": "Veuillez remplir les champs obligatoires."
   }
 }

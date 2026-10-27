@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import type { ContactFormBlock } from '@/lib/types'
 
 type Circuit = {
@@ -19,45 +20,18 @@ export function ContactForm({ block, circuits = [] }: Props) {
   const firstSegment = pathname.split('/').filter(Boolean)[0]
   const locale = ['fr', 'en', 'it'].includes(firstSegment) ? firstSegment : 'fr'
 
-  const isQuote = block.formType === 'quote'
+  // 👇 Récupération des traductions 👇
+  const t = useTranslations('contactForm')
 
-  const labels = {
-    fr: {
-      circuit: 'Circuit principal souhaité',
-      circuitDefault: 'Sur-mesure / Je ne sais pas encore',
-      circuitExtras: 'Souhaitez-vous ajouter une extension ?',
-      firstName: 'Prénom', lastName: 'Nom', email: 'Adresse e-mail', phone: 'Téléphone / WhatsApp', country: 'Pays de résidence',
-      startDate: 'Date de départ souhaitée', endDate: 'Date de retour souhaitée', adults: 'Nombre d’adultes', children: 'Nombre d’enfants', message: 'Votre message',
-      submit: isQuote ? 'Demander un devis' : 'Envoyer le message', sending: 'Envoi en cours…', success: 'Votre demande a bien été enregistrée.', reference: 'Référence de votre demande', error: 'Une erreur est survenue. Veuillez réessayer.', required: 'Veuillez remplir les champs obligatoires.',
-    },
-    en: {
-      circuit: 'Main desired tour',
-      circuitDefault: 'Tailor-made / I don\'t know yet',
-      circuitExtras: 'Would you like to add an extension?',
-      firstName: 'First name', lastName: 'Last name', email: 'Email address', phone: 'Phone / WhatsApp', country: 'Country of residence',
-      startDate: 'Preferred departure date', endDate: 'Preferred return date', adults: 'Number of adults', children: 'Number of children', message: 'Your message',
-      submit: isQuote ? 'Request a quote' : 'Send message', sending: 'Sending…', success: 'Your request has been saved.', reference: 'Your request reference', error: 'An error occurred. Please try again.', required: 'Please complete the required fields.',
-    },
-    it: {
-      circuit: 'Tour principale desiderato',
-      circuitDefault: 'Su misura / Non lo so ancora',
-      circuitExtras: 'Desideri aggiungere un\'estensione?',
-      firstName: 'Nome', lastName: 'Cognome', email: 'Indirizzo e-mail', phone: 'Telefono / WhatsApp', country: 'Paese di residenza',
-      startDate: 'Data di partenza desiderata', endDate: 'Data di ritorno desiderata', adults: 'Numero di adulti', children: 'Numero di bambini', message: 'Il tuo messaggio',
-      submit: isQuote ? 'Richiedi un preventivo' : 'Invia il messaggio', sending: 'Invio in corso…', success: 'La tua richiesta è stata registrata.', reference: 'Riferimento della richiesta', error: 'Si è verificato un errore. Riprova.', required: 'Compila i campi obbligatori.',
-    },
-  }[locale as 'fr' | 'en' | 'it']
+  const isQuote = block.formType === 'quote'
 
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
   
-  // État pour le menu déroulant principal
   const [selectedCircuit, setSelectedCircuit] = useState('')
-  // État pour les cases à cocher (extensions)
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
 
-  // Gérer les cases à cocher
   const toggleExtraCircuit = (slug: string) => {
     setExtraCircuits(prev => 
       prev.includes(slug) 
@@ -75,11 +49,9 @@ export function ContactForm({ block, circuits = [] }: Props) {
 
     const form = new FormData(formElement)
 
-    // On prépare le titre du circuit principal
     const circuitSlug = String(form.get('circuitSlug') || '')
     let circuitTitle = circuits.find(c => c.slug === circuitSlug)?.title || ''
 
-    // On prépare les extensions
     if (extraCircuits.length > 0) {
       const extraTitles = extraCircuits.map(slug => circuits.find(c => c.slug === slug)?.title).filter(Boolean)
       if (circuitTitle) {
@@ -118,7 +90,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
         const fieldErrors = result.fields
           ? Object.values(result.fields).flat().filter(Boolean).join(' ')
           : ''
-        throw new Error(fieldErrors || result.error || labels.error)
+        throw new Error(fieldErrors || result.error || t('error'))
       }
 
       setReference(result.reference || '')
@@ -126,7 +98,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
       setSelectedCircuit('')
       setExtraCircuits([])
     } catch (err) {
-      setError(err instanceof Error ? err.message : labels.error)
+      setError(err instanceof Error ? err.message : t('error'))
     } finally {
       setSending(false)
     }
@@ -144,24 +116,23 @@ export function ContactForm({ block, circuits = [] }: Props) {
 
           {reference ? (
             <div className="rounded-lg border border-green-200 bg-green-50 p-5 text-green-900" role="status">
-              <p className="font-semibold">{labels.success}</p>
-              <p className="mt-2">{labels.reference}: <strong>{reference}</strong></p>
+              <p className="font-semibold">{t('success')}</p>
+              <p className="mt-2">{t('reference')}: <strong>{reference}</strong></p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               
-              {/* 👇 SÉLECTEUR PRINCIPAL ET EXTENSIONS 👇 */}
               {isQuote && circuits.length > 0 && (
                 <div className="space-y-4 rounded-lg bg-gray-50 p-4 border border-gray-100">
                   <label className="block text-sm font-medium text-gray-700">
-                    {labels.circuit}
+                    {t('circuit')}
                     <select
                       className={inputClass}
                       name="circuitSlug"
                       value={selectedCircuit}
                       onChange={(e) => setSelectedCircuit(e.target.value)}
                     >
-                      <option value="">{labels.circuitDefault}</option>
+                      <option value="">{t('circuitDefault')}</option>
                       {circuits.map((c) => (
                         <option key={c.slug} value={c.slug}>{c.title}</option>
                       ))}
@@ -169,10 +140,9 @@ export function ContactForm({ block, circuits = [] }: Props) {
                   </label>
 
                   <div className="pt-2">
-                    <p className="mb-2 text-sm font-medium text-gray-700">{labels.circuitExtras}</p>
+                    <p className="mb-2 text-sm font-medium text-gray-700">{t('circuitExtras')}</p>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {circuits.map((c) => {
-                        // On ne propose pas le circuit déjà sélectionné en principal
                         if (c.slug === selectedCircuit) return null
                         return (
                           <label key={c.slug} className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-gray-900">
@@ -192,30 +162,29 @@ export function ContactForm({ block, circuits = [] }: Props) {
                 </div>
               )}
 
-              {/* ... Le reste du formulaire (Prénom, Nom, etc.) ne change pas ... */}
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  {labels.firstName} *
+                  {t('firstName')} *
                   <input className={inputClass} name="firstName" autoComplete="given-name" maxLength={100} required />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700">
-                  {labels.lastName} *
+                  {t('lastName')} *
                   <input className={inputClass} name="lastName" autoComplete="family-name" maxLength={100} required />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700">
-                  {labels.email} *
+                  {t('email')} *
                   <input className={inputClass} name="email" type="email" autoComplete="email" maxLength={191} required />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700">
-                  {labels.phone} *
+                  {t('phone')} *
                   <input className={inputClass} name="phone" type="tel" autoComplete="tel" maxLength={40} required />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
-                  {labels.country}
+                  {t('country')}
                   <input className={inputClass} name="country" autoComplete="country-name" maxLength={100} />
                 </label>
               </div>
@@ -223,34 +192,34 @@ export function ContactForm({ block, circuits = [] }: Props) {
               {isQuote && (
                 <div className="grid gap-5 sm:grid-cols-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    {labels.startDate}
+                    {t('startDate')}
                     <input className={inputClass} name="startDate" type="date" />
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">
-                    {labels.endDate}
+                    {t('endDate')}
                     <input className={inputClass} name="endDate" type="date" />
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">
-                    {labels.adults}
+                    {t('adults')}
                     <input className={inputClass} name="adults" type="number" min={1} max={20} defaultValue={2} required />
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">
-                    {labels.children}
+                    {t('children')}
                     <input className={inputClass} name="children" type="number" min={0} max={20} defaultValue={0} required />
                   </label>
                 </div>
               )}
 
               <label className="block text-sm font-medium text-gray-700">
-                {labels.message}
+                {t('message')}
                 <textarea className={inputClass} name="message" rows={5} maxLength={5000} />
               </label>
 
               {error && (
-                <p className="text-sm text-red-700" role="alert">{error || labels.required}</p>
+                <p className="text-sm text-red-700" role="alert">{error || t('required')}</p>
               )}
 
               <button
@@ -258,7 +227,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
                 disabled={sending}
                 className="inline-flex items-center justify-center rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {sending ? labels.sending : labels.submit}
+                {sending ? t('sending') : isQuote ? t('submitQuote') : t('submit')}
               </button>
             </form>
           )}

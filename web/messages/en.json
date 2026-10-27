@@ -25,5 +25,37 @@
   "metadata": {
     "title": "ANABO Roadtrip Madagascar | Driver Guide",
     "description": "Discover Madagascar with a local driver guide. Explore the island through authentic road trips and tailor-made journeys."
+  },
+  "tourIdeas": {
+    "title": "Tour Ideas in Madagascar",
+    "subtitle": "Discover our travel suggestions. Compose a tour that perfectly matches your desires.",
+    "createTrip": "Create my trip",
+    "details": "More details",
+    "noImage": "No image"
+  },
+  "slider": {
+    "learnMore": "Learn more"
+  },
+  "contactForm": {
+    "circuit": "Main desired tour",
+    "circuitDefault": "Tailor-made / I don't know yet",
+    "circuitExtras": "Would you like to add an extension?",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "phone": "Phone / WhatsApp",
+    "country": "Country of residence",
+    "startDate": "Preferred departure date",
+    "endDate": "Preferred return date",
+    "adults": "Number of adults",
+    "children": "Number of children",
+    "message": "Your message",
+    "submit": "Send message",
+    "submitQuote": "Request a quote",
+    "sending": "Sending…",
+    "success": "Your request has been saved.",
+    "reference": "Your request reference",
+    "error": "An error occurred. Please try again.",
+    "required": "Please complete the required fields."
   }
 }

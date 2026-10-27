@@ -25,5 +25,37 @@
   "metadata": {
     "title": "ANABO Roadtrip Madagascar | Guida-autista",
     "description": "Scopri il Madagascar con una guida-autista locale. Esplora l'isola attraverso road trip autentici e viaggi su misura."
+  },
+  "tourIdeas": {
+    "title": "Idee di viaggio in Madagascar",
+    "subtitle": "Scopri i nostri suggerimenti di viaggio. Componi un tour che corrisponda perfettamente ai tuoi desideri.",
+    "createTrip": "Crea il mio viaggio",
+    "details": "Maggiori dettagli",
+    "noImage": "Nessuna immagine"
+  },
+  "slider": {
+    "learnMore": "Scopri di più"
+  },
+  "contactForm": {
+    "circuit": "Tour principale desiderato",
+    "circuitDefault": "Su misura / Non lo so ancora",
+    "circuitExtras": "Desideri aggiungere un'estensione?",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "email": "Indirizzo e-mail",
+    "phone": "Telefono / WhatsApp",
+    "country": "Paese di residenza",
+    "startDate": "Data di partenza desiderata",
+    "endDate": "Data di ritorno desiderata",
+    "adults": "Numero di adulti",
+    "children": "Numero di bambini",
+    "message": "Il tuo messaggio",
+    "submit": "Invia il messaggio",
+    "submitQuote": "Richiedi un preventivo",
+    "sending": "Invio in corso…",
+    "success": "La tua richiesta è stata registrata.",
+    "reference": "Riferimento della richiesta",
+    "error": "Si è verificato un errore. Riprova.",
+    "required": "Compila i campi obbligatori."
   }
 }
