@@ -1,4 +1,5 @@
 import { Inter, Poppins, Playfair_Display } from 'next/font/google'
+import localFont from 'next/font/local'
 
 // Police pour le corps de texte (lecture facile, moderne)
 export const inter = Inter({
@@ -15,9 +16,22 @@ export const poppins = Poppins({
   display: 'swap',
 })
 
-// 👇 AJOUT OPTIONNEL : Police pour les grands titres (élégant, style "magazine de voyage")
+// Police pour les grands titres (élégant, style "magazine de voyage")
 export const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-playfair',
+  display: 'swap',
+})
+
+// 👇 Chargement des polices locales Perfect Girl 👇
+export const perfectGirlScript = localFont({
+  src: '../../public/fonts/PerfectGirl-Script.otf',
+  variable: '--font-perfect-script',
+  display: 'swap',
+})
+
+export const perfectGirlSans = localFont({
+  src: '../../public/fonts/PerfectGirl-SansSerif.otf',
+  variable: '--font-perfect-sans',
   display: 'swap',
 })

@@ -42,8 +42,10 @@ export default async function HomePage({ params }: Props) {
 
   setRequestLocale(locale)
 
+  // 👇 L'appel à Sanity DOIT recevoir la locale pour filtrer la bonne page 👇
   const homePage = await sanityClient.fetch<HomePage | null>(
     homePageQuery,
+    { locale },
   )
 
   const hero = homePage?.modules?.find(

@@ -1,7 +1,8 @@
 import 'flag-icons/css/flag-icons.min.css'
 import type { Metadata } from 'next'
 import './globals.css'
-import { inter, poppins, playfair } from '@/lib/fonts'
+// 👇 Ajout des imports
+import { inter, poppins, playfair, perfectGirlScript, perfectGirlSans } from '@/lib/fonts'
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +22,17 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${poppins.variable} ${playfair.variable}`}>
+    // 👇 Ajout des variables
+    <html 
+      lang="fr" 
+      className={`
+        ${inter.variable} 
+        ${poppins.variable} 
+        ${playfair.variable} 
+        ${perfectGirlScript.variable} 
+        ${perfectGirlSans.variable}
+      `}
+    >
       <body className="font-sans antialiased">{children}</body>
     </html>
   )

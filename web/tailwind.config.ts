@@ -1,6 +1,8 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  // 👇 Activation du mode sombre 👇
+  darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -38,12 +40,11 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        // On garde 'display' pour Poppins
         display: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
-        // 👇 On ajoute l'alias exact utilisé dans Sanity 👇
         poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
-        // 👇 On ajoute Playfair pour les titres élégants 👇
         serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+        script: ['var(--font-perfect-script)', 'cursive'],
+        'perfect-sans': ['var(--font-perfect-sans)', 'sans-serif'],
       },
       container: {
         center: true,

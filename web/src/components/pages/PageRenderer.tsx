@@ -7,13 +7,16 @@ import { Slider3D } from './Slider3D'
 import { PuzzleGallery } from './PuzzleGallery'
 import { AlternatingSection } from './AlternatingSection'
 import { Features } from './Features'
+import { CommitmentsSection } from './CommitmentsSection'
 
 type Props = {
   modules?: PageModule[] | null
   circuits?: Circuit[]
+  globalHeadingFont?: string
+  globalHeadingWeight?: string
 }
 
-export function PageRenderer({ modules, circuits = [] }: Props) {
+export function PageRenderer({ modules, circuits = [], globalHeadingFont, globalHeadingWeight }: Props) {
   const safeModules = Array.isArray(modules) ? modules : []
 
   return (
@@ -33,9 +36,11 @@ export function PageRenderer({ modules, circuits = [] }: Props) {
           case 'puzzleGalleryBlock':
             return <PuzzleGallery key={index} block={module as any} />
           case 'alternatingBlock':
-            return <AlternatingSection key={index} block={module as any} />
+            return <AlternatingSection key={index} block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
           case 'featuresBlock':
-            return <Features key={index} block={module as any} />
+            return <Features key={index} block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+          case 'commitmentsBlock':
+            return <CommitmentsSection key={index} block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
           default:
             return null
         }

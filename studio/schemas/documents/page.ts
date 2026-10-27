@@ -103,10 +103,11 @@ export default {
         { type: 'faqBlock' },
         { type: 'contactFormBlock' },
         { type: 'slider3dBlock' },
-        // 👇 NOUVEAUX BLOCS POUR LA MAQUETTE 👇
+        { type: 'puzzleGalleryBlock' },
         { type: 'alternatingBlock' },
         { type: 'featuresBlock' },
-        { type: 'puzzleGalleryBlock' },
+        // 👇 AJOUT IMPORTANT ICI 👇
+        { type: 'commitmentsBlock' },
       ],
       group: 'content',
     },

@@ -11,6 +11,11 @@ export const siteSettingsQuery = `
       fr{siteName, tagline, description},
       it{siteName, tagline, description}
     },
+    typography {
+      globalHeadingFont,
+      globalHeadingWeight,
+      globalBodyFont
+    },
     contactEmail,
     contactPhone,
     whatsappNumber,
@@ -23,7 +28,7 @@ export const siteSettingsQuery = `
 `
 
 export const homePageQuery = `
-  *[_type == "page" && pageType == "home"][0]{
+  *[_type == "page" && pageType == "home" && language == $locale][0]{
     _id,
     title,
     "slug": slug.current,
@@ -83,6 +88,10 @@ export const homePageQuery = `
       _type == "alternatingBlock" => {
         title,
         subtitle,
+        titleFont,
+        titleWeight,
+        subtitleFont,
+        subtitleWeight,
         content,
         imagePosition,
         backgroundColor,
@@ -111,6 +120,20 @@ export const homePageQuery = `
         title,
         content,
         features[]{ _key, title, description, icon }
+      },
+
+      _type == "commitmentsBlock" => {
+        title,
+        subtitle,
+        sections[]{
+          _key,
+          title,
+          items[]{
+            _key,
+            label,
+            text
+          }
+        }
       }
     }
   }
@@ -213,6 +236,10 @@ export const pageBySlugQuery = `
       _type == "alternatingBlock" => {
         title,
         subtitle,
+        titleFont,
+        titleWeight,
+        subtitleFont,
+        subtitleWeight,
         content,
         imagePosition,
         backgroundColor,
@@ -241,6 +268,20 @@ export const pageBySlugQuery = `
         title,
         content,
         features[]{ _key, title, description, icon }
+      },
+
+      _type == "commitmentsBlock" => {
+        title,
+        subtitle,
+        sections[]{
+          _key,
+          title,
+          items[]{
+            _key,
+            label,
+            text
+          }
+        }
       }
     }
   }
@@ -263,7 +304,6 @@ export const featuredTestimonialQuery = `
   }
 `
 
-// 👇 NOUVELLE REQUÊTE POUR LA PAGE TOUR IDEAS 👇
 export const tourIdeasQuery = `
   *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(pageType desc, title asc) {
     _id,
@@ -279,7 +319,6 @@ export const tourIdeasQuery = `
   }
 `
 
-// 👇 NOUVELLE REQUÊTE POUR LE MENU DÉROULANT DU FORMULAIRE 👇
 export const circuitsQuery = `
   *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
     "slug": slug.current,

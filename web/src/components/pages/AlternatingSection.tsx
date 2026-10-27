@@ -10,16 +10,31 @@ type Props = {
   block: {
     title: string
     subtitle?: string
+    subtitleFont?: string
+    titleFont?: string
+    titleWeight?: string
+    subtitleWeight?: string
     content?: any[]
     image?: SanityImage
     imagePosition?: 'left' | 'right'
     backgroundColor?: 'white' | 'cream'
   }
+  globalHeadingFont?: string
+  globalHeadingWeight?: string
 }
 
-export function AlternatingSection({ block }: Props) {
-  const bgClass = block.backgroundColor === 'cream' ? 'bg-[#FDF8F5]' : 'bg-white'
+export function AlternatingSection({ block, globalHeadingFont, globalHeadingWeight }: Props) {
+  // 👇 Ajout des classes dark pour le fond beige/blanc 👇
+  const bgClass = block.backgroundColor === 'cream' 
+    ? 'bg-[#FDF8F5] dark:bg-gray-800' 
+    : 'bg-white dark:bg-gray-900'
+
   const imageFirst = block.imagePosition === 'left'
+
+  // 👇 Logique de priorité : local > global > défaut 👇
+  const titleFont = block.titleFont || globalHeadingFont || 'font-serif'
+  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-bold'
+  const subtitleFont = block.subtitleFont || 'font-script'
 
   return (
     <section className={`py-16 md:py-24 overflow-hidden ${bgClass}`}>
@@ -35,15 +50,15 @@ export function AlternatingSection({ block }: Props) {
             className="flex-1 space-y-6"
           >
             {block.subtitle && (
-              <span className="font-serif italic text-[#E0A01C] text-xl">
+              <span className={`${subtitleFont} text-[#E0A01C] dark:text-[#E0A01C] text-2xl md:text-3xl block`}>
                 {block.subtitle}
               </span>
             )}
-            <h2 className="text-2xl font-bold uppercase tracking-wide text-[#06245F] md:text-3xl">
+            <h2 className={`${titleFont} ${titleWeight} text-2xl uppercase tracking-wide text-[#06245F] dark:text-white md:text-3xl`}>
               {block.title}
             </h2>
             {block.content && (
-              <div className="prose max-w-none text-gray-700 leading-relaxed">
+              <div className="prose max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
                 <PortableText value={block.content as never} />
               </div>
             )}

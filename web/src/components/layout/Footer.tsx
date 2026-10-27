@@ -31,8 +31,14 @@ export async function Footer() {
   const tagline = localized?.tagline || settings?.tagline
   const description = localized?.description || settings?.description
 
+  // 👇 Récupération des polices globales 👇
+  const headingFont = settings?.typography?.globalHeadingFont || 'font-serif'
+  const headingWeight = settings?.typography?.globalHeadingWeight || 'font-bold'
+  const bodyFont = settings?.typography?.globalBodyFont || 'font-sans'
+
   return (
-    <footer className="border-t bg-gray-950 text-white">
+    // 👇 Application de la police du corps au footer 👇
+    <footer className={`border-t bg-gray-950 text-white ${bodyFont}`}>
       <div className="container-custom py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           
@@ -47,9 +53,7 @@ export async function Footer() {
                 alt="ANABO ROADTRIP"
                 width={180}
                 height={60}
-                className="h-16 w-auto object-contain brightness-0 invert" 
-                /* Note: brightness-0 invert rend le logo blanc pour le fond noir. 
-                   Supprimez cette classe si votre logo est déjà clair. */
+                className="h-16 w-auto object-contain brightness-0 invert"
               />
             </Link>
 
@@ -68,7 +72,7 @@ export async function Footer() {
 
           {/* Liens de navigation */}
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider">
+            <h2 className={`text-sm font-semibold uppercase tracking-wider ${headingFont} ${headingWeight}`}>
               {t('navigation')}
             </h2>
 
@@ -87,7 +91,7 @@ export async function Footer() {
 
           {/* Contact */}
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider">
+            <h2 className={`text-sm font-semibold uppercase tracking-wider ${headingFont} ${headingWeight}`}>
               {t('contact')}
             </h2>
 

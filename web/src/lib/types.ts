@@ -1,3 +1,9 @@
+export interface SiteTypography {
+  globalHeadingFont?: string
+  globalHeadingWeight?: string
+  globalBodyFont?: string
+}
+
 export interface SiteSettings {
   _id: string
   siteName?: string
@@ -8,6 +14,8 @@ export interface SiteSettings {
     fr?: { siteName?: string; tagline?: string; description?: string }
     it?: { siteName?: string; tagline?: string; description?: string }
   }
+  // 👇 Ajout du champ typographie 👇
+  typography?: SiteTypography
   contactEmail?: string
   contactPhone?: string
   whatsappNumber?: string
@@ -27,7 +35,6 @@ export interface PageCta {
   link?: string
 }
 
-// 👇 NOUVEAUX TYPES POUR LES BLOCS 👇
 export interface PuzzleItem {
   _key: string
   image: SanityImage
@@ -45,6 +52,10 @@ export interface AlternatingBlock {
   _type: 'alternatingBlock'
   title: string
   subtitle?: string
+  subtitleFont?: string
+  titleFont?: string
+  titleWeight?: string
+  subtitleWeight?: string
   content?: unknown[]
   image?: SanityImage
   imagePosition?: 'left' | 'right'
@@ -54,6 +65,8 @@ export interface AlternatingBlock {
 export interface FeaturesBlock {
   _type: 'featuresBlock'
   title?: string
+  titleFont?: string
+  titleWeight?: string
   content?: string
   features?: {
     _key: string
@@ -62,7 +75,24 @@ export interface FeaturesBlock {
     icon?: string
   }[]
 }
-// 👇 FIN DES NOUVEAUX TYPES 👇
+
+export interface CommitmentsBlock {
+  _type: 'commitmentsBlock'
+  title?: string
+  titleFont?: string
+  titleWeight?: string
+  subtitle?: string
+  subtitleFont?: string
+  sections?: {
+    _key: string
+    title: string
+    items?: {
+      _key: string
+      label: string
+      text: string
+    }[]
+  }[]
+}
 
 export interface HeroBlock {
   _type: 'heroBlock'
@@ -91,7 +121,7 @@ export interface CtaBlock {
   description?: string
   buttonLabel?: string
   buttonLink?: string
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'brown'
 }
 
 export interface ContactFormBlock {
@@ -119,7 +149,6 @@ export interface Slider3DBlock {
   slides?: Slider3DSlide[]
 }
 
-// 👇 MISE À JOUR DE L'UNION PAGE MODULE 👇
 export type PageModule =
   | HeroBlock
   | TextMediaBlock
@@ -129,6 +158,7 @@ export type PageModule =
   | PuzzleGalleryBlock
   | AlternatingBlock
   | FeaturesBlock
+  | CommitmentsBlock
 
 export interface PageSeo {
   metaTitle?: string
@@ -154,7 +184,6 @@ export interface Page {
   modules?: PageModule[]
 }
 
-// 👇 MISE À JOUR DE HOME PAGE POUR ACCEPTER LES NOUVEAUX BLOCS 👇
 export interface HomePage {
   _id: string
   title: string
@@ -171,6 +200,7 @@ export interface HomePage {
     | PuzzleGalleryBlock
     | AlternatingBlock
     | FeaturesBlock
+    | CommitmentsBlock
   )[]
 }
 
@@ -186,7 +216,6 @@ export interface Testimonial {
   featured?: boolean
 }
 
-// 👇 NOUVEAU TYPE POUR LE MENU DÉROULANT 👇
 export interface Circuit {
   slug: string
   title: string

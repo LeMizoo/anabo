@@ -4,6 +4,7 @@ export default {
   type: 'document',
   groups: [
     { name: 'general', title: 'Général', default: true },
+    { name: 'typography', title: 'Typographie' }, // 👈 Nouveau groupe
     { name: 'contact', title: 'Contact' },
     { name: 'social', title: 'Réseaux sociaux' },
   ],
@@ -68,6 +69,55 @@ export default {
       title: 'Favicon',
       group: 'general',
     },
+    // 👇 NOUVEAUX CHAMPS POUR LA TYPOGRAPHIE GLOBALE 👇
+    {
+      name: 'typography',
+      title: 'Typographie globale',
+      type: 'object',
+      group: 'typography',
+      fields: [
+        {
+          name: 'globalHeadingFont',
+          title: 'Police par défaut des titres',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Playfair (Serif)', value: 'font-serif' },
+              { title: 'Perfect Girl Sans', value: 'font-perfect-sans' },
+              { title: 'Perfect Girl Script', value: 'font-script' },
+              { title: 'Poppins', value: 'font-poppins' },
+            ],
+          },
+          initialValue: 'font-serif',
+        },
+        {
+          name: 'globalHeadingWeight',
+          title: 'Graisse par défaut des titres',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Normal', value: 'font-normal' },
+              { title: 'Gras (Bold)', value: 'font-bold' },
+            ],
+          },
+          initialValue: 'font-bold',
+        },
+        {
+          name: 'globalBodyFont',
+          title: 'Police par défaut du texte',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Inter', value: 'font-sans' },
+              { title: 'Perfect Girl Sans', value: 'font-perfect-sans' },
+              { title: 'Poppins', value: 'font-poppins' },
+            ],
+          },
+          initialValue: 'font-sans',
+        },
+      ],
+    },
+    // 👇 FIN DES NOUVEAUX CHAMPS 👇
     {
       name: 'contactEmail',
       type: 'string',

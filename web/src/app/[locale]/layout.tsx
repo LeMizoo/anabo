@@ -6,6 +6,7 @@ import {
   setRequestLocale,
 } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { ThemeProvider } from 'next-themes' // 👈 Import
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { locales, type Locale } from '@/lib/i18n'
@@ -15,8 +16,6 @@ type Props = {
   params: Promise<{ locale: string }>
 }
 
-// Les pages sont régénérées toutes les 5 minutes : le contenu Sanity
-// (footer, coordonnées, etc.) se met à jour sans rebuild.
 export const revalidate = 300
 
 export function generateStaticParams() {
@@ -33,13 +32,10 @@ export async function generateMetadata({
   }
 
   const locale = localeParam as Locale
-
   setRequestLocale(locale)
 
   const t = await getTranslations('metadata')
-
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://anabo.mg'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://anabo.mg'
 
   return {
     title: {
@@ -79,18 +75,21 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   const locale = localeParam as Locale
-
   setRequestLocale(locale)
 
   const messages = await getMessages()
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </div>
+      {/* 👇 Le ThemeProvider englobe tout le contenu pour gérer le mode sombre 👇 */}
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {/* On ajoute les classes de fond et de texte de base + transition */}
+        <div className="flex min-h-screen flex-col bg-white text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
+      </ThemeProvider>
     </NextIntlClientProvider>
   )
 }

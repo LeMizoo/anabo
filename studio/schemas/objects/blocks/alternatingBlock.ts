@@ -3,8 +3,44 @@ export default {
   title: 'Texte et Image (Alterné)',
   type: 'object',
   fields: [
-    { name: 'title', type: 'string', title: 'Titre' },
-    { name: 'subtitle', type: 'string', title: 'Sous-titre (italique)' },
+    { 
+      name: 'subtitle', 
+      type: 'string', 
+      title: 'Sous-titre (ex: Ma philosophie)',
+    },
+    {
+      name: 'subtitleFont',
+      type: 'string',
+      title: 'Police du sous-titre',
+      options: {
+        list: [
+          { title: 'Perfect Girl Script (Manuscrite)', value: 'font-script' },
+          { title: 'Perfect Girl Sans Serif (Moderne)', value: 'font-perfect-sans' },
+          { title: 'Playfair (Serif)', value: 'font-serif' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'font-script',
+    },
+    { 
+      name: 'title', 
+      type: 'string', 
+      title: 'Titre principal' 
+    },
+    {
+      name: 'titleFont',
+      type: 'string',
+      title: 'Police du titre',
+      options: {
+        list: [
+          { title: 'Playfair (Serif)', value: 'font-serif' },
+          { title: 'Perfect Girl Sans Serif', value: 'font-perfect-sans' },
+          { title: 'Perfect Girl Script', value: 'font-script' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'font-serif',
+    },
     { name: 'content', type: 'array', of: [{ type: 'block' }], title: 'Contenu' },
     { name: 'image', type: 'image', title: 'Image', options: { hotspot: true }, fields: [{ name: 'alt', type: 'string', title: 'Alt' }] },
     { 
