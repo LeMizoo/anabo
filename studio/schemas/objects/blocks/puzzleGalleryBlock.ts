@@ -14,9 +14,16 @@ export default {
       title: 'Images du puzzle',
       of: [
         {
+          name: 'puzzleItem', // Le nom est bien ici
           type: 'object',
           fields: [
-            { name: 'image', type: 'image', title: 'Image', options: { hotspot: true }, fields: [{ name: 'alt', type: 'string', title: 'Texte alternatif' }] },
+            { 
+              name: 'image', 
+              type: 'image', 
+              title: 'Image', 
+              options: { hotspot: true }, 
+              fields: [{ name: 'alt', type: 'string', title: 'Texte alternatif' }] 
+            },
             { 
               name: 'size', 
               type: 'string', 
@@ -31,7 +38,11 @@ export default {
               },
               initialValue: 'small'
             },
-            { name: 'caption', type: 'string', title: 'Légende (optionnel)' }
+            { 
+              name: 'caption', 
+              type: 'string', 
+              title: 'Légende (optionnel)' 
+            }
           ],
           preview: {
             select: { title: 'caption', media: 'image', subtitle: 'size' }

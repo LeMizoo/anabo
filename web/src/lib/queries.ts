@@ -78,6 +78,39 @@ export const homePageQuery = `
         description,
         formType,
         showWhatsapp
+      },
+
+      _type == "alternatingBlock" => {
+        title,
+        subtitle,
+        content,
+        imagePosition,
+        backgroundColor,
+        image{
+          ...,
+          asset->,
+          alt
+        }
+      },
+
+      _type == "puzzleGalleryBlock" => {
+        title,
+        items[]{
+          _key,
+          caption,
+          size,
+          image{
+            ...,
+            asset->,
+            alt
+          }
+        }
+      },
+
+      _type == "featuresBlock" => {
+        title,
+        content,
+        features[]{ _key, title, description, icon }
       }
     }
   }
@@ -175,6 +208,39 @@ export const pageBySlugQuery = `
           linkUrl,
           "imageUrl": image.asset->url
         }
+      },
+
+      _type == "alternatingBlock" => {
+        title,
+        subtitle,
+        content,
+        imagePosition,
+        backgroundColor,
+        image{
+          ...,
+          asset->,
+          alt
+        }
+      },
+
+      _type == "puzzleGalleryBlock" => {
+        title,
+        items[]{
+          _key,
+          caption,
+          size,
+          image{
+            ...,
+            asset->,
+            alt
+          }
+        }
+      },
+
+      _type == "featuresBlock" => {
+        title,
+        content,
+        features[]{ _key, title, description, icon }
       }
     }
   }

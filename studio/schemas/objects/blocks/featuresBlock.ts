@@ -10,12 +10,16 @@ export default {
       type: 'array',
       title: 'Fonctionnalités',
       of: [{
+        name: 'featureItem', // Le nom est bien ici
         type: 'object',
         fields: [
           { name: 'title', type: 'string', title: 'Titre de la fonctionnalité' },
           { name: 'description', type: 'text', title: 'Description', rows: 3 },
           { name: 'icon', type: 'string', title: 'Icône (ex: check, shield, map)', initialValue: 'check' }
-        ]
+        ],
+        preview: {
+          select: { title: 'title', subtitle: 'description' }
+        }
       }]
     }
   ]

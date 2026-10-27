@@ -6,6 +6,7 @@ import { ContactForm } from './ContactForm'
 import { Slider3D } from './Slider3D'
 import { PuzzleGallery } from './PuzzleGallery'
 import { AlternatingSection } from './AlternatingSection'
+import { Features } from './Features'
 
 type Props = {
   modules?: PageModule[] | null
@@ -29,11 +30,12 @@ export function PageRenderer({ modules, circuits = [] }: Props) {
             return <ContactForm key={index} block={module} circuits={circuits} />
           case 'slider3dBlock':
             return <Slider3D key={index} block={module} />
-          // 👇 Nouveaux blocs ajoutés 👇
           case 'puzzleGalleryBlock':
             return <PuzzleGallery key={index} block={module as any} />
           case 'alternatingBlock':
             return <AlternatingSection key={index} block={module as any} />
+          case 'featuresBlock':
+            return <Features key={index} block={module as any} />
           default:
             return null
         }
