@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useTransition } from 'react'
@@ -51,7 +50,7 @@ export function AdminUserForm() {
         </div>
 
         <p className="text-sm text-green-700 mb-2">
-          Transmettez ces identifiants à votre collaborateur :
+          L'utilisateur a reçu un email avec ses identifiants. Voici également une sauvegarde :
         </p>
 
         <div className="bg-white p-3 rounded border text-sm font-mono space-y-1 text-gray-800">

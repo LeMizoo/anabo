@@ -175,3 +175,37 @@ export async function sendQuoteStatusEmail(
     })
   }
 }
+
+// 👇 NOUVELLE FONCTION AJOUTÉE ICI
+export async function sendNewUserEmail(
+  to: string,
+  name: string,
+  password: string,
+  role: string
+) {
+  const subject = `Vos accès à l'administration ANABO Roadtrip`
+  const html = `
+    <p>Bonjour ${escapeHtml(name)},</p>
+    <p>Un compte administrateur vient d'être créé pour vous sur le site ANABO Roadtrip.</p>
+    <p>Voici vos identifiants de connexion :</p>
+    <ul>
+      <li><strong>Email :</strong> ${escapeHtml(to)}</li>
+      <li><strong>Mot de passe temporaire :</strong> <code>${escapeHtml(password)}</code></li>
+      <li><strong>Rôle :</strong> ${escapeHtml(role)}</li>
+    </ul>
+    <p>Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe dès votre première connexion.</p>
+    <p style="margin: 30px 0;">
+      <a href="https://roadtrip.anabo.mg/admin/login" style="background-color: #06245F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+        Se connecter à l'administration
+      </a>
+    </p>
+    <p>À très bientôt,<br/>L'équipe ANABO Roadtrip</p>
+  `
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject,
+    html,
+  })
+}

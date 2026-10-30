@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X } from 'lucide-react'
+import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
@@ -13,6 +13,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
   const menuItems = [
     { label: 'Tableau de bord', href: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Demandes de devis', href: '/admin/demandes', icon: FileText },
+    { label: 'Mon compte', href: '/admin/mon-compte', icon: UserCircle }, // 👈 Lien ajouté
   ]
 
   if (userRole === 'SUPER_ADMIN') {

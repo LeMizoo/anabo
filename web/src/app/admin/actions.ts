@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { Prisma, QuoteStatus } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { sendQuoteStatusEmail } from '@/lib/email'
+import { sendQuoteStatusEmail, sendNewUserEmail } from '@/lib/email'
 import { signQuoteToken, verifyQuoteToken } from '@/lib/quote-token'
 
 const MAX_TEXT = 20000
@@ -16,21 +16,15 @@ type Role = (typeof ROLES)[number]
 
 async function requireSession() {
   const session = await auth()
-
-  if (!session?.user) {
-    throw new Error('Non autorisé')
-  }
-
+  if (!session?.user) throw new Error('Non autorisé')
   return session
 }
 
 async function requireSuperAdmin() {
   const session = await requireSession()
-
   if ((session.user as { role?: string }).role !== 'SUPER_ADMIN') {
     throw new Error('Seul un SUPER_ADMIN peut effectuer cette action.')
   }
-
   return session
 }
 
@@ -50,27 +44,16 @@ export async function updateQuoteStatus(
     select: { status: true },
   })
 
-  if (!existingQuote) {
-    throw new Error('Demande introuvable')
-  }
+  if (!existingQuote) throw new Error('Demande introuvable')
 
   const now = new Date()
-
   const dateData: Prisma.QuoteRequestUpdateInput = {}
 
   switch (newStatus) {
-    case 'CONTACTE':
-      dateData.contactedAt = now
-      break
-    case 'DEVIS_ENVOYE':
-      dateData.quoteSentAt = now
-      break
-    case 'CONFIRME':
-      dateData.confirmedAt = now
-      break
-    case 'PERDU':
-      dateData.lostAt = now
-      break
+    case 'CONTACTE': dateData.contactedAt = now; break
+    case 'DEVIS_ENVOYE': dateData.quoteSentAt = now; break
+    case 'CONFIRME': dateData.confirmedAt = now; break
+    case 'PERDU': dateData.lostAt = now; break
   }
 
   const updatedQuote = await prisma.quoteRequest.update({
@@ -162,27 +145,16 @@ export async function confirmQuoteByClient(
     select: { status: true },
   })
 
-  if (!quote) {
-    return { success: false, error: 'Demande introuvable.' }
-  }
-
-  if (quote.status === 'CONFIRME') {
-    return { success: true }
-  }
+  if (!quote) return { success: false, error: 'Demande introuvable.' }
+  if (quote.status === 'CONFIRME') return { success: true }
 
   if (quote.status !== 'DEVIS_ENVOYE') {
-    return {
-      success: false,
-      error: "Ce devis n'est pas disponible à la confirmation.",
-    }
+    return { success: false, error: "Ce devis n'est pas disponible à la confirmation." }
   }
 
   await prisma.quoteRequest.update({
     where: { id: quoteId },
-    data: {
-      status: 'CONFIRME',
-      confirmedAt: new Date(),
-    },
+    data: { status: 'CONFIRME', confirmedAt: new Date() },
   })
 
   revalidatePath('/admin/demandes')
@@ -204,17 +176,9 @@ export async function createAdminUser(data: {
   const email = String(data.email || '').trim().toLowerCase().slice(0, 191)
   const role = data.role as Role
 
-  if (!name) {
-    throw new Error('Nom requis.')
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new Error('E-mail invalide.')
-  }
-
-  if (!ROLES.includes(role)) {
-    throw new Error('Rôle invalide.')
-  }
+  if (!name) throw new Error('Nom requis.')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('E-mail invalide.')
+  if (!ROLES.includes(role)) throw new Error('Rôle invalide.')
 
   let tempPassword: string | undefined
   let password = data.password
@@ -226,13 +190,8 @@ export async function createAdminUser(data: {
     throw new Error('Mot de passe trop court (10 caractères minimum).')
   }
 
-  const existing = await prisma.adminUser.findUnique({
-    where: { email },
-  })
-
-  if (existing) {
-    throw new Error('Un utilisateur avec cet e-mail existe déjà.')
-  }
+  const existing = await prisma.adminUser.findUnique({ where: { email } })
+  if (existing) throw new Error('Un utilisateur avec cet e-mail existe déjà.')
 
   await prisma.adminUser.create({
     data: {
@@ -244,7 +203,89 @@ export async function createAdminUser(data: {
     },
   })
 
-  revalidatePath('/admin/utilisateurs')
+  try {
+    await sendNewUserEmail(email, name, password, role)
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi de l\'email de création de compte:', error)
+  }
 
+  revalidatePath('/admin/utilisateurs')
   return { success: true, tempPassword }
+}
+
+export async function toggleAdminUserStatus(userId: string, active: boolean) {
+  await requireSuperAdmin()
+
+  const session = await auth()
+  if (session?.user?.id === userId && !active) {
+    throw new Error('Vous ne pouvez pas désactiver votre propre compte.')
+  }
+
+  await prisma.adminUser.update({
+    where: { id: userId },
+    data: { active },
+  })
+
+  revalidatePath('/admin/utilisateurs')
+  return { success: true }
+}
+
+export async function resendAdminUserInvitation(userId: string) {
+  await requireSuperAdmin()
+
+  const user = await prisma.adminUser.findUnique({
+    where: { id: userId },
+  })
+
+  if (!user) throw new Error('Utilisateur introuvable.')
+
+  const tempPassword = randomBytes(12).toString('base64url')
+
+  await prisma.adminUser.update({
+    where: { id: userId },
+    data: {
+      passwordHash: await bcrypt.hash(tempPassword, 10),
+      active: true,
+    },
+  })
+
+  try {
+    await sendNewUserEmail(user.email, user.name, tempPassword, user.role)
+  } catch (error) {
+    console.error('Erreur lors du renvoi de l\'email:', error)
+    throw new Error("Le mot de passe a été réinitialisé, mais l'email n'a pas pu être envoyé.")
+  }
+
+  revalidatePath('/admin/utilisateurs')
+  return { success: true, tempPassword }
+}
+
+// 👇 NOUVELLE FONCTION : Changer son propre mot de passe
+export async function changePassword(currentPassword: string, newPassword: string) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Non autorisé')
+
+  if (newPassword.length < 10) {
+    throw new Error('Le nouveau mot de passe doit faire au moins 10 caractères.')
+  }
+
+  const user = await prisma.adminUser.findUnique({
+    where: { id: session.user.id },
+  })
+
+  if (!user) throw new Error('Utilisateur introuvable.')
+
+  const isValid = await bcrypt.compare(currentPassword, user.passwordHash)
+  if (!isValid) {
+    throw new Error('Le mot de passe actuel est incorrect.')
+  }
+
+  await prisma.adminUser.update({
+    where: { id: user.id },
+    data: {
+      passwordHash: await bcrypt.hash(newPassword, 10),
+    },
+  })
+
+  return { success: true }
 }
