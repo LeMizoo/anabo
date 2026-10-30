@@ -2,10 +2,7 @@ import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-// 1. CORRECTION : On utilise votre domaine vérifié au lieu de onboarding@resend.dev
 const FROM_EMAIL = 'ANABO Roadtrip <contact@anabo.mg>'
-
-// 2. CORRECTION : On met votre vraie adresse de réception par défaut
 const ADMIN_EMAIL = process.env.CONTACT_EMAIL || 'contact@anabo.mg'
 
 type QuoteData = {
@@ -25,7 +22,6 @@ type QuoteData = {
   message?: string | null
 }
 
-// Fonction de sécurité pour échapper les caractères HTML
 function escapeHtml(unsafe: string | null | undefined): string {
   if (!unsafe) return ''
   return unsafe
@@ -38,11 +34,7 @@ function escapeHtml(unsafe: string | null | undefined): string {
 
 function formatDate(date?: Date | null): string {
   if (!date) return '—'
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date)
+  return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
 }
 
 function buildAdminEmail(data: QuoteData) {
@@ -108,12 +100,11 @@ function buildClientEmail(data: QuoteData) {
 export async function sendQuoteEmails(data: QuoteData) {
   const errors: string[] = []
 
-  // 1. Notification admin (vers contact@anabo.mg)
   try {
     await resend.emails.send({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
-      replyTo: data.email, // TRÈS UTILE : Si vous cliquez sur "Répondre", ça répondra directement au client !
+      replyTo: data.email,
       subject: `[ANABO] Nouvelle demande de devis — ${escapeHtml(data.reference)}`,
       html: buildAdminEmail(data),
     })
@@ -121,13 +112,12 @@ export async function sendQuoteEmails(data: QuoteData) {
     errors.push(`admin: ${err instanceof Error ? err.message : String(err)}`)
   }
 
-  // 2. Accusé de réception au client
   try {
     const clientEmail = buildClientEmail(data)
     await resend.emails.send({
       from: FROM_EMAIL,
       to: data.email,
-      replyTo: ADMIN_EMAIL, // Si le client répond, ça vous arrive sur contact@anabo.mg
+      replyTo: ADMIN_EMAIL,
       subject: clientEmail.subject,
       html: clientEmail.html,
     })
@@ -135,9 +125,54 @@ export async function sendQuoteEmails(data: QuoteData) {
     errors.push(`client: ${err instanceof Error ? err.message : String(err)}`)
   }
 
-  if (errors.length > 0) {
-    console.error('[email] Erreurs:', errors)
+  if (errors.length > 0) console.error('[email] Erreurs:', errors)
+  return { ok: errors.length === 0, errors }
+}
+
+export async function sendQuoteStatusEmail(
+  to: string,
+  firstName: string,
+  status: string,
+  reference: string,
+  token?: string,
+) {
+  let subject = ''
+  let html = ''
+  
+  // Lien vers la page publique du devis
+  const quoteUrl = token
+  ? `https://roadtrip.anabo.mg/fr/devis/${encodeURIComponent(reference)}?token=${encodeURIComponent(token)}`
+  : `https://roadtrip.anabo.mg/fr/devis/${encodeURIComponent(reference)}` 
+
+  if (status === 'DEVIS_ENVOYE') {
+    subject = `Votre devis ANABO Roadtrip est prêt (Réf: ${reference})`
+    html = `
+      <p>Bonjour ${escapeHtml(firstName)},</p>
+      <p>Nous avons le plaisir de vous informer que votre devis personnalisé pour votre voyage à Madagascar est prêt.</p>
+      <p style="margin: 30px 0;">
+        <a href="${quoteUrl}" style="background-color: #E0A01C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+          Consulter mon devis
+        </a>
+      </p>
+      <p>Vous pourrez le consulter, le confirmer ou nous demander des modifications directement depuis ce lien.</p>
+      <p>À très bientôt,<br/>L'équipe ANABO Roadtrip</p>
+    `
+  } else if (status === 'CONFIRME') {
+    subject = `Votre voyage à Madagascar est confirmé ! (Réf: ${reference})`
+    html = `
+      <p>Bonjour ${escapeHtml(firstName)},</p>
+      <p>Nous sommes ravis de confirmer votre réservation pour votre voyage à Madagascar.</p>
+      <p>Nous avons hâte de vous accueillir et de vous faire découvrir notre belle île.</p>
+      <p>À très bientôt,<br/>L'équipe ANABO Roadtrip</p>
+    `
   }
 
-  return { ok: errors.length === 0, errors }
+  if (subject) {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
+    })
+  }
 }

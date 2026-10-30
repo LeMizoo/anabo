@@ -1,106 +1,111 @@
 'use client'
 
-import { Suspense, useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { Mail, Lock, Loader2, Monitor } from 'lucide-react' // Ajout de l'icône Monitor
 
-// 1. On crée un composant séparé pour le formulaire
-function LoginForm() {
+export default function LoginPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin/demandes'
-
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  async function handleSubmit(e: FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
     setError('')
-    setLoading(true)
 
     try {
-      const res = await signIn('credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       })
 
-      if (res?.error) {
+      if (result?.error) {
         setError('Email ou mot de passe incorrect.')
       } else {
-        router.push(callbackUrl)
+        router.push('/admin/dashboard')
         router.refresh()
       }
-    } catch {
-      setError('Une erreur est survenue. Veuillez réessayer.')
+    } catch (err) {
+      setError('Une erreur est survenue lors de la connexion.')
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-md">
-        <h1 className="mb-2 text-2xl font-bold text-[#06245F]">
-          ANABO — Administration
-        </h1>
-        <p className="mb-6 text-sm text-gray-500">
-          Connectez-vous pour accéder au tableau de bord.
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+        <div>
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            ANABO — Administration
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Connectez-vous pour accéder au tableau de bord.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-[#06245F]"
-            />
-          </div>
+        {/* NOUVEL ENCART D'INFORMATION */}
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 flex items-start gap-3 text-sm text-blue-800">
+          <Monitor className="w-5 h-5 shrink-0 mt-0.5" />
+          <p>
+            L'outil d'administration est optimisé pour les ordinateurs et tablettes. 
+            Certaines fonctionnalités peuvent être limitées sur un écran de téléphone.
+          </p>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Mot de passe</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-[#06245F]"
-            />
-          </div>
-
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <p className="text-sm text-red-600" role="alert">
+            <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm text-center font-medium">
               {error}
-            </p>
+            </div>
           )}
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="admin@anabo.mg"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+          </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-[#E0A01C] px-4 py-2 font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+            disabled={isLoading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Connexion…' : 'Se connecter'}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Se connecter'}
           </button>
         </form>
       </div>
     </div>
-  )
-}
-
-// 2. Le composant principal (page) enveloppe le formulaire dans Suspense
-export default function AdminLoginPage() {
-  return (
-    <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-gray-100">
-        <p className="text-gray-500">Chargement...</p>
-      </div>
-    }>
-      <LoginForm />
-    </Suspense>
   )
 }

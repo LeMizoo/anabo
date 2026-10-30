@@ -2,64 +2,76 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { StatusSelect } from '@/components/admin/StatusSelect'
+import { QuoteFilters } from '@/components/admin/QuoteFilters'
+import { Prisma } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 
-// Nombre d'éléments par page
 const ITEMS_PER_PAGE = 10
 
 type Props = {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string, q?: string, status?: string }>
 }
 
 export default async function AdminDemandesPage({ searchParams }: Props) {
   const session = await auth()
   if (!session) redirect('/admin/login')
 
-  // Récupération du numéro de page depuis l'URL (par défaut page 1)
-  const { page } = await searchParams
+  const { page, q, status } = await searchParams
   const currentPage = Math.max(1, Number(page) || 1)
-
-  // Calcul des éléments à ignorer pour Prisma
   const skip = (currentPage - 1) * ITEMS_PER_PAGE
 
-  // Récupération des données paginées et du total
+  const whereClause: Prisma.QuoteRequestWhereInput = {}
+  
+  if (q) {
+    whereClause.OR = [
+      { reference: { contains: q } },
+      { firstName: { contains: q } },
+      { lastName: { contains: q } },
+      { email: { contains: q } },
+    ]
+  }
+  
+  if (status) {
+    whereClause.status = status as any
+  }
+
   const [quotes, totalQuotes] = await Promise.all([
     prisma.quoteRequest.findMany({
+      where: whereClause,
       orderBy: { createdAt: 'desc' },
       skip,
       take: ITEMS_PER_PAGE,
     }),
-    prisma.quoteRequest.count(),
+    prisma.quoteRequest.count({ where: whereClause }),
   ])
 
   const totalPages = Math.ceil(totalQuotes / ITEMS_PER_PAGE)
 
+  const buildPaginationUrl = (newPage: number) => {
+    const params = new URLSearchParams()
+    if (q) params.set('q', q)
+    if (status) params.set('status', status)
+    params.set('page', String(newPage))
+    return `/admin/demandes?${params.toString()}`
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
-        {/* 👇 En-tête avec bouton de déconnexion 👇 */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#06245F]">Demandes de devis</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Demandes de devis</h1>
             <p className="mt-1 text-sm text-gray-500">
               Connecté en tant que <strong>{session.user?.name}</strong> ({session.user?.email})
             </p>
           </div>
-          
-          <form action={async () => {
-            'use server'
-            const { signOut } = await import('@/lib/auth')
-            await signOut({ redirectTo: '/admin/login' })
-          }}>
-            <button className="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 sm:w-auto">
-              Déconnexion
-            </button>
-          </form>
         </div>
 
-        {/* Tableau avec défilement horizontal */}
-        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <QuoteFilters />
+
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="w-full overflow-x-auto">
             <table className="w-full min-w-[800px] text-left text-sm text-gray-500">
               <thead className="bg-gray-50 text-xs uppercase text-gray-700">
@@ -77,7 +89,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
                 {quotes.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                      Aucune demande pour le moment.
+                      Aucune demande ne correspond à ces critères.
                     </td>
                   </tr>
                 ) : (
@@ -100,9 +112,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
                         {quote.adults} ad. / {quote.children} enf.
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 whitespace-nowrap">
-                          {quote.status}
-                        </span>
+                        <StatusSelect quoteId={quote.id} currentStatus={quote.status} />
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Link
@@ -120,16 +130,15 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
           </div>
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-gray-600">
               Page <span className="font-medium">{currentPage}</span> sur <span className="font-medium">{totalPages}</span>
-              {' '}({totalQuotes} demandes au total)
+              {' '}({totalQuotes} résultats)
             </p>
             <div className="flex gap-2">
               <Link
-                href={`/admin/demandes?page=${currentPage - 1}`}
+                href={buildPaginationUrl(currentPage - 1)}
                 className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition ${
                   currentPage <= 1
                     ? 'pointer-events-none bg-gray-100 text-gray-400'
@@ -139,7 +148,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
                 Précédent
               </Link>
               <Link
-                href={`/admin/demandes?page=${currentPage + 1}`}
+                href={buildPaginationUrl(currentPage + 1)}
                 className={`rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium transition ${
                   currentPage >= totalPages
                     ? 'pointer-events-none bg-gray-100 text-gray-400'
