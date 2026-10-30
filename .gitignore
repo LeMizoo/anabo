@@ -59,3 +59,4 @@ web/prisma/.env.backup-*
 *.tar.gz
 .env*.bak
 .env.local.off
+*.bak
