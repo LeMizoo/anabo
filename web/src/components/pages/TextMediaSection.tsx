@@ -70,15 +70,90 @@ const portableTextComponents: PortableTextComponents = {
 
 export function TextMediaSection({ block }: Props) {
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
-  const imageFirst = block.imagePosition === 'left'
   const titleFontClass = block.titleFont || 'font-sans'
+  
+  // Nouvelles positions
+  const isImageTop = block.imagePosition === 'top'
+  const isImageBottom = block.imagePosition === 'bottom'
+  const isImageSide = block.imagePosition === 'left' || block.imagePosition === 'right'
+  const imageFirst = block.imagePosition === 'left'
+
   const isTextOnly = !imageUrl
 
+  // Rendu pour les positions "haut" et "bas" (colonne unique)
+  if (isImageTop || isImageBottom) {
+    return (
+      <section className="container-custom py-12 md:py-16 overflow-hidden">
+        <div className="max-w-5xl mx-auto flex flex-col gap-8">
+          
+          {isImageTop && imageUrl && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
+            >
+              <Image
+                src={imageUrl}
+                alt={block.image?.alt || ''}
+                fill
+                sizes="100vw"
+                className="object-cover"
+              />
+            </motion.div>
+          )}
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            {block.title && (
+              <h2 className={`text-3xl font-bold text-[#06245F] md:text-4xl ${titleFontClass}`}>
+                {block.title}
+              </h2>
+            )}
+            {block.content && block.content.length > 0 && (
+              <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed">
+                <PortableText value={block.content as never} components={portableTextComponents} />
+              </div>
+            )}
+            {block.cta?.label && block.cta.link && (
+              <Link
+                href={block.cta.link}
+                className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
+              >
+                {block.cta.label}
+              </Link>
+            )}
+          </motion.div>
+
+          {isImageBottom && imageUrl && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
+            >
+              <Image
+                src={imageUrl}
+                alt={block.image?.alt || ''}
+                fill
+                sizes="100vw"
+                className="object-cover"
+              />
+            </motion.div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  // Rendu pour les positions "gauche" et "droite" (2 colonnes classiques)
   return (
     <section className="container-custom py-16 md:py-24 overflow-hidden">
       <div className={`grid items-center gap-10 md:gap-16 ${isTextOnly ? 'max-w-5xl mx-auto' : 'md:grid-cols-2'}`}>
         
-        {/* Bloc Texte avec animation */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -91,17 +166,11 @@ export function TextMediaSection({ block }: Props) {
               {block.title}
             </h2>
           )}
-
           {block.content && block.content.length > 0 && (
             <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed">
-              <PortableText
-                value={block.content as never}
-                onMissingComponent={false}
-                components={portableTextComponents}
-              />
+              <PortableText value={block.content as never} onMissingComponent={false} components={portableTextComponents} />
             </div>
           )}
-
           {block.cta?.label && block.cta.link && (
             <Link
               href={block.cta.link}
@@ -112,7 +181,6 @@ export function TextMediaSection({ block }: Props) {
           )}
         </motion.div>
 
-        {/* Bloc Image avec animation */}
         {imageUrl && (
           <motion.div 
             initial={{ opacity: 0, x: imageFirst ? -40 : 40 }}

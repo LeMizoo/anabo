@@ -11,7 +11,6 @@ export default async function AdminDashboardPage() {
   const session = await auth()
   if (!session) redirect('/admin/login')
 
-  // Statistiques de base
   const [totalQuotes, newQuotes] = await Promise.all([
     prisma.quoteRequest.count(),
     prisma.quoteRequest.count({ where: { status: 'NOUVEAU' } })
@@ -22,7 +21,6 @@ export default async function AdminDashboardPage() {
     orderBy: { createdAt: 'desc' },
   })
 
-  // 1. Données pour le graphique "Demandes par mois"
   const allQuotes = await prisma.quoteRequest.findMany({ 
     select: { createdAt: true } 
   })
@@ -38,7 +36,6 @@ export default async function AdminDashboardPage() {
     demandes: quotesByMonth[month]
   }))
 
-  // 2. Données pour le graphique "Répartition par statut"
   const statusCounts = await prisma.quoteRequest.groupBy({
     by: ['status'],
     _count: { status: true },
@@ -50,7 +47,7 @@ export default async function AdminDashboardPage() {
   }))
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* En-tête */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -67,7 +64,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Cartes de statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="p-4 bg-blue-50 text-blue-600 rounded-lg">
             <FileText className="w-6 h-6" />
@@ -105,7 +102,7 @@ export default async function AdminDashboardPage() {
       {/* Graphiques */}
       <DashboardCharts data={chartData} statusData={statusData} />
 
-      {/* Dernières demandes améliorées */}
+      {/* Dernières demandes */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <h2 className="text-lg font-semibold text-gray-900">Dernières demandes reçues</h2>
@@ -113,8 +110,10 @@ export default async function AdminDashboardPage() {
             Tout voir
           </Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
+        
+        {/* Le conteneur scrollable pour mobile */}
+        <div className="w-full overflow-x-auto">
+          <table className="w-full min-w-[700px] text-left text-sm text-gray-600">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>
                 <th className="px-6 py-4 font-medium whitespace-nowrap">Référence</th>

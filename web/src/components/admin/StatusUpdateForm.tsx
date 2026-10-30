@@ -9,18 +9,14 @@ import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 export function StatusUpdateForm({ 
   quoteId, 
   currentStatus, 
-  currentNotes 
 }: { 
   quoteId: string, 
   currentStatus: QuoteStatus, 
-  currentNotes: string 
 }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
   const [status, setStatus] = useState<QuoteStatus>(currentStatus)
-  const [notes, setNotes] = useState(currentNotes)
-  
   const [successMsg, setSuccessMsg] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -30,18 +26,19 @@ export function StatusUpdateForm({
     setErrorMsg('')
 
     startTransition(async () => {
-      const result = await updateQuoteStatus(quoteId, status, notes)
+      // On passe undefined pour ne pas écraser les notes déjà enregistrées
+      const result = await updateQuoteStatus(quoteId, status, undefined)
       
       if (result.emailError) {
         setErrorMsg(result.emailError)
         router.refresh()
       } else {
         if (result.emailSent) {
-          setSuccessMsg('Statut mis à jour et e-mail envoyé au client ! Redirection vers le tableau de bord...')
+          setSuccessMsg('Statut mis à jour et e-mail envoyé au client ! Redirection...')
         } else if (result.statusChanged) {
-          setSuccessMsg('Statut mis à jour avec succès ! Redirection vers le tableau de bord...')
+          setSuccessMsg('Statut mis à jour avec succès ! Redirection...')
         } else {
-          setSuccessMsg('Aucune modification nécessaire (statut identique). Redirection vers le tableau de bord...')
+          setSuccessMsg('Aucune modification nécessaire (statut identique). Redirection...')
         }
 
         setTimeout(() => {
@@ -65,31 +62,19 @@ export function StatusUpdateForm({
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-          <select 
-            value={status} 
-            onChange={(e) => setStatus(e.target.value as QuoteStatus)} 
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-800 focus:ring-1 focus:ring-gray-800"
-          >
-            <option value="NOUVEAU">Nouveau</option>
-            <option value="CONTACTE">Contacté</option>
-            <option value="DEVIS_ENVOYE">Devis envoyé</option>
-            <option value="CONFIRME">Confirmé</option>
-            <option value="PERDU">Perdu</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notes internes</label>
-          <textarea 
-            value={notes} 
-            onChange={(e) => setNotes(e.target.value)} 
-            rows={1} 
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-800 focus:ring-1 focus:ring-gray-800" 
-            placeholder="Notes privées..." 
-          />
-        </div>
+      <div className="max-w-xs">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau statut</label>
+        <select 
+          value={status} 
+          onChange={(e) => setStatus(e.target.value as QuoteStatus)} 
+          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-800 focus:ring-1 focus:ring-gray-800"
+        >
+          <option value="NOUVEAU">Nouveau</option>
+          <option value="CONTACTE">Contacté</option>
+          <option value="DEVIS_ENVOYE">Devis envoyé</option>
+          <option value="CONFIRME">Confirmé</option>
+          <option value="PERDU">Perdu</option>
+        </select>
       </div>
       
       <div className="flex justify-end pt-2">

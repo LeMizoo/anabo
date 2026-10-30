@@ -46,7 +46,7 @@ function buildAdminEmail(data: QuoteData) {
     <p><strong>Téléphone :</strong> ${escapeHtml(data.phone)}</p>
     <p><strong>Pays :</strong> ${escapeHtml(data.country) || '—'}</p>
     <hr />
-    <p><strong>Circuit :</strong> ${escapeHtml(data.circuitTitle) || escapeHtml(data.circuitSlug) || '—'}</p>
+    <p><strong>Itinéraire :</strong> ${escapeHtml(data.circuitTitle) || escapeHtml(data.circuitSlug) || '—'}</p>
     <p><strong>Dates :</strong> ${formatDate(data.startDate)} → ${formatDate(data.endDate)}</p>
     <p><strong>Voyageurs :</strong> ${data.adults} adulte(s), ${data.children} enfant(s)</p>
     <hr />
@@ -69,7 +69,7 @@ function buildClientEmail(data: QuoteData) {
       <p>Bonjour ${escapeHtml(d.firstName)},</p>
       <p>Nous avons bien reçu votre demande de devis et vous remercions de votre confiance.</p>
       <p><strong>Référence :</strong> ${escapeHtml(d.reference)}</p>
-      ${d.circuitTitle ? `<p><strong>Circuit :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
+      ${d.circuitTitle ? `<p><strong>Itinéraire :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Notre équipe vous répondra sous 24 à 48 heures ouvrées.</p>
       <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>
     `,
@@ -77,7 +77,7 @@ function buildClientEmail(data: QuoteData) {
       <p>Hello ${escapeHtml(d.firstName)},</p>
       <p>We have received your quote request and thank you for your trust.</p>
       <p><strong>Reference:</strong> ${escapeHtml(d.reference)}</p>
-      ${d.circuitTitle ? `<p><strong>Tour:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
+      ${d.circuitTitle ? `<p><strong>Itinerary:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Our team will reply within 24 to 48 business hours.</p>
       <p>See you soon,<br />The ANABO Roadtrip Madagascar team</p>
     `,
@@ -85,7 +85,7 @@ function buildClientEmail(data: QuoteData) {
       <p>Ciao ${escapeHtml(d.firstName)},</p>
       <p>Abbiamo ricevuto la tua richiesta di preventivo e ti ringraziamo per la fiducia.</p>
       <p><strong>Riferimento:</strong> ${escapeHtml(d.reference)}</p>
-      ${d.circuitTitle ? `<p><strong>Tour:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
+      ${d.circuitTitle ? `<p><strong>Itinerario:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Il nostro team risponderà entro 24-48 ore lavorative.</p>
       <p>A presto,<br />Il team ANABO Roadtrip Madagascar</p>
     `,
@@ -139,7 +139,6 @@ export async function sendQuoteStatusEmail(
   let subject = ''
   let html = ''
   
-  // Lien vers la page publique du devis
   const quoteUrl = token
   ? `https://roadtrip.anabo.mg/fr/devis/${encodeURIComponent(reference)}?token=${encodeURIComponent(token)}`
   : `https://roadtrip.anabo.mg/fr/devis/${encodeURIComponent(reference)}` 

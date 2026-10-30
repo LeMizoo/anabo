@@ -111,7 +111,7 @@ export interface TextMediaBlock {
   titleFont?: string
   content?: unknown[]
   image?: SanityImage
-  imagePosition?: 'left' | 'right'
+  imagePosition?: 'left' | 'right' | 'top' | 'bottom' // <-- Modifié
   cta?: PageCta
 }
 
