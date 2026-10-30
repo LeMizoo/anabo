@@ -23,6 +23,10 @@ export async function HomeHero({ hero }: HomeHeroProps) {
         ? 'items-end text-right'
         : 'items-center text-center'
 
+  // 👇 Récupération des polices depuis Sanity
+  const titleFont = hero.titleFont || 'font-sans'
+  const subtitleFont = hero.subtitleFont || 'font-sans'
+
   return (
     <section className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-gray-900">
       {backgroundImage && (
@@ -48,12 +52,14 @@ export async function HomeHero({ hero }: HomeHeroProps) {
             {t('eyebrow')}
           </p>
 
-          <h1 className="max-w-4xl text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-7xl">
+          {/* 👇 Application de la police du titre */}
+          <h1 className={`max-w-4xl text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-7xl ${titleFont}`}>
             {hero.title || t('fallbackTitle')}
           </h1>
 
           {hero.subtitle && (
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/90 sm:text-xl">
+            /* 👇 Application de la police du sous-titre */
+            <p className={`mt-6 max-w-2xl text-lg leading-8 text-white/90 sm:text-xl ${subtitleFont}`}>
               {hero.subtitle}
             </p>
           )}

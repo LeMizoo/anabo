@@ -9,7 +9,43 @@ export default {
       title: 'Titre principal',
       validation: (Rule: any) => Rule.required(),
     },
-    { name: 'subtitle', type: 'string', title: 'Sous-titre' },
+    // 👇 NOUVEAU : Police pour le titre principal 👇
+    {
+      name: 'titleFont',
+      type: 'string',
+      title: 'Police du Titre',
+      description: 'Choisissez la police pour le titre principal.',
+      options: {
+        list: [
+          { title: 'Par défaut (Inter / Sans-serif)', value: 'font-sans' },
+          { title: 'Élégante (Playfair / Serif)', value: 'font-serif' },
+          { title: 'Manuscrite (Perfect Girl)', value: 'font-script' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'font-sans',
+    },
+    { 
+      name: 'subtitle', 
+      type: 'string', 
+      title: 'Sous-titre' 
+    },
+    // 👇 NOUVEAU : Police pour le sous-titre 👇
+    {
+      name: 'subtitleFont',
+      type: 'string',
+      title: 'Police du Sous-titre',
+      description: 'Choisissez la police pour le sous-titre.',
+      options: {
+        list: [
+          { title: 'Par défaut (Inter / Sans-serif)', value: 'font-sans' },
+          { title: 'Élégante (Playfair / Serif)', value: 'font-serif' },
+          { title: 'Manuscrite (Perfect Girl)', value: 'font-script' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'font-sans',
+    },
     {
       name: 'backgroundImage',
       type: 'image',

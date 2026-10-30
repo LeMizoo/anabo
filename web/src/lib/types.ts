@@ -98,6 +98,8 @@ export interface HeroBlock {
   _type: 'heroBlock'
   title: string
   subtitle?: string
+  titleFont?: string    // 👈 Ajouté
+  subtitleFont?: string // 👈 Ajouté
   backgroundImage?: SanityImage
   overlay?: boolean
   alignment?: 'left' | 'center' | 'right'

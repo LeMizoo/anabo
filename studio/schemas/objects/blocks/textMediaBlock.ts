@@ -5,7 +5,6 @@ export default {
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
     
-    // 👇 NOUVEAU : Sélecteur de police pour ce titre spécifique 👇
     {
       name: 'titleFont',
       type: 'string',
@@ -17,11 +16,10 @@ export default {
           { title: 'Élégante (Serif / Playfair)', value: 'font-serif' },
           { title: 'Moderne (Poppins)', value: 'font-poppins' },
         ],
-        layout: 'radio', // Affiche des boutons radio au lieu d'un menu déroulant
+        layout: 'radio',
       },
       initialValue: 'font-sans',
     },
-    // 👆 FIN DU NOUVEAU CHAMP 👆
 
     {
       name: 'content',
@@ -36,7 +34,6 @@ export default {
             { title: 'H3', value: 'h3' },
             { title: 'Citation', value: 'blockquote' },
           ],
-          // Listes personnalisées (y compris les coches)
           lists: [
             { title: 'Puces', value: 'bullet' },
             { title: 'Numérotée', value: 'number' },
@@ -78,6 +75,8 @@ export default {
         list: [
           { title: 'Gauche', value: 'left' },
           { title: 'Droite', value: 'right' },
+          { title: 'En haut', value: 'top' },
+          { title: 'En bas', value: 'bottom' },
         ],
         layout: 'radio',
       },
