@@ -34,6 +34,14 @@ export interface PageCta {
   link?: string
 }
 
+// Réglages communs
+export interface BlockSettings {
+  anchorId?: string
+  background?: 'white' | 'cream' | 'navy'
+  spacing?: 'sm' | 'md' | 'lg'
+  hidden?: boolean
+}
+
 export interface PuzzleItem {
   _key: string
   image: SanityImage
@@ -45,6 +53,7 @@ export interface PuzzleGalleryBlock {
   _type: 'puzzleGalleryBlock'
   title?: string
   items?: PuzzleItem[]
+  settings?: BlockSettings
 }
 
 export interface AlternatingBlock {
@@ -57,8 +66,21 @@ export interface AlternatingBlock {
   subtitleWeight?: string
   content?: unknown[]
   image?: SanityImage
+  floatingImages?: {
+    _key: string
+    image: SanityImage
+    size: 'sm' | 'md' | 'lg'
+    position:
+      | 'top-left'
+      | 'top-right'
+      | 'center-left'
+      | 'center-right'
+      | 'bottom-left'
+      | 'bottom-right'
+  }[]
   imagePosition?: 'left' | 'right'
   backgroundColor?: 'white' | 'cream'
+  settings?: BlockSettings
 }
 
 export interface FeaturesBlock {
@@ -73,6 +95,7 @@ export interface FeaturesBlock {
     description: string
     icon?: string
   }[]
+  settings?: BlockSettings
 }
 
 export interface CommitmentsBlock {
@@ -91,6 +114,7 @@ export interface CommitmentsBlock {
       text: string
     }[]
   }[]
+  settings?: BlockSettings
 }
 
 export interface HeroBlock {
@@ -104,6 +128,7 @@ export interface HeroBlock {
   alignment?: 'left' | 'center' | 'right'
   ctaPrimary?: PageCta
   ctaSecondary?: PageCta
+  settings?: BlockSettings
 }
 
 export interface TextMediaBlock {
@@ -114,6 +139,7 @@ export interface TextMediaBlock {
   image?: SanityImage
   imagePosition?: 'left' | 'right' | 'top' | 'bottom'
   cta?: PageCta
+  settings?: BlockSettings
 }
 
 export interface CtaBlock {
@@ -123,6 +149,7 @@ export interface CtaBlock {
   buttonLabel?: string
   buttonLink?: string
   variant?: 'primary' | 'secondary' | 'brown'
+  settings?: BlockSettings
 }
 
 export interface ContactFormBlock {
@@ -131,6 +158,7 @@ export interface ContactFormBlock {
   description?: string
   formType?: 'contact' | 'quote'
   showWhatsapp?: boolean
+  settings?: BlockSettings
 }
 
 export interface Slider3DSlide {
@@ -148,6 +176,7 @@ export interface Slider3DBlock {
   autoplay?: boolean
   interval?: number
   slides?: Slider3DSlide[]
+  settings?: BlockSettings
 }
 
 export interface TestimonialBlock {
@@ -162,9 +191,10 @@ export interface TestimonialBlock {
     content: string
     rating?: number
   }[]
+  settings?: BlockSettings
 }
 
-// 👇 DÉCLARATION UNIQUE DE PageModule
+// PageModule complet
 export type PageModule =
   | HeroBlock
   | TextMediaBlock
@@ -210,7 +240,7 @@ export interface HomePage {
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
-  modules?: PageModule[] // 👈 Utilise PageModule directement pour éviter les oublis
+  modules?: PageModule[]
 }
 
 export interface Testimonial {

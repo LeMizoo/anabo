@@ -83,7 +83,7 @@ export function TextMediaSection({ block }: Props) {
   // Rendu pour les positions "haut" et "bas" (colonne unique)
   if (isImageTop || isImageBottom) {
     return (
-      <section className="container-custom py-12 md:py-16 overflow-hidden">
+      <section className="container-custom overflow-hidden">
         <div className="max-w-5xl mx-auto flex flex-col gap-8">
           
           {isImageTop && imageUrl && (
@@ -151,7 +151,7 @@ export function TextMediaSection({ block }: Props) {
 
   // Rendu pour les positions "gauche" et "droite" (2 colonnes classiques)
   return (
-    <section className="container-custom py-16 md:py-24 overflow-hidden">
+    <section className="container-custom overflow-hidden">
       <div className={`grid items-center gap-10 md:gap-16 ${isTextOnly ? 'max-w-5xl mx-auto' : 'md:grid-cols-2'}`}>
         
         <motion.div 

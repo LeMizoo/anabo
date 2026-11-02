@@ -1,3 +1,4 @@
+
 export default {
   name: 'heroBlock',
   title: 'Hero Section',
@@ -9,7 +10,6 @@ export default {
       title: 'Titre principal',
       validation: (Rule: any) => Rule.required(),
     },
-    // 👇 NOUVEAU : Police pour le titre principal 👇
     {
       name: 'titleFont',
       type: 'string',
@@ -25,12 +25,11 @@ export default {
       },
       initialValue: 'font-sans',
     },
-    { 
-      name: 'subtitle', 
-      type: 'string', 
-      title: 'Sous-titre' 
+    {
+      name: 'subtitle',
+      type: 'string',
+      title: 'Sous-titre',
     },
-    // 👇 NOUVEAU : Police pour le sous-titre 👇
     {
       name: 'subtitleFont',
       type: 'string',
@@ -51,7 +50,9 @@ export default {
       type: 'image',
       title: 'Image de fond',
       options: { hotspot: true },
-      fields: [{ name: 'alt', type: 'string', title: 'Texte alternatif' }],
+      fields: [
+        { name: 'alt', type: 'string', title: 'Texte alternatif' },
+      ],
     },
     {
       name: 'overlay',
@@ -91,11 +92,23 @@ export default {
         { name: 'link', type: 'string', title: 'Lien' },
       ],
     },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ],
   preview: {
-    select: { title: 'title', media: 'backgroundImage' },
+    select: {
+      title: 'title',
+      media: 'backgroundImage',
+    },
     prepare({ title, media }: any) {
-      return { title: title || 'Hero Section', subtitle: 'Hero', media }
+      return {
+        title: title || 'Hero Section',
+        subtitle: 'Hero',
+        media,
+      }
     },
   },
 }

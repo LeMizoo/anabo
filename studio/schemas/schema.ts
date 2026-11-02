@@ -1,8 +1,11 @@
+
 import page from './documents/page'
 import siteSettings from './documents/siteSettings'
 import testimonial from './documents/testimonial'
 
 import seoFields from './objects/seoFields'
+import blockSettings from './objects/blockSettings'
+
 import heroBlock from './objects/blocks/heroBlock'
 import textMediaBlock from './objects/blocks/textMediaBlock'
 import galleryBlock from './objects/blocks/galleryBlock'
@@ -15,7 +18,6 @@ import slider3dBlock from './objects/blocks/slider3dBlock'
 import puzzleGalleryBlock from './objects/blocks/puzzleGalleryBlock'
 import alternatingBlock from './objects/blocks/alternatingBlock'
 import featuresBlock from './objects/blocks/featuresBlock'
-// 👇 NOUVEL IMPORT 👇
 import commitmentsBlock from './objects/blocks/commitmentsBlock'
 
 export const schemaTypes = [
@@ -23,6 +25,7 @@ export const schemaTypes = [
   siteSettings,
   testimonial,
   seoFields,
+  blockSettings,
   heroBlock,
   textMediaBlock,
   galleryBlock,
@@ -35,6 +38,5 @@ export const schemaTypes = [
   puzzleGalleryBlock,
   alternatingBlock,
   featuresBlock,
-  // 👇 NOUVEAU BLOC AJOUTÉ AU TABLEAU 👇
   commitmentsBlock,
 ]

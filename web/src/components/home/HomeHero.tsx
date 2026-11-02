@@ -3,13 +3,17 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
-import type { HeroBlock } from '@/lib/types'
+import type { HeroBlock, BlockSettings } from '@/lib/types'
 
 type HomeHeroProps = {
   hero: HeroBlock
+  settings?: BlockSettings
 }
 
-export async function HomeHero({ hero }: HomeHeroProps) {
+export async function HomeHero({ hero, settings }: HomeHeroProps) {
+  // 👇 Si le bloc est masqué, on ne l'affiche pas du tout
+  if (settings?.hidden) return null
+
   const t = await getTranslations('home')
 
   const backgroundImage = hero.backgroundImage?.asset?.url
@@ -28,7 +32,11 @@ export async function HomeHero({ hero }: HomeHeroProps) {
   const subtitleFont = hero.subtitleFont || 'font-sans'
 
   return (
-    <section className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-gray-900">
+    // 👇 Ajout de l'id pour permettre les liens internes (ex: /fr#accueil)
+    <section 
+      id={settings?.anchorId} 
+      className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-gray-900"
+    >
       {backgroundImage && (
         <Image
           src={backgroundImage}

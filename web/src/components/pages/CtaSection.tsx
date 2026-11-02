@@ -9,7 +9,7 @@ export function CtaSection({ block }: Props) {
   const secondary = block.variant === 'secondary'
 
   return (
-    <section className="container-custom py-16 md:py-24">
+    <section className="container-custom">
       <div
         className={`rounded-2xl px-6 py-12 text-center md:px-12 ${
           secondary

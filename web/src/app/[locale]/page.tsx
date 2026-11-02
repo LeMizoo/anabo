@@ -72,9 +72,10 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
-      <HomeHero hero={hero} />
+      {/* 👇 On passe les settings (ancre, masquage) au Hero d'accueil */}
+      <HomeHero hero={hero} settings={hero.settings} />
       <PageRenderer modules={otherModules} />
-      
+
       {/* 👇 Intégration du widget Tripadvisor (Trustindex) */}
       <TrustindexWidget />
     </>

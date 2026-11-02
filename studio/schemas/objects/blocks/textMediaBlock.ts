@@ -1,10 +1,11 @@
+
 export default {
   name: 'textMediaBlock',
   title: 'Texte + Média',
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
-    
+
     {
       name: 'titleFont',
       type: 'string',
@@ -60,6 +61,7 @@ export default {
         },
       ],
     },
+
     {
       name: 'image',
       type: 'image',
@@ -67,6 +69,7 @@ export default {
       options: { hotspot: true },
       fields: [{ name: 'alt', type: 'string', title: 'Texte alternatif' }],
     },
+
     {
       name: 'imagePosition',
       type: 'string',
@@ -82,6 +85,7 @@ export default {
       },
       initialValue: 'right',
     },
+
     {
       name: 'cta',
       type: 'object',
@@ -91,7 +95,14 @@ export default {
         { name: 'link', type: 'string', title: 'Lien' },
       ],
     },
+
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ],
+
   preview: {
     select: { title: 'title', media: 'image' },
     prepare({ title, media }: any) {
