@@ -14,7 +14,6 @@ export interface SiteSettings {
     fr?: { siteName?: string; tagline?: string; description?: string }
     it?: { siteName?: string; tagline?: string; description?: string }
   }
-  // 👇 Ajout du champ typographie 👇
   typography?: SiteTypography
   contactEmail?: string
   contactPhone?: string
@@ -98,8 +97,8 @@ export interface HeroBlock {
   _type: 'heroBlock'
   title: string
   subtitle?: string
-  titleFont?: string    // 👈 Ajouté
-  subtitleFont?: string // 👈 Ajouté
+  titleFont?: string
+  subtitleFont?: string
   backgroundImage?: SanityImage
   overlay?: boolean
   alignment?: 'left' | 'center' | 'right'
@@ -113,7 +112,7 @@ export interface TextMediaBlock {
   titleFont?: string
   content?: unknown[]
   image?: SanityImage
-  imagePosition?: 'left' | 'right' | 'top' | 'bottom' // <-- Modifié
+  imagePosition?: 'left' | 'right' | 'top' | 'bottom'
   cta?: PageCta
 }
 
@@ -151,6 +150,21 @@ export interface Slider3DBlock {
   slides?: Slider3DSlide[]
 }
 
+export interface TestimonialBlock {
+  _type: 'testimonialBlock'
+  title?: string
+  layout?: 'carousel' | 'grid'
+  testimonials?: {
+    _id: string
+    authorName: string
+    authorCountry?: string
+    authorPhoto?: SanityImage
+    content: string
+    rating?: number
+  }[]
+}
+
+// 👇 DÉCLARATION UNIQUE DE PageModule
 export type PageModule =
   | HeroBlock
   | TextMediaBlock
@@ -161,6 +175,7 @@ export type PageModule =
   | AlternatingBlock
   | FeaturesBlock
   | CommitmentsBlock
+  | TestimonialBlock
 
 export interface PageSeo {
   metaTitle?: string
@@ -195,15 +210,7 @@ export interface HomePage {
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
-  modules?: (
-    | HeroBlock
-    | Slider3DBlock
-    | ContactFormBlock
-    | PuzzleGalleryBlock
-    | AlternatingBlock
-    | FeaturesBlock
-    | CommitmentsBlock
-  )[]
+  modules?: PageModule[] // 👈 Utilise PageModule directement pour éviter les oublis
 }
 
 export interface Testimonial {

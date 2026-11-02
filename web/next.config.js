@@ -16,6 +16,12 @@ const nextConfig = {
         hostname: 'cdn.sanity.io',
         pathname: '/images/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'dynamic-media-cdn.tripadvisor.com',
+        pathname: '/media/**',
+        // 👇 On ne met PAS de "search" ici, ce qui autorise ?w=...&h=...&s=1
+      },
     ],
     formats: ['image/avif', 'image/webp'],
   },

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { HomeHero } from '@/components/home/HomeHero'
+import { TrustindexWidget } from '@/components/pages/TrustindexWidget'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { sanityClient } from '@/lib/sanity'
 import { homePageQuery } from '@/lib/queries'
@@ -42,7 +43,7 @@ export default async function HomePage({ params }: Props) {
 
   setRequestLocale(locale)
 
-  // 👇 L'appel à Sanity DOIT recevoir la locale pour filtrer la bonne page 👇
+  // Appel à Sanity pour récupérer la page d'accueil de la locale courante
   const homePage = await sanityClient.fetch<HomePage | null>(
     homePageQuery,
     { locale },
@@ -73,6 +74,9 @@ export default async function HomePage({ params }: Props) {
     <>
       <HomeHero hero={hero} />
       <PageRenderer modules={otherModules} />
+      
+      {/* 👇 Intégration du widget Tripadvisor (Trustindex) */}
+      <TrustindexWidget />
     </>
   )
 }

@@ -6,9 +6,10 @@ import {
   setRequestLocale,
 } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { ThemeProvider } from 'next-themes' // 👈 Import
+import { ThemeProvider } from 'next-themes'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { CookieBanner } from '@/components/layout/CookieBanner' // 👈 Import ajouté
 import { locales, type Locale } from '@/lib/i18n'
 
 type Props = {
@@ -88,6 +89,9 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          
+          {/* 👇 Bandeau de cookies ajouté ici 👇 */}
+          <CookieBanner />
         </div>
       </ThemeProvider>
     </NextIntlClientProvider>

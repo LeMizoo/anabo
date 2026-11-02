@@ -8,6 +8,7 @@ import { PuzzleGallery } from './PuzzleGallery'
 import { AlternatingSection } from './AlternatingSection'
 import { Features } from './Features'
 import { CommitmentsSection } from './CommitmentsSection'
+import { TestimonialsSection } from './TestimonialsSection' // 👈 Import ajouté
 
 type Props = {
   modules?: PageModule[] | null
@@ -41,6 +42,8 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
             return <Features key={index} block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
           case 'commitmentsBlock':
             return <CommitmentsSection key={index} block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+          case 'testimonialBlock': // 👈 Case ajouté
+            return <TestimonialsSection key={index} block={module as any} />
           default:
             return null
         }
