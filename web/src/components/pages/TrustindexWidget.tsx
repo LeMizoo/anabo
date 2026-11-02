@@ -79,6 +79,16 @@ export function TrustindexWidget() {
   return (
     <section className="bg-white py-16">
       <div className="container-custom mx-auto max-w-6xl px-4">
+        {/* 👇 CSS pour masquer les images de profil Tripadvisor 👇 */}
+        <style jsx global>{`
+          .ti-widget .ti-profile-img,
+          .ti-widget .ti-profile-img img,
+          .ti-widget .ti-review-item .ti-profile-img,
+          .ti-widget .ti-review-item img.ti-profile-img {
+            display: none !important;
+          }
+        `}</style>
+
         <h2 className="mb-12 text-center font-serif text-3xl font-bold text-[#06245F]">
           {t.title}
         </h2>
