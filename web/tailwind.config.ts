@@ -9,7 +9,18 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  safelist: ['font-sans', 'font-poppins', 'font-serif', 'font-perfect-sans', 'font-script'],
+  safelist: [
+    'font-sans',
+    'font-poppins',
+    'font-serif',
+    'font-playfair-sc',
+    'font-perfect-sans',
+    'font-script',
+    'font-euphoria',
+    'font-haigrast',
+    'font-script-alt',
+    'font-script-in',
+  ],
   theme: {
     extend: {
       colors: {
@@ -45,8 +56,13 @@ const config: Config = {
         display: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
         poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
         serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+        'playfair-sc': ['var(--font-playfair-sc)', 'Georgia', 'serif'],
         script: ['var(--font-perfect-script)', 'cursive'],
         'perfect-sans': ['var(--font-perfect-sans)', 'sans-serif'],
+        euphoria: ['var(--font-euphoria)', 'cursive'],
+        haigrast: ['var(--font-haigrast)', 'cursive'],
+        'script-alt': ['var(--font-script-alt)', 'cursive'],
+        'script-in': ['var(--font-script-in)', 'cursive'],
       },
       container: {
         center: true,

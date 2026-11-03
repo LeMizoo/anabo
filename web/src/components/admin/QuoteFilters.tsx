@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 
 export function QuoteFilters() {
   const router = useRouter()
@@ -28,26 +28,41 @@ export function QuoteFilters() {
     router.push(`?${params.toString()}`)
   }
 
+  const clearFilters = () => {
+    setSearch('')
+    router.push('/admin/demandes')
+  }
+
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+    <div className="mb-6 flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row">
       {/* Barre de recherche */}
-      <form onSubmit={handleSearch} className="flex-1 relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <form onSubmit={handleSearch} role="search" className="relative flex flex-1 gap-2">
+        <label htmlFor="quote-search" className="sr-only">Rechercher une demande</label>
+        <Search aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
+          id="quote-search"
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Rechercher par référence, nom ou email..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          className="min-w-0 w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
         />
-        <button type="submit" className="hidden">Rechercher</button>
+        <button
+          type="submit"
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        >
+          <Search aria-hidden="true" className="h-4 w-4" />
+          <span className="hidden sm:inline">Rechercher</span>
+        </button>
       </form>
 
       {/* Filtre par statut */}
+      <label htmlFor="quote-status-filter" className="sr-only">Filtrer les demandes par statut</label>
       <select
+        id="quote-status-filter"
         value={currentStatus}
         onChange={handleStatusChange}
-        className="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+        className="w-full cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 sm:w-48"
       >
         <option value="">Tous les statuts</option>
         <option value="NOUVEAU">Nouveau</option>
@@ -56,6 +71,16 @@ export function QuoteFilters() {
         <option value="CONFIRME">Confirmé</option>
         <option value="PERDU">Perdu</option>
       </select>
+      {(search || currentStatus) && (
+        <button
+          type="button"
+          onClick={clearFilters}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        >
+          <X aria-hidden="true" className="h-4 w-4" />
+          Effacer
+        </button>
+      )}
     </div>
   )
 }

@@ -4,16 +4,18 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
-import type { ImagePresentation } from '@/lib/types'
+import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import type { BrandTextColor, ImagePresentation } from '@/lib/types'
 import { imageContentStyle, imageFrameStyle } from './ImageFrame'
 
 type Slide = {
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   subtitle?: string
   subtitleFont?: string
+  subtitleColor?: BrandTextColor
   subtitleSize?: string
   imagePosition?: string
   imageFit?: 'cover' | 'contain'
@@ -28,6 +30,7 @@ type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleColor?: BrandTextColor
     titleSize?: string
     autoplay?: boolean
     interval?: number
@@ -52,10 +55,15 @@ export function Slider3D({ block }: Props) {
   if (n === 0) return null
 
   return (
-    <section className="overflow-hidden py-16">
+    <section className="overflow-hidden">
       <div className="container-custom">
         {block.title && (
-          <h2 className={`mb-10 text-center font-bold ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}>{block.title}</h2>
+          <h2
+            className={`mb-8 text-center font-bold ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
+            style={{ color: brandTextColor(block.titleColor) }}
+          >
+            {block.title}
+          </h2>
         )}
 
         <div
@@ -98,8 +106,22 @@ export function Slider3D({ block }: Props) {
                 
                 {(s.title || s.subtitle) && (
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
-                    {s.title && <h3 className={`${s.titleFont || 'font-sans'} font-semibold ${titleSizeClass(s.titleSize)}`}>{s.title}</h3>}
-                    {s.subtitle && <p className={`mt-1 ${s.subtitleFont || 'font-sans'} ${subtitleSizeClass(s.subtitleSize)}`}>{s.subtitle}</p>}
+                    {s.title && (
+                      <h3
+                        className={`${s.titleFont || 'font-sans'} font-semibold ${titleSizeClass(s.titleSize)}`}
+                        style={{ color: brandTextColor(s.titleColor) }}
+                      >
+                        {s.title}
+                      </h3>
+                    )}
+                    {s.subtitle && (
+                      <p
+                        className={`mt-1 ${s.subtitleFont || 'font-sans'} ${subtitleSizeClass(s.subtitleSize)}`}
+                        style={{ color: brandTextColor(s.subtitleColor) }}
+                      >
+                        {s.subtitle}
+                      </p>
+                    )}
                     
                     {/* 👇 Utilisation de la traduction ici 👇 */}
                     {s.linkUrl && i === active && (

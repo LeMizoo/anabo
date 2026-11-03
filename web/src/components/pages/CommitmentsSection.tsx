@@ -1,16 +1,18 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleColor?: 'navy' | 'gold' | 'charcoal' | 'white'
     titleSize?: string
     titleWeight?: string
     subtitle?: string
     subtitleFont?: string
+    subtitleColor?: 'navy' | 'gold' | 'charcoal' | 'white'
     subtitleSize?: string
     sections?: {
       _key: string
@@ -33,20 +35,26 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
   const subtitleFont = block.subtitleFont || 'font-script'
 
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-gray-900">
+    <section className="bg-white dark:bg-gray-900">
       <div className="container-custom mx-auto max-w-4xl px-4">
         {block.subtitle && (
-          <span className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} text-[#E0A01C] block mb-2`}>
+          <span
+            className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} text-[#E0A01C] block mb-2`}
+            style={{ color: brandTextColor(block.subtitleColor) }}
+          >
             {block.subtitle}
           </span>
         )}
         {block.title && (
-          <h2 className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}>
+          <h2
+            className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}
+            style={{ color: brandTextColor(block.titleColor) }}
+          >
             {block.title}
           </h2>
         )}
 
-        <div className="space-y-10">
+        <div className="space-y-8">
           {block.sections?.map((section, index) => (
             <motion.div
               key={section._key}
@@ -63,7 +71,7 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
                 </span>
                 {section.title}
               </h3>
-              <ul className="space-y-3 pl-8">
+              <ul className="space-y-2 pl-8">
                 {section.items?.map((item) => (
                   <li key={item._key} className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed list-disc marker:text-[#E0A01C]">
                     <strong className="text-gray-900 dark:text-gray-200">{item.label} :</strong> {item.text}

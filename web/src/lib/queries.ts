@@ -3,6 +3,7 @@
 export const siteSettingsQuery = `
   *[_type == "siteSettings"][0]{
     _id,
+    logo{ ..., asset->{url, metadata{dimensions}}, alt },
     siteName,
     tagline,
     description,
@@ -16,9 +17,30 @@ export const siteSettingsQuery = `
       globalHeadingWeight,
       globalBodyFont
     },
+    header {
+      showLogo,
+      logoHeight,
+      logoOpacity,
+      sticky,
+      showNavigation,
+      showThemeToggle,
+      showLanguageSwitcher
+    },
+    footer {
+      showLogo,
+      logoHeight,
+      logoOpacity,
+      invertLogo,
+      showTagline,
+      showDescription,
+      showNavigation,
+      showContact,
+      showSocialLinks
+    },
     contactEmail,
     contactPhone,
     whatsappNumber,
+    showFloatingWhatsapp,
     address,
     socialLinks[]{
       platform,
@@ -34,8 +56,10 @@ const pageModulesProjection = `
     title,
     subtitle,
     titleFont,
+    titleColor,
     titleSize,
     subtitleFont,
+    subtitleColor,
     subtitleSize,
     backgroundImage{ ..., asset->, alt, presentation },
     backgroundImagePosition,
@@ -48,6 +72,7 @@ const pageModulesProjection = `
   _type == "textMediaBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     content,
     image{ ..., asset->, alt, presentation },
@@ -58,6 +83,7 @@ const pageModulesProjection = `
   _type == "ctaBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     description,
     buttonLabel,
@@ -67,6 +93,7 @@ const pageModulesProjection = `
   _type == "contactFormBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     description,
     formType,
@@ -75,15 +102,18 @@ const pageModulesProjection = `
   _type == "slider3dBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     autoplay,
     interval,
     slides[]{
       title,
       titleFont,
+      titleColor,
       titleSize,
       subtitle,
       subtitleFont,
+      subtitleColor,
       subtitleSize,
       alt,
       linkLabel,
@@ -98,9 +128,11 @@ const pageModulesProjection = `
     title,
     subtitle,
     titleFont,
+    titleColor,
     titleSize,
     titleWeight,
     subtitleFont,
+    subtitleColor,
     subtitleSize,
     subtitleWeight,
     content,
@@ -118,6 +150,7 @@ const pageModulesProjection = `
   _type == "puzzleGalleryBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     layout,
     items[]{
@@ -133,6 +166,7 @@ const pageModulesProjection = `
   _type == "featuresBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     titleWeight,
     content,
@@ -141,10 +175,12 @@ const pageModulesProjection = `
   _type == "commitmentsBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     titleWeight,
     subtitle,
     subtitleFont,
+    subtitleColor,
     subtitleSize,
     sections[]{
       _key,
@@ -155,12 +191,14 @@ const pageModulesProjection = `
   _type == "galleryBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     images[]{ ..., asset->, alt, caption, presentation }
   },
   _type == "testimonialBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     layout,
     testimonials[]->{
@@ -168,6 +206,7 @@ const pageModulesProjection = `
       authorName,
       authorCountry,
       authorPhoto{ ..., asset->, alt },
+      testimonialImage{ ..., asset->, alt },
       content,
       rating
     }
@@ -175,12 +214,14 @@ const pageModulesProjection = `
   _type == "faqBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     items[]{ _key, question, answer }
   },
   _type == "tripadvisorBlock" => {
     title,
     titleFont,
+    titleColor,
     titleSize,
     showBadge,
     showCarousel,

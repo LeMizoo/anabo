@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { getImageUrl } from '@/lib/sanity'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
 import type { GalleryBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -18,12 +18,13 @@ export function GallerySection({ block }: Props) {
       <div className="mx-auto max-w-6xl">
         {block.title && (
           <h2
-            className={`mb-8 text-center font-bold text-[#06245F] ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
+            className={`mb-6 text-center font-bold text-[#06245F] ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
+            style={{ color: brandTextColor(block.titleColor) }}
           >
             {block.title}
           </h2>
         )}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {images.map((image, index) => (
             <figure key={image._key || index} className="relative">
               <ImageFrame

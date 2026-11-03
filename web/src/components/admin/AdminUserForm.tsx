@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { createAdminUser } from '@/app/admin/actions'
 import { Loader2, UserPlus, CheckCircle2 } from 'lucide-react'
+import { PasswordField } from './PasswordField'
 
 export function AdminUserForm() {
   const [isPending, startTransition] = useTransition()
@@ -50,12 +51,18 @@ export function AdminUserForm() {
         </div>
 
         <p className="text-sm text-green-700 mb-2">
-          L'utilisateur a reçu un email avec ses identifiants. Voici également une sauvegarde :
+          L&apos;utilisateur a reçu un email avec ses identifiants. Voici également une sauvegarde :
         </p>
 
-        <div className="bg-white p-3 rounded border text-sm font-mono space-y-1 text-gray-800">
+        <div className="bg-white p-3 rounded border text-sm space-y-3 text-gray-800">
           <p><strong>Email :</strong> {success.email}</p>
-          <p><strong>Mot de passe :</strong> {success.password}</p>
+          <PasswordField
+            id="temporary-password"
+            label="Mot de passe temporaire"
+            value={success.password}
+            readOnly
+            autoComplete="off"
+          />
         </div>
 
         <button
@@ -78,38 +85,48 @@ export function AdminUserForm() {
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="admin-user-name" className="block text-sm font-medium text-gray-700 mb-1">
           Nom complet
         </label>
         <input
+          id="admin-user-name"
           required
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
+          autoComplete="name"
+          maxLength={150}
+          disabled={isPending}
           className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="admin-user-email" className="block text-sm font-medium text-gray-700 mb-1">
           Email
         </label>
         <input
+          id="admin-user-email"
           required
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          autoComplete="email"
+          maxLength={191}
+          disabled={isPending}
           className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="admin-user-role" className="block text-sm font-medium text-gray-700 mb-1">
           Rôle
         </label>
         <select
+          id="admin-user-role"
           value={role}
           onChange={e => setRole(e.target.value)}
+          disabled={isPending}
           className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
         >
           <option value="ADMIN">Administrateur (gère les demandes)</option>
@@ -127,7 +144,7 @@ export function AdminUserForm() {
         ) : (
           <UserPlus className="w-4 h-4" />
         )}
-        Créer l'utilisateur
+        Créer l&apos;utilisateur
       </button>
     </form>
   )

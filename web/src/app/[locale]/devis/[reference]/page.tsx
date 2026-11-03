@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -75,12 +76,11 @@ export default async function DevisPage({ params, searchParams }: Props) {
             <input type="hidden" name="token" value={token} />
             <input type="hidden" name="reference" value={quote.reference} />
             <input type="hidden" name="locale" value={locale} />
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-green-600 px-4 py-3 text-white font-medium hover:bg-green-700"
-            >
-              Confirmer ce devis
-            </button>
+            <FormSubmitButton
+              label="Confirmer ce devis"
+              pendingLabel="Confirmation..."
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-medium text-white transition hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            />
           </form>
         )}
 

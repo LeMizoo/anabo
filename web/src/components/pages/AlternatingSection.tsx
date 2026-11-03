@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PortableText } from '@portabletext/react'
 import { getImageUrl } from '@/lib/sanity'
-import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 import type { AlternatingBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -49,10 +49,10 @@ export function AlternatingSection({
   const subtitleFont = block.subtitleFont || 'font-script'
 
   return (
-    <section className={`py-16 md:py-24 overflow-hidden ${bgClass}`}>
+    <section className={`overflow-hidden ${bgClass}`}>
       <div className="container-custom mx-auto max-w-6xl px-4">
         <div
-          className={`flex flex-col gap-12 md:flex-row md:items-center ${
+          className={`flex flex-col gap-8 md:flex-row md:items-center ${
             imageFirst ? 'md:flex-row-reverse' : ''
           }`}
         >
@@ -62,11 +62,12 @@ export function AlternatingSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.6 }}
-            className="flex-1 space-y-6"
+            className="flex-1 space-y-5"
           >
             {block.subtitle && (
               <span
                 className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} block text-[#E0A01C] dark:text-[#E0A01C]`}
+                style={{ color: brandTextColor(block.subtitleColor) }}
               >
                 {block.subtitle}
               </span>
@@ -74,6 +75,7 @@ export function AlternatingSection({
 
             <h2
               className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white`}
+              style={{ color: brandTextColor(block.titleColor) }}
             >
               {block.title}
             </h2>

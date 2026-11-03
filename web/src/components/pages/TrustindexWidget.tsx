@@ -2,36 +2,37 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useLocale } from 'next-intl'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import type { BrandTextColor } from '@/lib/types'
 
 const LOADER_SRC = 'https://cdn.trustindex.io/loader.js?acb2ed78468d8473bb4605f645f'
-const TRIPADVISOR_URL =
-  process.env.NEXT_PUBLIC_TRIPADVISOR_URL || 'https://www.tripadvisor.com'
 
 const TEXTS: Record<
   string,
-  { title: string; loading: string; failed: string; link: string }
+  { title: string; loading: string }
 > = {
   fr: {
     title: 'Ils nous font confiance',
     loading: 'Chargement des avis…',
-    failed: 'Les avis ne peuvent pas s’afficher pour le moment.',
-    link: 'Voir nos avis sur Tripadvisor',
   },
   en: {
     title: 'They trust us',
     loading: 'Loading reviews…',
-    failed: 'Reviews cannot be displayed right now.',
-    link: 'See our reviews on Tripadvisor',
   },
   it: {
     title: 'Si fidano di noi',
     loading: 'Caricamento delle recensioni…',
-    failed: 'Le recensioni non sono disponibili al momento.',
-    link: 'Vedi le nostre recensioni su Tripadvisor',
   },
 }
 
-export function TrustindexWidget({ title }: { title?: string } = {}) {
+type Props = {
+  title?: string
+  titleFont?: string
+  titleColor?: BrandTextColor
+  titleSize?: string
+}
+
+export function TrustindexWidget({ title, titleFont, titleColor, titleSize }: Props = {}) {
   const locale = useLocale()
   const t = TEXTS[locale] ?? TEXTS.fr
   const containerRef = useRef<HTMLDivElement>(null)
@@ -77,7 +78,7 @@ export function TrustindexWidget({ title }: { title?: string } = {}) {
   if (!hasConsent) return null
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-white">
       <div className="container-custom mx-auto max-w-6xl px-4">
         {/* 👇 CSS pour masquer les images de profil Tripadvisor 👇 */}
         <style jsx global>{`
@@ -89,25 +90,15 @@ export function TrustindexWidget({ title }: { title?: string } = {}) {
           }
         `}</style>
 
-        <h2 className="mb-12 text-center font-serif text-3xl font-bold text-[#06245F]">
+        <h2
+          className={`mb-12 text-center font-bold text-[#06245F] ${titleFont || 'font-serif'} ${titleSizeClass(titleSize)}`}
+          style={{ color: brandTextColor(titleColor) }}
+        >
           {title || t.title}
         </h2>
         <div ref={containerRef} className="min-h-[200px]">
           {!loaded && !failed && (
             <p className="text-center text-gray-400">{t.loading}</p>
-          )}
-          {failed && !loaded && (
-            <p className="text-center text-gray-600">
-              {t.failed}{' '}
-              <a
-                href={TRIPADVISOR_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-blue-600 underline"
-              >
-                {t.link}
-              </a>
-            </p>
           )}
         </div>
       </div>

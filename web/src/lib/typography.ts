@@ -1,9 +1,22 @@
+import type { BrandTextColor } from './types'
+
 const TITLE_SIZE_CLASSES: Record<string, string> = {
   sm: 'text-2xl md:text-3xl',
   md: 'text-3xl md:text-4xl',
   lg: 'text-4xl md:text-5xl',
   xl: 'text-5xl md:text-6xl',
   '2xl': 'text-6xl md:text-7xl',
+}
+
+const BRAND_TEXT_COLORS: Record<BrandTextColor, string> = {
+  navy: '#06245F',
+  gold: '#E0A01C',
+  charcoal: '#374151',
+  white: '#FFFFFF',
+}
+
+export function brandTextColor(color?: BrandTextColor) {
+  return color ? BRAND_TEXT_COLORS[color] : undefined
 }
 
 const SUBTITLE_SIZE_CLASSES: Record<string, string> = {

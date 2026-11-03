@@ -26,25 +26,28 @@ export function StatusUpdateForm({
     setErrorMsg('')
 
     startTransition(async () => {
-      // On passe undefined pour ne pas écraser les notes déjà enregistrées
-      const result = await updateQuoteStatus(quoteId, status, undefined)
-      
-      if (result.emailError) {
-        setErrorMsg(result.emailError)
-        router.refresh()
-      } else {
-        if (result.emailSent) {
-          setSuccessMsg('Statut mis à jour et e-mail envoyé au client ! Redirection...')
-        } else if (result.statusChanged) {
-          setSuccessMsg('Statut mis à jour avec succès ! Redirection...')
-        } else {
-          setSuccessMsg('Aucune modification nécessaire (statut identique). Redirection...')
-        }
+      try {
+        const result = await updateQuoteStatus(quoteId, status, undefined)
 
-        setTimeout(() => {
-          router.push('/admin/dashboard')
+        if (result.emailError) {
+          setErrorMsg(result.emailError)
           router.refresh()
-        }, 1500)
+        } else {
+          if (result.emailSent) {
+            setSuccessMsg('Statut mis à jour et e-mail envoyé au client ! Redirection...')
+          } else if (result.statusChanged) {
+            setSuccessMsg('Statut mis à jour avec succès ! Redirection...')
+          } else {
+            setSuccessMsg('Aucune modification nécessaire (statut identique). Redirection...')
+          }
+
+          setTimeout(() => {
+            router.push('/admin/dashboard')
+            router.refresh()
+          }, 1500)
+        }
+      } catch (error) {
+        setErrorMsg(error instanceof Error ? error.message : 'Impossible de mettre à jour le statut.')
       }
     })
   }
@@ -63,10 +66,12 @@ export function StatusUpdateForm({
       )}
 
       <div className="max-w-xs">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau statut</label>
+        <label htmlFor={`quote-status-${quoteId}`} className="block text-sm font-medium text-gray-700 mb-1">Nouveau statut</label>
         <select 
+          id={`quote-status-${quoteId}`}
           value={status} 
           onChange={(e) => setStatus(e.target.value as QuoteStatus)} 
+          disabled={isPending}
           className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-gray-800 focus:ring-1 focus:ring-gray-800"
         >
           <option value="NOUVEAU">Nouveau</option>
@@ -81,9 +86,10 @@ export function StatusUpdateForm({
         <button 
           type="submit" 
           disabled={isPending}
+          aria-busy={isPending}
           className="rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-black disabled:opacity-50 flex items-center gap-2"
         >
-          {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isPending && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
           Mettre à jour le statut et notifier
         </button>
       </div>

@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
 import type { PuzzleGalleryBlock, PuzzleItem, SanityImage } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -53,20 +53,21 @@ export function PuzzleGallery({ block }: Props) {
   }
 
   return (
-    <section className="py-12 md:py-16 bg-white overflow-hidden">
+    <section className="bg-white overflow-hidden">
       <div className="container-custom max-w-6xl mx-auto px-4">
         {block.title && (
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`text-center font-bold text-[#06245F] mb-8 ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
+            className={`text-center font-bold text-[#06245F] mb-6 ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
+            style={{ color: brandTextColor(block.titleColor) }}
           >
             {block.title}
           </motion.h2>
         )}
 
-        <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 auto-rows-[150px] md:auto-rows-[200px]">
+        <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[150px] md:auto-rows-[200px]">
           {items.map((item, index) => (
             <motion.div
               key={item._key}

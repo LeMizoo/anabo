@@ -10,7 +10,11 @@ import { ThemeProvider } from 'next-themes'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CookieBanner } from '@/components/layout/CookieBanner' // 👈 Import ajouté
+import { FloatingWhatsApp } from '@/components/layout/FloatingWhatsApp'
 import { locales, type Locale } from '@/lib/i18n'
+import { sanityClient } from '@/lib/sanity'
+import { siteSettingsQuery } from '@/lib/queries'
+import type { SiteSettings } from '@/lib/types'
 
 type Props = {
   children: React.ReactNode
@@ -78,7 +82,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   const locale = localeParam as Locale
   setRequestLocale(locale)
 
-  const messages = await getMessages()
+  const [messages, settings] = await Promise.all([
+    getMessages(),
+    sanityClient.fetch<SiteSettings | null>(siteSettingsQuery),
+  ])
 
   return (
     <NextIntlClientProvider messages={messages}>
@@ -86,9 +93,14 @@ export default async function LocaleLayout({ children, params }: Props) {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {/* On ajoute les classes de fond et de texte de base + transition */}
         <div className="flex min-h-screen flex-col bg-white text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
-          <Header />
+          <Header settings={settings} />
           <main className="flex-1">{children}</main>
-          <Footer />
+          <Footer settings={settings} />
+          <FloatingWhatsApp
+            phone={settings?.whatsappNumber || settings?.contactPhone}
+            enabled={settings?.showFloatingWhatsapp !== false}
+            locale={locale}
+          />
           
           {/* 👇 Bandeau de cookies ajouté ici 👇 */}
           <CookieBanner />

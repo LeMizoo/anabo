@@ -7,7 +7,8 @@ import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import { ThemeToggle } from '@/components/ui/ThemeToggle' // 👈 Import du bouton
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import type { SiteSettings } from '@/lib/types'
 
 const navigation = [
   { key: 'home', href: '' },
@@ -24,10 +25,24 @@ const locales = [
   { code: 'it', label: 'IT', flagClass: 'fi fi-it' },
 ]
 
-export function Header() {
+export function Header({ settings }: { settings?: SiteSettings | null }) {
   const pathname = usePathname()
   const t = useTranslations('nav')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const header = settings?.header
+  const logoUrl = settings?.logo?.asset?.url || '/images/logo.svg'
+  const logoHeight = Math.min(100, Math.max(24, header?.logoHeight ?? 48))
+  const logoOpacity = Math.min(100, Math.max(0, header?.logoOpacity ?? 100)) / 100
+  const dimensions = settings?.logo?.asset?.metadata?.dimensions
+  const logoRatio =
+    dimensions?.width && dimensions.height
+      ? dimensions.width / dimensions.height
+      : 372 / 374
+  const logoWidth = Math.min(280, Math.max(logoHeight, logoHeight * logoRatio))
+  const showLogo = header?.showLogo !== false
+  const showNavigation = header?.showNavigation !== false
+  const showThemeToggle = header?.showThemeToggle !== false
+  const showLanguageSwitcher = header?.showLanguageSwitcher !== false
 
   const currentLocale = pathname.split('/')[1] || 'en'
 
@@ -43,30 +58,33 @@ export function Header() {
   }
 
   return (
-    // 👇 Ajout des classes dark pour le fond et la bordure
-    <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95">
+    <header
+      className={`${header?.sticky === false ? 'relative' : 'sticky top-0'} z-50 border-b bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95`}
+    >
       <div className="container-custom">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex min-h-20 items-center justify-between gap-4 py-2">
           
           {/* Logo */}
-          <Link
+          {showLogo && <Link
             href={getHref('')}
             className="flex items-center"
             onClick={() => setMobileOpen(false)}
+            aria-label={settings?.logo?.alt || 'ANABO ROADTRIP — Accueil'}
           >
             <Image
-              src="/images/logo.svg"
-              alt="ANABO ROADTRIP"
-              width={150}
-              height={50}
-              className="h-12 w-auto object-contain dark:brightness-0 dark:invert" 
-              /* 👆 Astuce : on inverse les couleurs du logo en mode sombre */
+              src={logoUrl}
+              alt={settings?.logo?.alt || 'ANABO ROADTRIP'}
+              width={Math.round(logoWidth)}
+              height={logoHeight}
+              sizes={`${Math.round(logoWidth)}px`}
+              className="w-auto max-w-[280px] object-contain"
+              style={{ height: logoHeight, opacity: logoOpacity }}
               priority
             />
-          </Link>
+          </Link>}
 
           {/* Navigation Desktop */}
-          <nav className="hidden items-center gap-6 lg:flex">
+          {showNavigation && <nav className="hidden items-center gap-6 lg:flex">
             {navigation.map((item) => {
               const href = getHref(item.href)
               const active =
@@ -89,15 +107,15 @@ export function Header() {
                 </Link>
               )
             })}
-          </nav>
+          </nav>}
 
           {/* Actions Desktop : Theme + Langues */}
-          <div className="hidden items-center gap-4 lg:flex">
+          {(showThemeToggle || showLanguageSwitcher) && <div className="hidden items-center gap-4 lg:flex">
             {/* 👇 Bouton Thème 👇 */}
-            <ThemeToggle />
+            {showThemeToggle && <ThemeToggle />}
 
             {/* Langues */}
-            <div className="flex items-center gap-2">
+            {showLanguageSwitcher && <div className="flex items-center gap-2">
               {locales.map((locale) => {
                 const active = currentLocale === locale.code
 
@@ -117,11 +135,11 @@ export function Header() {
                   </Link>
                 )
               })}
-            </div>
-          </div>
+            </div>}
+          </div>}
 
           {/* Bouton Burger Mobile */}
-          <button
+          {(showNavigation || showThemeToggle || showLanguageSwitcher) && <button
             type="button"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
@@ -133,13 +151,13 @@ export function Header() {
             ) : (
               <Menu className="h-6 w-6" />
             )}
-          </button>
+          </button>}
         </div>
 
         {/* Menu Mobile */}
-        {mobileOpen && (
+        {mobileOpen && (showNavigation || showThemeToggle || showLanguageSwitcher) && (
           <div className="border-t py-4 lg:hidden dark:border-gray-800">
-            <nav className="flex flex-col">
+            {showNavigation && <nav className="flex flex-col">
               {navigation.map((item) => {
                 const href = getHref(item.href)
                 const active =
@@ -163,11 +181,11 @@ export function Header() {
                   </Link>
                 )
               })}
-            </nav>
+            </nav>}
 
             {/* Langues et Thème Mobile */}
-            <div className="mt-4 flex items-center justify-between border-t pt-4 dark:border-gray-800">
-              <div className="flex gap-2">
+            {(showLanguageSwitcher || showThemeToggle) && <div className="mt-4 flex items-center justify-between border-t pt-4 dark:border-gray-800">
+              {showLanguageSwitcher && <div className="flex gap-2">
                 {locales.map((locale) => {
                   const active = currentLocale === locale.code
 
@@ -188,9 +206,9 @@ export function Header() {
                     </Link>
                   )
                 })}
-              </div>
-              <ThemeToggle />
-            </div>
+              </div>}
+              {showThemeToggle && <ThemeToggle />}
+            </div>}
           </div>
         )}
       </div>

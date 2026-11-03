@@ -14,9 +14,9 @@ const BG_CLASSES = {
 }
 
 const SPACING_CLASSES = {
-  sm: 'py-8 md:py-12',
-  md: 'py-16 md:py-24',
-  lg: 'py-24 md:py-32',
+  sm: 'py-3 md:py-4',
+  md: 'py-6 md:py-8',
+  lg: 'py-10 md:py-12',
 }
 
 export function BlockWrapper({ settings, children, className = '' }: Props) {

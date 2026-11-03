@@ -13,8 +13,18 @@ export default {
     {
       name: 'authorPhoto',
       type: 'image',
-      title: 'Photo',
+      title: 'Photo de profil',
       options: { hotspot: true },
+    },
+    {
+      name: 'testimonialImage',
+      type: 'image',
+      title: 'Image du témoignage (optionnelle)',
+      description: 'Photo du voyage ou illustration affichée avec le témoignage.',
+      options: { hotspot: true },
+      fields: [
+        { name: 'alt', type: 'string', title: 'Texte alternatif' },
+      ],
     },
     {
       name: 'content',

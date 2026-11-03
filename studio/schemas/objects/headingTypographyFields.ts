@@ -2,8 +2,20 @@ const fontOptions = [
   { title: 'Inter (Sans-serif)', value: 'font-sans' },
   { title: 'Poppins', value: 'font-poppins' },
   { title: 'Playfair (Serif)', value: 'font-serif' },
+  { title: 'Playfair Display SC', value: 'font-playfair-sc' },
   { title: 'Perfect Girl Sans Serif', value: 'font-perfect-sans' },
   { title: 'Perfect Girl Script', value: 'font-script' },
+  { title: 'Euphoria Script', value: 'font-euphoria' },
+  { title: 'Haigrast Script', value: 'font-haigrast' },
+  { title: 'Script Alt', value: 'font-script-alt' },
+  { title: 'Script In', value: 'font-script-in' },
+]
+
+const colorOptions = [
+  { title: 'Bleu marine', value: 'navy' },
+  { title: 'Doré', value: 'gold' },
+  { title: 'Gris texte', value: 'charcoal' },
+  { title: 'Blanc', value: 'white' },
 ]
 
 const sizeOptions = [
@@ -34,6 +46,12 @@ export function headingTypographyFields({
       initialValue: titleFont,
     },
     {
+      name: 'titleColor',
+      type: 'string',
+      title: 'Couleur du titre',
+      options: { list: colorOptions, layout: 'radio' },
+    },
+    {
       name: 'titleSize',
       type: 'string',
       title: 'Taille du titre',
@@ -48,6 +66,12 @@ export function headingTypographyFields({
             title: 'Police du sous-titre',
             options: { list: fontOptions, layout: 'radio' },
             initialValue: subtitleFont,
+          },
+          {
+            name: 'subtitleColor',
+            type: 'string',
+            title: 'Couleur du sous-titre',
+            options: { list: colorOptions, layout: 'radio' },
           },
           {
             name: 'subtitleSize',

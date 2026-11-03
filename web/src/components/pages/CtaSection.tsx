@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { CtaBlock } from '@/lib/types'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: CtaBlock
@@ -23,6 +23,7 @@ export function CtaSection({ block }: Props) {
             className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'} font-bold ${
               secondary ? 'text-[#06245F]' : 'text-white'
             }`}
+            style={{ color: brandTextColor(block.titleColor) }}
           >
             {block.title}
           </h2>

@@ -3,8 +3,9 @@
 import { useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
 
 type Circuit = {
   slug: string
@@ -106,32 +107,44 @@ export function ContactForm({ block, circuits = [] }: Props) {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100'
+    'mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100'
 
   return (
-    <section className="py-12 md:py-16">
+    <section>
       <div className="mx-auto max-w-3xl px-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-          {block.title && <h2 className={`mb-3 font-bold text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'}`}>{block.title}</h2>}
+          {block.title && (
+            <h2
+              className={`mb-3 font-bold text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'}`}
+              style={{ color: brandTextColor(block.titleColor) }}
+            >
+              {block.title}
+            </h2>
+          )}
           {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
 
           {reference ? (
-            <div className="rounded-lg border border-green-200 bg-green-50 p-5 text-green-900" role="status">
-              <p className="font-semibold">{t('success')}</p>
-              <p className="mt-2">{t('reference')}: <strong>{reference}</strong></p>
+            <div className="flex gap-3 rounded-xl border border-green-200 bg-green-50 p-5 text-green-900" role="status" aria-live="polite">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+              <div>
+                <p className="font-semibold">{t('success')}</p>
+                <p className="mt-2">{t('reference')}: <strong>{reference}</strong></p>
+              </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-6" aria-busy={sending}>
               
               {isQuote && circuits.length > 0 && (
-                <div className="space-y-4 rounded-lg bg-gray-50 p-4 border border-gray-100">
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className="space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
+                  <label htmlFor="circuitSlug" className="block text-sm font-medium text-gray-700">
                     {t('circuit')}
                     <select
+                      id="circuitSlug"
                       className={inputClass}
                       name="circuitSlug"
                       value={selectedCircuit}
                       onChange={(e) => setSelectedCircuit(e.target.value)}
+                      disabled={sending}
                     >
                       <option value="">{t('circuitDefault')}</option>
                       {circuits.map((c) => (
@@ -152,6 +165,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
                               value={c.slug}
                               checked={extraCircuits.includes(c.slug)}
                               onChange={() => toggleExtraCircuit(c.slug)}
+                              disabled={sending}
                               className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             />
                             {c.title}
@@ -166,27 +180,27 @@ export function ContactForm({ block, circuits = [] }: Props) {
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block text-sm font-medium text-gray-700">
                   {t('firstName')} *
-                  <input className={inputClass} name="firstName" autoComplete="given-name" maxLength={100} required />
+                  <input className={inputClass} name="firstName" autoComplete="given-name" maxLength={100} required disabled={sending} />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700">
                   {t('lastName')} *
-                  <input className={inputClass} name="lastName" autoComplete="family-name" maxLength={100} required />
+                  <input className={inputClass} name="lastName" autoComplete="family-name" maxLength={100} required disabled={sending} />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700">
                   {t('email')} *
-                  <input className={inputClass} name="email" type="email" autoComplete="email" maxLength={191} required />
+                  <input className={inputClass} name="email" type="email" autoComplete="email" maxLength={191} required disabled={sending} />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700">
                   {t('phone')} *
-                  <input className={inputClass} name="phone" type="tel" autoComplete="tel" maxLength={40} required />
+                  <input className={inputClass} name="phone" type="tel" autoComplete="tel" maxLength={40} required disabled={sending} />
                 </label>
 
                 <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
                   {t('country')}
-                  <input className={inputClass} name="country" autoComplete="country-name" maxLength={100} />
+                  <input className={inputClass} name="country" autoComplete="country-name" maxLength={100} disabled={sending} />
                 </label>
               </div>
 
@@ -194,40 +208,45 @@ export function ContactForm({ block, circuits = [] }: Props) {
                 <div className="grid gap-5 sm:grid-cols-2">
                   <label className="block text-sm font-medium text-gray-700">
                     {t('startDate')}
-                    <input className={inputClass} name="startDate" type="date" />
+                    <input className={inputClass} name="startDate" type="date" disabled={sending} />
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">
                     {t('endDate')}
-                    <input className={inputClass} name="endDate" type="date" />
+                    <input className={inputClass} name="endDate" type="date" disabled={sending} />
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">
                     {t('adults')}
-                    <input className={inputClass} name="adults" type="number" min={1} max={20} defaultValue={2} required />
+                    <input className={inputClass} name="adults" type="number" min={1} max={20} defaultValue={2} required disabled={sending} />
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">
                     {t('children')}
-                    <input className={inputClass} name="children" type="number" min={0} max={20} defaultValue={0} required />
+                    <input className={inputClass} name="children" type="number" min={0} max={20} defaultValue={0} required disabled={sending} />
                   </label>
                 </div>
               )}
 
               <label className="block text-sm font-medium text-gray-700">
                 {t('message')}
-                <textarea className={inputClass} name="message" rows={5} maxLength={5000} />
+                <textarea className={inputClass} name="message" rows={5} maxLength={5000} disabled={sending} />
               </label>
 
               {error && (
-                <p className="text-sm text-red-700" role="alert">{error || t('required')}</p>
+                <p className="flex items-start gap-2 text-sm text-red-700" role="alert">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  {error || t('required')}
+                </p>
               )}
 
               <button
                 type="submit"
                 disabled={sending}
-                className="inline-flex items-center justify-center rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60"
+                aria-live="polite"
+                className="inline-flex min-w-48 items-center justify-center gap-2 rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
+                {sending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
                 {sending ? t('sending') : isQuote ? t('submitQuote') : t('submit')}
               </button>
             </form>

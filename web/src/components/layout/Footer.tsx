@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { Facebook, Instagram, Mail, MapPin, Music2, Phone, Youtube } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { sanityClient } from '@/lib/sanity'
-import { siteSettingsQuery } from '@/lib/queries'
 import type { SiteSettings } from '@/lib/types'
 
 const navigation = [
@@ -15,9 +13,15 @@ const navigation = [
   { key: 'contact', href: '/contact' },
 ]
 
-export async function Footer() {
-  const [settings, t, nav, locale] = await Promise.all([
-    sanityClient.fetch<SiteSettings | null>(siteSettingsQuery),
+const socialIcons = {
+  facebook: Facebook,
+  instagram: Instagram,
+  youtube: Youtube,
+  tiktok: Music2,
+}
+
+export async function Footer({ settings }: { settings?: SiteSettings | null }) {
+  const [t, nav, locale] = await Promise.all([
     getTranslations('footer'),
     getTranslations('nav'),
     getLocale(),
@@ -35,6 +39,16 @@ export async function Footer() {
   const headingFont = settings?.typography?.globalHeadingFont || 'font-serif'
   const headingWeight = settings?.typography?.globalHeadingWeight || 'font-bold'
   const bodyFont = settings?.typography?.globalBodyFont || 'font-sans'
+  const footer = settings?.footer
+  const logoUrl = settings?.logo?.asset?.url || '/images/logo.svg'
+  const logoHeight = Math.min(160, Math.max(24, footer?.logoHeight ?? 64))
+  const logoOpacity = Math.min(100, Math.max(0, footer?.logoOpacity ?? 100)) / 100
+  const dimensions = settings?.logo?.asset?.metadata?.dimensions
+  const logoRatio =
+    dimensions?.width && dimensions.height
+      ? dimensions.width / dimensions.height
+      : 372 / 374
+  const logoWidth = Math.min(320, Math.max(logoHeight, logoHeight * logoRatio))
 
   return (
     // 👇 Application de la police du corps au footer 👇
@@ -43,35 +57,40 @@ export async function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           
           {/* Logo et description */}
-          <div className="lg:col-span-2">
-            <Link
+          {(footer?.showLogo !== false ||
+            (footer?.showTagline !== false && tagline) ||
+            (footer?.showDescription !== false && description)) && <div className="lg:col-span-2">
+            {footer?.showLogo !== false && <Link
               href={`/${locale}`}
               className="inline-block"
+              aria-label={settings?.logo?.alt || `${siteName} — Accueil`}
             >
               <Image
-                src="/images/logo.svg"
-                alt="ANABO ROADTRIP"
-                width={180}
-                height={60}
-                className="h-16 w-auto object-contain brightness-0 invert"
+                src={logoUrl}
+                alt={settings?.logo?.alt || siteName}
+                width={Math.round(logoWidth)}
+                height={logoHeight}
+                sizes={`${Math.round(logoWidth)}px`}
+                className={`w-auto max-w-[320px] object-contain ${footer?.invertLogo === false ? '' : 'brightness-0 invert'}`}
+                style={{ height: logoHeight, opacity: logoOpacity }}
               />
-            </Link>
+            </Link>}
 
-            {tagline && (
+            {footer?.showTagline !== false && tagline && (
               <p className="mt-4 max-w-md text-gray-400">
                 {tagline}
               </p>
             )}
 
-            {description && (
+            {footer?.showDescription !== false && description && (
               <p className="mt-4 max-w-xl text-sm leading-7 text-gray-500">
                 {description}
               </p>
             )}
-          </div>
+          </div>}
 
           {/* Liens de navigation */}
-          <div>
+          {footer?.showNavigation !== false && <div>
             <h2 className={`text-sm font-semibold uppercase tracking-wider ${headingFont} ${headingWeight}`}>
               {t('navigation')}
             </h2>
@@ -87,10 +106,10 @@ export async function Footer() {
                 </Link>
               ))}
             </nav>
-          </div>
+          </div>}
 
           {/* Contact */}
-          <div>
+          {footer?.showContact !== false && <div>
             <h2 className={`text-sm font-semibold uppercase tracking-wider ${headingFont} ${headingWeight}`}>
               {t('contact')}
             </h2>
@@ -123,8 +142,31 @@ export async function Footer() {
                 </div>
               )}
             </div>
-          </div>
+          </div>}
         </div>
+
+        {footer?.showSocialLinks !== false && settings?.socialLinks?.length ? (
+          <nav aria-label="Réseaux sociaux" className="mt-8 flex flex-wrap gap-3">
+            {settings.socialLinks.map((social, index) => {
+              if (!social.platform || !social.url) return null
+              const Icon = socialIcons[social.platform as keyof typeof socialIcons]
+              if (!Icon) return null
+
+              return (
+                <a
+                  key={`${social.platform}-${index}`}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.platform}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-gray-300 transition hover:border-white/40 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                >
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </a>
+              )
+            })}
+          </nav>
+        ) : null}
 
         {/* Copyright */}
         <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">

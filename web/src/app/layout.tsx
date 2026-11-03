@@ -2,7 +2,18 @@ import 'flag-icons/css/flag-icons.min.css'
 import type { Metadata } from 'next'
 import './globals.css'
 // 👇 Ajout des imports
-import { inter, poppins, playfair, perfectGirlScript, perfectGirlSans } from '@/lib/fonts'
+import {
+  euphoriaScript,
+  haigrastScript,
+  inter,
+  playfair,
+  playfairDisplaySc,
+  perfectGirlSans,
+  perfectGirlScript,
+  poppins,
+  scriptAlt,
+  scriptIn,
+} from '@/lib/fonts'
 
 export const metadata: Metadata = {
   title: {
@@ -31,6 +42,11 @@ export default function RootLayout({
         ${playfair.variable} 
         ${perfectGirlScript.variable} 
         ${perfectGirlSans.variable}
+        ${playfairDisplaySc.variable}
+        ${euphoriaScript.variable}
+        ${haigrastScript.variable}
+        ${scriptAlt.variable}
+        ${scriptIn.variable}
       `}
     >
       <body className="font-sans antialiased">{children}</body>

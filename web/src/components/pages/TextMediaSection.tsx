@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -118,7 +118,10 @@ export function TextMediaSection({ block }: Props) {
             viewport={{ once: true }}
           >
             {block.title && (
-              <h2 className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}>
+              <h2
+                className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}
+                style={{ color: brandTextColor(block.titleColor) }}
+              >
                 {block.title}
               </h2>
             )}
@@ -177,7 +180,10 @@ export function TextMediaSection({ block }: Props) {
           className={imageFirst ? 'md:order-2' : 'md:order-1'}
         >
           {block.title && (
-            <h2 className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}>
+            <h2
+              className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}
+              style={{ color: brandTextColor(block.titleColor) }}
+            >
               {block.title}
             </h2>
           )}

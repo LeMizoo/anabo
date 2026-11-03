@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { StatusUpdateForm } from '@/components/admin/StatusUpdateForm'
+import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 import { saveQuoteDetails } from '@/app/admin/actions'
 
 export const dynamic = 'force-dynamic'
@@ -104,39 +105,42 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
           >
             <input type="hidden" name="id" value={quote.id} />
             <div>
-              <h2 className="text-lg font-semibold mb-2">Rédiger le devis</h2>
+              <label htmlFor="quote-details" className="mb-2 block text-lg font-semibold">Rédiger le devis</label>
               <textarea
+                id="quote-details"
                 name="quoteDetails"
                 defaultValue={quote.quoteDetails || ''}
                 rows={8}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                maxLength={20000}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 placeholder="Contenu du devis envoyé au client..."
               />
             </div>
             <div>
-              <h2 className="text-lg font-semibold mb-2">Notes privées</h2>
+              <label htmlFor="admin-notes" className="mb-2 block text-lg font-semibold">Notes privées</label>
               <textarea
+                id="admin-notes"
                 name="adminNotes"
                 defaultValue={quote.adminNotes || ''}
                 rows={4}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                maxLength={20000}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 placeholder="Notes internes (non visibles par le client)..."
               />
             </div>
             <div className="flex justify-end">
-              <button
-                type="submit"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Enregistrer le devis et les notes
-              </button>
+              <FormSubmitButton
+                label="Enregistrer le devis et les notes"
+                pendingLabel="Enregistrement..."
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+              />
             </div>
           </form>
 
           <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold mb-2">Mise à jour du statut</h2>
             <p className="text-sm text-gray-500 mb-4">
-              Assurez-vous d'avoir enregistré le devis ci-dessus avant de changer le statut.
+              Assurez-vous d&apos;avoir enregistré le devis ci-dessus avant de changer le statut.
             </p>
             <StatusUpdateForm
               quoteId={quote.id}

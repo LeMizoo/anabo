@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { getImageUrl } from '@/lib/sanity'
-import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 import type { HeroBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -62,12 +62,18 @@ export function HeroSection({ block }: Props) {
 
       <div className="container-custom relative z-10 flex min-h-[520px] flex-col justify-center py-20">
         <div className={`flex max-w-4xl flex-col ${alignment}`}>
-          <h1 className={`${titleSizeClass(block.titleSize)} ${titleFont} font-bold text-white`}>
+          <h1
+            className={`${titleSizeClass(block.titleSize)} ${titleFont} font-bold text-white`}
+            style={{ color: brandTextColor(block.titleColor) }}
+          >
             {block.title}
           </h1>
 
           {block.subtitle && (
-            <p className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize)} ${subtitleFont}`}>
+            <p
+              className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize)} ${subtitleFont}`}
+              style={{ color: brandTextColor(block.subtitleColor) }}
+            >
               {block.subtitle}
             </p>
           )}

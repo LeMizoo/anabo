@@ -5,13 +5,15 @@ import Image from 'next/image'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import type { SanityImage } from '@/lib/types'
 
 type Testimonial = {
   _id: string
   authorName: string
   authorCountry?: string
-  authorPhoto?: any
+  authorPhoto?: SanityImage
+  testimonialImage?: SanityImage
   content: string
   rating?: number
 }
@@ -20,6 +22,7 @@ type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleColor?: 'navy' | 'gold' | 'charcoal' | 'white'
     titleSize?: string
     layout?: 'carousel' | 'grid'
     testimonials?: Testimonial[]
@@ -69,17 +72,37 @@ export function TestimonialsSection({ block }: Props) {
     </div>
   )
 
+  const renderTestimonialImage = (t: Testimonial) => {
+    if (!t.testimonialImage?.asset?.url) return null
+
+    return (
+      <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-xl bg-gray-100">
+        <Image
+          src={getImageUrl(t.testimonialImage, 1000, 85)}
+          alt={t.testimonialImage.alt || `Photo du voyage de ${t.authorName}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover"
+        />
+      </div>
+    )
+  }
+
   // --- AFFICHAGE EN GRILLE ---
   if (block.layout === 'grid') {
     return (
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="bg-gray-50">
         <div className="container-custom">
-          <h2 className={`text-center text-[#06245F] mb-12 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}>
+          <h2
+            className={`text-center text-[#06245F] mb-8 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
+            style={{ color: brandTextColor(block.titleColor) }}
+          >
             {block.title || 'Ce que nos voyageurs disent'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {testimonials.map((t) => (
-              <div key={t._id} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
+              <div key={t._id} className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
+                {renderTestimonialImage(t)}
                 {renderStars(t.rating)}
                 <p className="text-gray-700 italic flex-1 leading-relaxed">"{t.content}"</p>
                 {renderAuthor(t)}
@@ -93,9 +116,12 @@ export function TestimonialsSection({ block }: Props) {
 
   // --- AFFICHAGE EN CAROUSEL (Par défaut) ---
   return (
-    <section className="py-16 md:py-24 bg-gray-50 overflow-hidden">
+    <section className="bg-gray-50 overflow-hidden">
       <div className="container-custom">
-        <h2 className={`text-center text-[#06245F] mb-12 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}>
+        <h2
+          className={`text-center text-[#06245F] mb-8 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
+          style={{ color: brandTextColor(block.titleColor) }}
+        >
           {block.title || 'Ce que nos voyageurs disent'}
         </h2>
 
@@ -110,6 +136,7 @@ export function TestimonialsSection({ block }: Props) {
                 transition={{ duration: 0.3 }}
                 className="text-center"
               >
+                {renderTestimonialImage(testimonials[currentIndex])}
                 <div className="flex justify-center">{renderStars(testimonials[currentIndex].rating)}</div>
                 <p className="text-xl md:text-2xl text-gray-700 italic leading-relaxed mb-8">
                   "{testimonials[currentIndex].content}"

@@ -1,12 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleColor?: 'navy' | 'gold' | 'charcoal' | 'white'
     titleSize?: string
     titleWeight?: string
     content?: string
@@ -25,10 +26,13 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-bold'
 
   return (
-    <section className="overflow-hidden bg-[#FDF8F5] dark:bg-gray-800 py-16 md:py-24">
+    <section className="overflow-hidden bg-[#FDF8F5] dark:bg-gray-800">
       <div className="container-custom mx-auto max-w-6xl px-4">
         {block.title && (
-          <h2 className={`text-center text-[#06245F] dark:text-white ${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)}`}>
+          <h2
+            className={`text-center text-[#06245F] dark:text-white ${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)}`}
+            style={{ color: brandTextColor(block.titleColor) }}
+          >
             {block.title}
           </h2>
         )}
@@ -37,7 +41,7 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
             {block.content}
           </p>
         )}
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <motion.div
               key={f._key}

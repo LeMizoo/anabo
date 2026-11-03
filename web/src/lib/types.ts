@@ -4,8 +4,11 @@ export interface SiteTypography {
   globalBodyFont?: string
 }
 
+export type BrandTextColor = 'navy' | 'gold' | 'charcoal' | 'white'
+
 export interface SiteSettings {
   _id: string
+  logo?: SanityImage
   siteName?: string
   tagline?: string
   description?: string
@@ -15,16 +18,42 @@ export interface SiteSettings {
     it?: { siteName?: string; tagline?: string; description?: string }
   }
   typography?: SiteTypography
+  header?: {
+    showLogo?: boolean
+    logoHeight?: number
+    logoOpacity?: number
+    sticky?: boolean
+    showNavigation?: boolean
+    showThemeToggle?: boolean
+    showLanguageSwitcher?: boolean
+  }
+  footer?: {
+    showLogo?: boolean
+    logoHeight?: number
+    logoOpacity?: number
+    invertLogo?: boolean
+    showTagline?: boolean
+    showDescription?: boolean
+    showNavigation?: boolean
+    showContact?: boolean
+    showSocialLinks?: boolean
+  }
   contactEmail?: string
   contactPhone?: string
   whatsappNumber?: string
+  showFloatingWhatsapp?: boolean
   address?: string
   socialLinks?: { platform?: string; url?: string }[]
 }
 
 export interface SanityImage {
   _id?: string
-  asset?: { _id?: string; url?: string; [key: string]: unknown }
+  asset?: {
+    _id?: string
+    url?: string
+    metadata?: { dimensions?: { width?: number; height?: number } }
+    [key: string]: unknown
+  }
   alt?: string
   presentation?: ImagePresentation
   [key: string]: unknown
@@ -66,6 +95,7 @@ export interface PuzzleGalleryBlock {
   _type: 'puzzleGalleryBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   layout?: 'balanced' | 'manual'
   items?: PuzzleItem[]
@@ -75,8 +105,10 @@ export interface PuzzleGalleryBlock {
 export interface AlternatingBlock {
   _type: 'alternatingBlock'
   title?: string
+  titleColor?: BrandTextColor
   subtitle?: string
   subtitleFont?: string
+  subtitleColor?: BrandTextColor
   subtitleSize?: string
   titleFont?: string
   titleSize?: string
@@ -106,6 +138,7 @@ export interface FeaturesBlock {
   _type: 'featuresBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   titleWeight?: string
   content?: string
@@ -122,9 +155,11 @@ export interface CommitmentsBlock {
   _type: 'commitmentsBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleWeight?: string
   subtitle?: string
   subtitleFont?: string
+  subtitleColor?: BrandTextColor
   subtitleSize?: string
   sections?: {
     _key: string
@@ -143,8 +178,10 @@ export interface HeroBlock {
   title: string
   subtitle?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   subtitleFont?: string
+  subtitleColor?: BrandTextColor
   subtitleSize?: string
   backgroundImage?: SanityImage
   backgroundImagePosition?: string
@@ -160,6 +197,7 @@ export interface TextMediaBlock {
   _type: 'textMediaBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   content?: unknown[]
   image?: SanityImage
@@ -173,6 +211,7 @@ export interface CtaBlock {
   _type: 'ctaBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   description?: string
   buttonLabel?: string
@@ -185,6 +224,7 @@ export interface ContactFormBlock {
   _type: 'contactFormBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   description?: string
   formType?: 'contact' | 'quote'
@@ -195,9 +235,11 @@ export interface ContactFormBlock {
 export interface Slider3DSlide {
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   subtitle?: string
   subtitleFont?: string
+  subtitleColor?: BrandTextColor
   subtitleSize?: string
   alt?: string
   linkLabel?: string
@@ -212,6 +254,7 @@ export interface Slider3DBlock {
   _type: 'slider3dBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   autoplay?: boolean
   interval?: number
@@ -223,6 +266,7 @@ export interface TestimonialBlock {
   _type: 'testimonialBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   layout?: 'carousel' | 'grid'
   testimonials?: {
@@ -230,6 +274,7 @@ export interface TestimonialBlock {
     authorName: string
     authorCountry?: string
     authorPhoto?: SanityImage
+    testimonialImage?: SanityImage
     content: string
     rating?: number
   }[]
@@ -240,6 +285,7 @@ export interface GalleryBlock {
   _type: 'galleryBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   images?: (SanityImage & { _key?: string; caption?: string })[]
 }
@@ -248,6 +294,7 @@ export interface FaqBlock {
   _type: 'faqBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   items?: {
     _key: string
@@ -260,6 +307,7 @@ export interface TripadvisorBlock {
   _type: 'tripadvisorBlock'
   title?: string
   titleFont?: string
+  titleColor?: BrandTextColor
   titleSize?: string
   showBadge?: boolean
   showCarousel?: boolean

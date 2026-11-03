@@ -56,11 +56,20 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
             case 'faqBlock':
               return <FaqSection block={module} />
             case 'tripadvisorBlock':
-              return <TrustindexWidget title={module.title} />
+              return (
+                <TrustindexWidget
+                  title={module.title}
+                  titleFont={module.titleFont}
+                  titleColor={module.titleColor}
+                  titleSize={module.titleSize}
+                />
+              )
             default:
               return null
           }
         })()
+
+        if (!content) return null
 
         // Le Hero gère son propre plein écran, on ne l'enveloppe pas
         if (module._type === 'heroBlock') {
