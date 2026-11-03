@@ -1,9 +1,12 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'slider3dBlock',
   title: 'Slider 3D',
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
+    ...headingTypographyFields({ titleFont: 'font-sans' }),
     {
       name: 'autoplay',
       type: 'boolean',
@@ -34,9 +37,39 @@ export default {
               options: { hotspot: true },
               validation: (Rule: any) => Rule.required(),
             },
+            {
+              name: 'imagePosition',
+              type: 'string',
+              title: 'Position de l’image',
+              options: {
+                list: [
+                  { title: 'Centre', value: 'center' },
+                  { title: 'Haut', value: 'top' },
+                  { title: 'Droite', value: 'right' },
+                  { title: 'Bas', value: 'bottom' },
+                  { title: 'Gauche', value: 'left' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'center',
+            },
+            {
+              name: 'imageFit',
+              type: 'string',
+              title: 'Ajustement de l’image',
+              options: {
+                list: [
+                  { title: 'Remplir', value: 'cover' },
+                  { title: 'Afficher toute l’image', value: 'contain' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'cover',
+            },
             { name: 'alt', type: 'string', title: 'Texte alternatif' },
             { name: 'title', type: 'string', title: 'Titre' },
             { name: 'subtitle', type: 'string', title: 'Sous-titre' },
+            ...headingTypographyFields({ subtitle: true, titleFont: 'font-sans', subtitleFont: 'font-sans' }),
             { name: 'linkLabel', type: 'string', title: 'Texte du lien' },
             {
               name: 'linkUrl',

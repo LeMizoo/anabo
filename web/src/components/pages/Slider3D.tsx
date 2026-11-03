@@ -4,10 +4,17 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 
 type Slide = {
   title?: string
+  titleFont?: string
+  titleSize?: string
   subtitle?: string
+  subtitleFont?: string
+  subtitleSize?: string
+  imagePosition?: string
+  imageFit?: 'cover' | 'contain'
   alt?: string
   linkLabel?: string
   linkUrl?: string
@@ -17,6 +24,8 @@ type Slide = {
 type Props = {
   block: {
     title?: string
+    titleFont?: string
+    titleSize?: string
     autoplay?: boolean
     interval?: number
     slides?: Slide[]
@@ -43,7 +52,7 @@ export function Slider3D({ block }: Props) {
     <section className="overflow-hidden py-16">
       <div className="container-custom">
         {block.title && (
-          <h2 className="mb-10 text-center text-3xl font-bold">{block.title}</h2>
+          <h2 className={`mb-10 text-center font-bold ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}>{block.title}</h2>
         )}
 
         <div
@@ -75,12 +84,16 @@ export function Slider3D({ block }: Props) {
                   className="object-cover"
                   sizes="(max-width: 640px) 70vw, 60vw"
                   priority={i === 0}
+                  style={{
+                    objectPosition: s.imagePosition || 'center',
+                    objectFit: s.imageFit || 'cover',
+                  }}
                 />
                 
                 {(s.title || s.subtitle) && (
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
-                    {s.title && <h3 className="text-xl font-semibold">{s.title}</h3>}
-                    {s.subtitle && <p className="mt-1 text-sm">{s.subtitle}</p>}
+                    {s.title && <h3 className={`${s.titleFont || 'font-sans'} font-semibold ${titleSizeClass(s.titleSize)}`}>{s.title}</h3>}
+                    {s.subtitle && <p className={`mt-1 ${s.subtitleFont || 'font-sans'} ${subtitleSizeClass(s.subtitleSize)}`}>{s.subtitle}</p>}
                     
                     {/* 👇 Utilisation de la traduction ici 👇 */}
                     {s.linkUrl && i === active && (

@@ -1,3 +1,5 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'faqBlock',
   title: 'FAQ',
@@ -9,6 +11,7 @@ export default {
       title: 'Titre',
       initialValue: 'Questions fréquentes',
     },
+    ...headingTypographyFields({ titleFont: 'font-serif' }),
     {
       name: 'items',
       type: 'array',

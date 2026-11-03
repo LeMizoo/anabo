@@ -1,4 +1,6 @@
 
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'textMediaBlock',
   title: 'Texte + Média',
@@ -6,21 +8,7 @@ export default {
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
 
-    {
-      name: 'titleFont',
-      type: 'string',
-      title: 'Police du titre',
-      description: 'Choisissez la police à utiliser pour ce titre.',
-      options: {
-        list: [
-          { title: 'Par défaut (Sans-serif / Inter)', value: 'font-sans' },
-          { title: 'Élégante (Serif / Playfair)', value: 'font-serif' },
-          { title: 'Moderne (Poppins)', value: 'font-poppins' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-sans',
-    },
+    ...headingTypographyFields({ titleFont: 'font-sans' }),
 
     {
       name: 'content',
@@ -84,6 +72,20 @@ export default {
         layout: 'radio',
       },
       initialValue: 'right',
+    },
+    {
+      name: 'imageSize',
+      type: 'string',
+      title: "Taille de l'image",
+      options: {
+        list: [
+          { title: 'Petite', value: 'sm' },
+          { title: 'Moyenne', value: 'md' },
+          { title: 'Grande', value: 'lg' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'lg',
     },
 
     {

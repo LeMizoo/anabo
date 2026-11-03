@@ -31,7 +31,9 @@
     "subtitle": "Discover our travel suggestions. Compose a tour that perfectly matches your desires.",
     "createTrip": "Create my trip",
     "details": "More details",
-    "noImage": "No image"
+    "noImage": "No image",
+    "itinerary": "Route",
+    "viewRoute": "View route"
   },
   "slider": {
     "learnMore": "Learn more"

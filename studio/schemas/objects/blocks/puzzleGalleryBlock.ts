@@ -1,3 +1,5 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'puzzleGalleryBlock',
   title: 'Galerie Puzzle (Asymétrique)',
@@ -8,6 +10,7 @@ export default {
       type: 'string',
       title: 'Titre de la section (optionnel)',
     },
+    ...headingTypographyFields({ titleFont: 'font-sans' }),
     {
       name: 'items',
       type: 'array',

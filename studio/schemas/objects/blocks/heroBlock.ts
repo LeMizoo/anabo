@@ -1,4 +1,6 @@
 
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'heroBlock',
   title: 'Hero Section',
@@ -11,40 +13,11 @@ export default {
       validation: (Rule: any) => Rule.required(),
     },
     {
-      name: 'titleFont',
-      type: 'string',
-      title: 'Police du Titre',
-      description: 'Choisissez la police pour le titre principal.',
-      options: {
-        list: [
-          { title: 'Par défaut (Inter / Sans-serif)', value: 'font-sans' },
-          { title: 'Élégante (Playfair / Serif)', value: 'font-serif' },
-          { title: 'Manuscrite (Perfect Girl)', value: 'font-script' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-sans',
-    },
-    {
       name: 'subtitle',
       type: 'string',
       title: 'Sous-titre',
     },
-    {
-      name: 'subtitleFont',
-      type: 'string',
-      title: 'Police du Sous-titre',
-      description: 'Choisissez la police pour le sous-titre.',
-      options: {
-        list: [
-          { title: 'Par défaut (Inter / Sans-serif)', value: 'font-sans' },
-          { title: 'Élégante (Playfair / Serif)', value: 'font-serif' },
-          { title: 'Manuscrite (Perfect Girl)', value: 'font-script' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-sans',
-    },
+    ...headingTypographyFields({ subtitle: true, titleFont: 'font-sans', subtitleFont: 'font-sans' }),
     {
       name: 'backgroundImage',
       type: 'image',
@@ -53,6 +26,35 @@ export default {
       fields: [
         { name: 'alt', type: 'string', title: 'Texte alternatif' },
       ],
+    },
+    {
+      name: 'backgroundImagePosition',
+      type: 'string',
+      title: 'Position de l’image de fond',
+      options: {
+        list: [
+          { title: 'Centre', value: 'center' },
+          { title: 'Haut', value: 'top' },
+          { title: 'Droite', value: 'right' },
+          { title: 'Bas', value: 'bottom' },
+          { title: 'Gauche', value: 'left' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'center',
+    },
+    {
+      name: 'backgroundImageFit',
+      type: 'string',
+      title: 'Ajustement de l’image',
+      options: {
+        list: [
+          { title: 'Remplir la section', value: 'cover' },
+          { title: 'Afficher toute l’image', value: 'contain' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'cover',
     },
     {
       name: 'overlay',

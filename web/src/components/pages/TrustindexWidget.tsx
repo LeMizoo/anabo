@@ -31,7 +31,7 @@ const TEXTS: Record<
   },
 }
 
-export function TrustindexWidget() {
+export function TrustindexWidget({ title }: { title?: string } = {}) {
   const locale = useLocale()
   const t = TEXTS[locale] ?? TEXTS.fr
   const containerRef = useRef<HTMLDivElement>(null)
@@ -90,7 +90,7 @@ export function TrustindexWidget() {
         `}</style>
 
         <h2 className="mb-12 text-center font-serif text-3xl font-bold text-[#06245F]">
-          {t.title}
+          {title || t.title}
         </h2>
         <div ref={containerRef} className="min-h-[200px]">
           {!loaded && !failed && (

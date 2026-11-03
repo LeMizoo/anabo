@@ -27,6 +27,162 @@ export const siteSettingsQuery = `
   }
 `
 
+const pageModulesProjection = `
+  _type,
+  settings,
+  _type == "heroBlock" => {
+    title,
+    subtitle,
+    titleFont,
+    titleSize,
+    subtitleFont,
+    subtitleSize,
+    backgroundImage{ ..., asset->, alt },
+    backgroundImagePosition,
+    backgroundImageFit,
+    overlay,
+    alignment,
+    ctaPrimary{ label, link },
+    ctaSecondary{ label, link }
+  },
+  _type == "textMediaBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    content,
+    image{ ..., asset->, alt },
+    imagePosition,
+    imageSize,
+    cta{ label, link }
+  },
+  _type == "ctaBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    description,
+    buttonLabel,
+    buttonLink,
+    variant
+  },
+  _type == "contactFormBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    description,
+    formType,
+    showWhatsapp
+  },
+  _type == "slider3dBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    autoplay,
+    interval,
+    slides[]{
+      title,
+      titleFont,
+      titleSize,
+      subtitle,
+      subtitleFont,
+      subtitleSize,
+      alt,
+      linkLabel,
+      linkUrl,
+      "imageUrl": image.asset->url,
+      imagePosition,
+      imageFit
+    }
+  },
+  _type == "alternatingBlock" => {
+    title,
+    subtitle,
+    titleFont,
+    titleSize,
+    titleWeight,
+    subtitleFont,
+    subtitleSize,
+    subtitleWeight,
+    content,
+    imagePosition,
+    imageSize,
+    backgroundColor,
+    image{ ..., asset->, alt },
+    floatingImages[]{
+      _key,
+      size,
+      position,
+      image{ ..., asset->, alt }
+    }
+  },
+  _type == "puzzleGalleryBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    items[]{
+      _key,
+      caption,
+      size,
+      image{ ..., asset->, alt }
+    }
+  },
+  _type == "featuresBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    titleWeight,
+    content,
+    features[]{ _key, title, description, icon }
+  },
+  _type == "commitmentsBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    titleWeight,
+    subtitle,
+    subtitleFont,
+    subtitleSize,
+    sections[]{
+      _key,
+      title,
+      items[]{ _key, label, text }
+    }
+  },
+  _type == "galleryBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    images[]{ ..., asset->, alt, caption }
+  },
+  _type == "testimonialBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    layout,
+    testimonials[]->{
+      _id,
+      authorName,
+      authorCountry,
+      authorPhoto{ ..., asset->, alt },
+      content,
+      rating
+    }
+  },
+  _type == "faqBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    items[]{ _key, question, answer }
+  },
+  _type == "tripadvisorBlock" => {
+    title,
+    titleFont,
+    titleSize,
+    showBadge,
+    showCarousel,
+    reviewLimit
+  }
+`
+
 export const homePageQuery = `
   *[_type == "page" && pageType == "home" && language == $locale][0]{
     _id,
@@ -36,126 +192,10 @@ export const homePageQuery = `
     translationGroup,
     pageType,
     excerpt,
-    featuredImage{
-      ...,
-      asset->,
-      alt
-    },
+    routeStops,
+    featuredImage{ ..., asset->, alt },
     modules[]{
-      _type,
-      settings, // 👈 AJOUTÉ ICI
-
-      _type == "heroBlock" => {
-        title,
-        subtitle,
-        titleFont,
-        subtitleFont,
-        backgroundImage{
-          ...,
-          asset->,
-          alt
-        },
-        overlay,
-        alignment,
-        ctaPrimary{ label, link },
-        ctaSecondary{ label, link }
-      },
-
-      _type == "textMediaBlock" => {
-        title,
-        titleFont,
-        content,
-        image{ ..., asset->, alt },
-        imagePosition,
-        cta{ label, link }
-      },
-
-      _type == "ctaBlock" => {
-        title,
-        description,
-        buttonLabel,
-        buttonLink,
-        variant
-      },
-
-      _type == "contactFormBlock" => {
-        title,
-        description,
-        formType,
-        showWhatsapp
-      },
-
-      _type == "slider3dBlock" => {
-        title,
-        autoplay,
-        interval,
-        slides[]{
-          title,
-          subtitle,
-          alt,
-          linkLabel,
-          linkUrl,
-          "imageUrl": image.asset->url
-        }
-      },
-
-      _type == "alternatingBlock" => {
-        title,
-        subtitle,
-        titleFont,
-        titleWeight,
-        subtitleFont,
-        subtitleWeight,
-        content,
-        imagePosition,
-        backgroundColor,
-        image{
-          ...,
-          asset->,
-          alt
-        },
-        floatingImages[]{
-          _key,
-          size,
-          position,
-          image{
-            ...,
-            asset->,
-            alt
-          }
-        }
-      },
-
-      _type == "puzzleGalleryBlock" => {
-        title,
-        items[]{
-          _key,
-          caption,
-          size,
-          image{ ..., asset->, alt }
-        }
-      },
-
-      _type == "featuresBlock" => {
-        title,
-        titleFont,
-        titleWeight,
-        content,
-        features[]{ _key, title, description, icon }
-      },
-
-      _type == "commitmentsBlock" => {
-        title,
-        titleFont,
-        titleWeight,
-        subtitle,
-        subtitleFont,
-        sections[]{
-          _key,
-          title,
-          items[]{ _key, label, text }
-        }
-      }
+      ${pageModulesProjection}
     }
   }
 `
@@ -169,6 +209,7 @@ export const pageBySlugQuery = `
     translationGroup,
     pageType,
     excerpt,
+    routeStops,
     featuredImage{ ..., asset->, alt },
     seo{
       metaTitle,
@@ -179,108 +220,7 @@ export const pageBySlugQuery = `
       noIndex
     },
     modules[]{
-      _type,
-      settings, // 👈 AJOUTÉ ICI
-
-      _type == "heroBlock" => {
-        title,
-        subtitle,
-        titleFont,
-        subtitleFont,
-        backgroundImage{ ..., asset->, alt },
-        overlay,
-        alignment,
-        ctaPrimary{ label, link },
-        ctaSecondary{ label, link }
-      },
-
-      _type == "textMediaBlock" => {
-        title,
-        titleFont,
-        content,
-        image{ ..., asset->, alt },
-        imagePosition,
-        cta{ label, link }
-      },
-
-      _type == "ctaBlock" => {
-        title,
-        description,
-        buttonLabel,
-        buttonLink,
-        variant
-      },
-
-      _type == "contactFormBlock" => {
-        title,
-        description,
-        formType,
-        showWhatsapp
-      },
-
-      _type == "slider3dBlock" => {
-        title,
-        autoplay,
-        interval,
-        slides[]{
-          title,
-          subtitle,
-          alt,
-          linkLabel,
-          linkUrl,
-          "imageUrl": image.asset->url
-        }
-      },
-
-      _type == "alternatingBlock" => {
-        title,
-        subtitle,
-        titleFont,
-        titleWeight,
-        subtitleFont,
-        subtitleWeight,
-        content,
-        imagePosition,
-        backgroundColor,
-        floatingImages[]{
-          _key,
-          size,
-          position,
-          image{ ..., asset->, alt }
-        },
-        image{ ..., asset->, alt }
-      },
-
-      _type == "puzzleGalleryBlock" => {
-        title,
-        items[]{
-          _key,
-          caption,
-          size,
-          image{ ..., asset->, alt }
-        }
-      },
-
-      _type == "featuresBlock" => {
-        title,
-        titleFont,
-        titleWeight,
-        content,
-        features[]{ _key, title, description, icon }
-      },
-
-      _type == "commitmentsBlock" => {
-        title,
-        titleFont,
-        titleWeight,
-        subtitle,
-        subtitleFont,
-        sections[]{
-          _key,
-          title,
-          items[]{ _key, label, text }
-        }
-      }
+      ${pageModulesProjection}
     }
   }
 `
@@ -306,6 +246,7 @@ export const tourIdeasQuery = `
     "slug": slug.current,
     pageType,
     excerpt,
+    routeStops,
     featuredImage{ ..., asset->, alt }
   }
 `

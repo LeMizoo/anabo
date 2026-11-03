@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { getImageUrl } from '@/lib/sanity'
+import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 import type { HeroBlock } from '@/lib/types'
 
 type Props = {
@@ -18,6 +19,8 @@ export function HeroSection({ block }: Props) {
   const imageUrl = block.backgroundImage
     ? getImageUrl(block.backgroundImage, 1920, 85)
     : null
+  const titleFont = block.titleFont || 'font-sans'
+  const subtitleFont = block.subtitleFont || 'font-sans'
 
   return (
     <section className="relative min-h-[520px] overflow-hidden bg-[#06245F]">
@@ -29,6 +32,10 @@ export function HeroSection({ block }: Props) {
           priority
           sizes="100vw"
           className="object-cover"
+          style={{
+            objectPosition: block.backgroundImagePosition || 'center',
+            objectFit: block.backgroundImageFit || 'cover',
+          }}
         />
       )}
 
@@ -38,12 +45,12 @@ export function HeroSection({ block }: Props) {
 
       <div className="container-custom relative z-10 flex min-h-[520px] flex-col justify-center py-20">
         <div className={`flex max-w-4xl flex-col ${alignment}`}>
-          <h1 className="text-4xl font-bold text-white md:text-6xl">
+          <h1 className={`${titleSizeClass(block.titleSize)} ${titleFont} font-bold text-white`}>
             {block.title}
           </h1>
 
           {block.subtitle && (
-            <p className="mt-5 max-w-2xl text-lg text-white/90 md:text-xl">
+            <p className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize)} ${subtitleFont}`}>
               {block.subtitle}
             </p>
           )}

@@ -1,14 +1,17 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleSize?: string
     titleWeight?: string
     subtitle?: string
     subtitleFont?: string
+    subtitleSize?: string
     sections?: {
       _key: string
       title: string
@@ -33,12 +36,12 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
     <section className="py-16 md:py-24 bg-white dark:bg-gray-900">
       <div className="container-custom mx-auto max-w-4xl px-4">
         {block.subtitle && (
-          <span className={`${subtitleFont} text-[#E0A01C] text-2xl block mb-2`}>
+          <span className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} text-[#E0A01C] block mb-2`}>
             {block.subtitle}
           </span>
         )}
         {block.title && (
-          <h2 className={`${titleFont} ${titleWeight} text-2xl uppercase tracking-wide text-[#06245F] dark:text-white md:text-3xl mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}>
+          <h2 className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}>
             {block.title}
           </h2>
         )}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { CtaBlock } from '@/lib/types'
+import { titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: CtaBlock
@@ -19,7 +20,7 @@ export function CtaSection({ block }: Props) {
       >
         {block.title && (
           <h2
-            className={`text-3xl font-bold md:text-4xl ${
+            className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'} font-bold ${
               secondary ? 'text-[#06245F]' : 'text-white'
             }`}
           >

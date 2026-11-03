@@ -31,7 +31,9 @@
     "subtitle": "Découvrez nos suggestions de voyages. Composez un circuit qui correspond parfaitement à vos envies.",
     "createTrip": "Créer mon voyage",
     "details": "Plus de détails",
-    "noImage": "Pas d'image"
+    "noImage": "Pas d'image",
+    "itinerary": "Itinéraire",
+    "viewRoute": "Voir le trajet"
   },
   "slider": {
     "learnMore": "En savoir plus"

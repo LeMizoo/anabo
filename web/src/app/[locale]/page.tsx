@@ -56,6 +56,9 @@ export default async function HomePage({ params }: Props) {
   const otherModules = (homePage?.modules ?? []).filter(
     (module) => module._type !== 'heroBlock',
   )
+  const hasTripadvisorBlock = otherModules.some(
+    (module) => module._type === 'tripadvisorBlock',
+  )
 
   if (!hero) {
     return (
@@ -77,7 +80,7 @@ export default async function HomePage({ params }: Props) {
       <PageRenderer modules={otherModules} />
 
       {/* 👇 Intégration du widget Tripadvisor (Trustindex) */}
-      <TrustindexWidget />
+      {!hasTripadvisorBlock && <TrustindexWidget />}
     </>
   )
 }

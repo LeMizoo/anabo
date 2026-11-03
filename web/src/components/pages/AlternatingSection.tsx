@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PortableText } from '@portabletext/react'
 import { getImageUrl } from '@/lib/sanity'
+import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 import type { AlternatingBlock } from '@/lib/types'
 
 // Tailles des images flottantes
@@ -64,14 +65,14 @@ export function AlternatingSection({
           >
             {block.subtitle && (
               <span
-                className={`${subtitleFont} block text-2xl text-[#E0A01C] dark:text-[#E0A01C] md:text-3xl`}
+                className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} block text-[#E0A01C] dark:text-[#E0A01C]`}
               >
                 {block.subtitle}
               </span>
             )}
 
             <h2
-              className={`${titleFont} ${titleWeight} text-2xl uppercase tracking-wide text-[#06245F] dark:text-white md:text-3xl`}
+              className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white`}
             >
               {block.title}
             </h2>
@@ -93,10 +94,10 @@ export function AlternatingSection({
               className="relative flex flex-1 items-center justify-center py-8"
             >
               {/* Image principale */}
-              <div className="relative z-0 aspect-[4/3] w-[85%] overflow-hidden rounded-xl shadow-lg">
+              <div className="relative z-0 aspect-[4/3] overflow-hidden rounded-xl shadow-lg" style={{ width: block.imageSize === 'sm' ? '65%' : block.imageSize === 'lg' ? '100%' : '85%' }}>
                 <Image
                   src={getImageUrl(block.image, 800, 85)}
-                  alt={block.image.alt || block.title}
+                  alt={block.image.alt || block.title || 'Illustration de la section'}
                   fill
                   className="object-cover transition-transform duration-700 hover:scale-105"
                 />

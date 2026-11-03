@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
+import { titleSizeClass } from '@/lib/typography'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
 
@@ -71,6 +72,7 @@ const portableTextComponents: PortableTextComponents = {
 export function TextMediaSection({ block }: Props) {
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
   const titleFontClass = block.titleFont || 'font-sans'
+  const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
   
   // Nouvelles positions
   const isImageTop = block.imagePosition === 'top'
@@ -91,7 +93,8 @@ export function TextMediaSection({ block }: Props) {
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
+              className="relative mx-auto aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
+              style={{ maxWidth: imageWidth }}
             >
               <Image
                 src={imageUrl}
@@ -109,7 +112,7 @@ export function TextMediaSection({ block }: Props) {
             viewport={{ once: true }}
           >
             {block.title && (
-              <h2 className={`text-3xl font-bold text-[#06245F] md:text-4xl ${titleFontClass}`}>
+              <h2 className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}>
                 {block.title}
               </h2>
             )}
@@ -133,7 +136,8 @@ export function TextMediaSection({ block }: Props) {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
+              className="relative mx-auto aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
+              style={{ maxWidth: imageWidth }}
             >
               <Image
                 src={imageUrl}
@@ -162,7 +166,7 @@ export function TextMediaSection({ block }: Props) {
           className={imageFirst ? 'md:order-2' : 'md:order-1'}
         >
           {block.title && (
-            <h2 className={`text-3xl font-bold text-[#06245F] md:text-4xl ${titleFontClass}`}>
+            <h2 className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}>
               {block.title}
             </h2>
           )}
@@ -189,7 +193,7 @@ export function TextMediaSection({ block }: Props) {
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
             className={imageFirst ? 'md:order-1' : 'md:order-2'}
           >
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl">
+            <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-xl" style={{ maxWidth: imageWidth }}>
               <Image
                 src={imageUrl}
                 alt={block.image?.alt || ''}

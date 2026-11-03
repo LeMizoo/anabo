@@ -1,9 +1,12 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'testimonialBlock',
   title: 'Témoignages',
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
+    ...headingTypographyFields({ titleFont: 'font-serif' }),
     {
       name: 'testimonials',
       type: 'array',

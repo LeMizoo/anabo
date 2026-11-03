@@ -1,4 +1,6 @@
 
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'alternatingBlock',
   title: 'Section Image + Texte (Alterné)',
@@ -10,38 +12,11 @@ export default {
       title: 'Sous-titre (ex: Ma philosophie)',
     },
     {
-      name: 'subtitleFont',
-      type: 'string',
-      title: 'Police du sous-titre',
-      options: {
-        list: [
-          { title: 'Perfect Girl Script (Manuscrite)', value: 'font-script' },
-          { title: 'Perfect Girl Sans Serif (Moderne)', value: 'font-perfect-sans' },
-          { title: 'Playfair (Serif)', value: 'font-serif' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-script',
-    },
-    {
       name: 'title',
       type: 'string',
       title: 'Titre principal',
     },
-    {
-      name: 'titleFont',
-      type: 'string',
-      title: 'Police du titre',
-      options: {
-        list: [
-          { title: 'Playfair (Serif)', value: 'font-serif' },
-          { title: 'Perfect Girl Sans Serif', value: 'font-perfect-sans' },
-          { title: 'Perfect Girl Script', value: 'font-script' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-serif',
-    },
+    ...headingTypographyFields({ subtitle: true, titleFont: 'font-serif', subtitleFont: 'font-script' }),
     {
       name: 'content',
       type: 'array',
@@ -154,6 +129,20 @@ export default {
         layout: 'radio',
       },
       initialValue: 'right',
+    },
+    {
+      name: 'imageSize',
+      type: 'string',
+      title: "Taille de l'image principale",
+      options: {
+        list: [
+          { title: 'Petite', value: 'sm' },
+          { title: 'Moyenne', value: 'md' },
+          { title: 'Grande', value: 'lg' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'md',
     },
 
     // COULEUR DE FOND

@@ -1,17 +1,19 @@
+import { defineField } from 'sanity'
+
 export default {
   name: 'blockSettings',
   title: 'Réglages du bloc',
   type: 'object',
   options: { collapsible: true, collapsed: true },
   fields: [
-    {
+    defineField({
       name: 'anchorId',
       type: 'string',
       title: 'Ancre (lien interne)',
       description: 'Ex. « avis » permet un lien vers /fr#avis. Lettres minuscules et tirets.',
-      validation: (Rule: any) =>
+      validation: (Rule) =>
         Rule.regex(/^[a-z0-9-]*$/, { name: 'ancre' }).error('Minuscules, chiffres et tirets seulement'),
-    },
+    }),
     {
       name: 'background',
       type: 'string',

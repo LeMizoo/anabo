@@ -1,23 +1,12 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'commitmentsBlock',
   title: 'Engagements (Listes)',
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre principal (ex: Nos engagements)' },
-    {
-      name: 'titleFont',
-      type: 'string',
-      title: 'Police du titre',
-      options: {
-        list: [
-          { title: 'Playfair (Serif)', value: 'font-serif' },
-          { title: 'Perfect Girl Sans Serif', value: 'font-perfect-sans' },
-          { title: 'Perfect Girl Script', value: 'font-script' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-serif',
-    },
+    ...headingTypographyFields({ subtitle: true, titleFont: 'font-serif', subtitleFont: 'font-script' }),
     {
       name: 'titleWeight',
       type: 'string',
@@ -32,20 +21,6 @@ export default {
       initialValue: 'font-bold',
     },
     { name: 'subtitle', type: 'string', title: 'Sous-titre manuscrit (ex: Salama)' },
-    {
-      name: 'subtitleFont',
-      type: 'string',
-      title: 'Police du sous-titre',
-      options: {
-        list: [
-          { title: 'Perfect Girl Script (Manuscrite)', value: 'font-script' },
-          { title: 'Perfect Girl Sans Serif (Moderne)', value: 'font-perfect-sans' },
-          { title: 'Playfair (Serif)', value: 'font-serif' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-script',
-    },
     {
       name: 'sections',
       type: 'array',

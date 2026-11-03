@@ -1,3 +1,5 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'tripadvisorBlock',
   title: 'Avis TripAdvisor',
@@ -9,6 +11,7 @@ export default {
       title: 'Titre',
       initialValue: 'Ils nous ont fait confiance',
     },
+    ...headingTypographyFields({ titleFont: 'font-serif' }),
     {
       name: 'showBadge',
       type: 'boolean',

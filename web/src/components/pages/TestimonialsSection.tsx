@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
+import { titleSizeClass } from '@/lib/typography'
 
 type Testimonial = {
   _id: string
@@ -18,6 +19,8 @@ type Testimonial = {
 type Props = {
   block: {
     title?: string
+    titleFont?: string
+    titleSize?: string
     layout?: 'carousel' | 'grid'
     testimonials?: Testimonial[]
   }
@@ -71,7 +74,7 @@ export function TestimonialsSection({ block }: Props) {
     return (
       <section className="py-16 md:py-24 bg-gray-50">
         <div className="container-custom">
-          <h2 className="text-3xl font-bold text-center text-[#06245F] mb-12 font-serif">
+          <h2 className={`text-center text-[#06245F] mb-12 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}>
             {block.title || 'Ce que nos voyageurs disent'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -92,7 +95,7 @@ export function TestimonialsSection({ block }: Props) {
   return (
     <section className="py-16 md:py-24 bg-gray-50 overflow-hidden">
       <div className="container-custom">
-        <h2 className="text-3xl font-bold text-center text-[#06245F] mb-12 font-serif">
+        <h2 className={`text-center text-[#06245F] mb-12 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}>
           {block.title || 'Ce que nos voyageurs disent'}
         </h2>
 

@@ -1,9 +1,12 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'galleryBlock',
   title: 'Galerie photos',
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la galerie' },
+    ...headingTypographyFields({ titleFont: 'font-serif' }),
     {
       name: 'images',
       type: 'array',

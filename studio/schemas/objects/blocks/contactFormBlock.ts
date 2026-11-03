@@ -1,3 +1,5 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'contactFormBlock',
   title: 'Formulaire de contact',
@@ -9,6 +11,7 @@ export default {
       title: 'Titre',
       initialValue: 'Contactez-nous',
     },
+    ...headingTypographyFields({ titleFont: 'font-sans' }),
     { name: 'description', type: 'text', title: 'Description', rows: 2 },
     {
       name: 'formType',

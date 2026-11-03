@@ -3,24 +3,18 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import type { SanityImage } from '@/lib/types'
-
-type PuzzleItem = {
-  _key: string
-  image: SanityImage
-  size: 'small' | 'wide' | 'tall' | 'large'
-  caption?: string
-}
+import { titleSizeClass } from '@/lib/typography'
+import type { PuzzleGalleryBlock, PuzzleItem, SanityImage } from '@/lib/types'
 
 type Props = {
-  block: {
-    title?: string
-    items?: PuzzleItem[]
-  }
+  block: PuzzleGalleryBlock
 }
 
 export function PuzzleGallery({ block }: Props) {
-  if (!block.items || block.items.length === 0) return null
+  const items = block.items?.filter(
+    (item): item is PuzzleItem & { image: SanityImage } => Boolean(item.image),
+  )
+  if (!items?.length) return null
 
   const getItemClasses = (size: string) => {
     switch (size) {
@@ -45,7 +39,7 @@ export function PuzzleGallery({ block }: Props) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl font-bold text-center text-[#06245F] mb-8" // mb-12 -> mb-8
+            className={`text-center font-bold text-[#06245F] mb-8 ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
           >
             {block.title}
           </motion.h2>
@@ -53,7 +47,7 @@ export function PuzzleGallery({ block }: Props) {
 
         {/* gap-4 -> gap-2 md:gap-4 pour resserrer + auto-rows plus petits */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 auto-rows-[150px] md:auto-rows-[200px]">
-          {block.items.map((item, index) => (
+          {items.map((item, index) => (
             <motion.div
               key={item._key}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -61,7 +55,7 @@ export function PuzzleGallery({ block }: Props) {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               // Ajout de la rotation et du décalage pour l'effet "désordonné"
-              className={`relative rounded-xl overflow-hidden group ${getItemClasses(item.size)} ${getRandomOffset(index)} md:rotate-1`}
+              className={`relative rounded-xl overflow-hidden group ${getItemClasses(item.size || 'small')} ${getRandomOffset(index)} md:rotate-1`}
             >
               <Image
                 src={getImageUrl(item.image, 800, 80)}

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import type { ContactFormBlock } from '@/lib/types'
+import { titleSizeClass } from '@/lib/typography'
 
 type Circuit = {
   slug: string
@@ -111,7 +112,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
     <section className="py-12 md:py-16">
       <div className="mx-auto max-w-3xl px-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-          {block.title && <h2 className="mb-3 text-2xl font-bold text-gray-900 md:text-3xl">{block.title}</h2>}
+          {block.title && <h2 className={`mb-3 font-bold text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'}`}>{block.title}</h2>}
           {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
 
           {reference ? (

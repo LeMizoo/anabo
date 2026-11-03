@@ -1,4 +1,6 @@
 
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'ctaBlock',
   title: 'Call To Action',
@@ -9,6 +11,7 @@ export default {
       type: 'string',
       title: 'Titre',
     },
+    ...headingTypographyFields({ titleFont: 'font-sans' }),
     {
       name: 'description',
       type: 'text',

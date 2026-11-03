@@ -1,23 +1,12 @@
+import { headingTypographyFields } from '../headingTypographyFields'
+
 export default {
   name: 'featuresBlock',
   title: 'Grille de fonctionnalités',
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
-    {
-      name: 'titleFont',
-      type: 'string',
-      title: 'Police du titre',
-      options: {
-        list: [
-          { title: 'Playfair (Serif)', value: 'font-serif' },
-          { title: 'Perfect Girl Sans Serif', value: 'font-perfect-sans' },
-          { title: 'Perfect Girl Script', value: 'font-script' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-serif',
-    },
+    ...headingTypographyFields({ titleFont: 'font-serif' }),
     {
       name: 'titleWeight',
       type: 'string',

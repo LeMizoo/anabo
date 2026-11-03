@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
+import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 import type { HeroBlock, BlockSettings } from '@/lib/types'
 
 type HomeHeroProps = {
@@ -45,6 +46,10 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
           priority
           sizes="100vw"
           className="-z-20 object-cover"
+          style={{
+            objectPosition: hero.backgroundImagePosition || 'center',
+            objectFit: hero.backgroundImageFit || 'cover',
+          }}
         />
       )}
 
@@ -61,13 +66,13 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
           </p>
 
           {/* 👇 Application de la police du titre */}
-          <h1 className={`max-w-4xl text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-7xl ${titleFont}`}>
+          <h1 className={`max-w-4xl font-bold leading-tight text-white ${titleSizeClass(hero.titleSize)} ${titleFont}`}>
             {hero.title || t('fallbackTitle')}
           </h1>
 
           {hero.subtitle && (
             /* 👇 Application de la police du sous-titre */
-            <p className={`mt-6 max-w-2xl text-lg leading-8 text-white/90 sm:text-xl ${subtitleFont}`}>
+            <p className={`mt-6 max-w-2xl leading-8 text-white/90 ${subtitleSizeClass(hero.subtitleSize)} ${subtitleFont}`}>
               {hero.subtitle}
             </p>
           )}

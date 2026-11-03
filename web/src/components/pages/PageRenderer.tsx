@@ -10,6 +10,9 @@ import { AlternatingSection } from './AlternatingSection'
 import { Features } from './Features'
 import { CommitmentsSection } from './CommitmentsSection'
 import { TestimonialsSection } from './TestimonialsSection'
+import { GallerySection } from './GallerySection'
+import { FaqSection } from './FaqSection'
+import { TrustindexWidget } from './TrustindexWidget'
 
 type Props = {
   modules?: PageModule[] | null
@@ -48,6 +51,12 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
               return <CommitmentsSection block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'testimonialBlock':
               return <TestimonialsSection block={module as any} />
+            case 'galleryBlock':
+              return <GallerySection block={module} />
+            case 'faqBlock':
+              return <FaqSection block={module} />
+            case 'tripadvisorBlock':
+              return <TrustindexWidget title={module.title} />
             default:
               return null
           }

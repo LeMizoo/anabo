@@ -90,6 +90,14 @@ export default {
       group: 'content',
     },
     {
+      name: 'routeStops',
+      type: 'array',
+      title: 'Étapes de l’itinéraire',
+      description: 'Laissez vide pour afficher un itinéraire par défaut depuis Antananarivo vers le titre de la page. Les étapes sont ordonnées du départ à l’arrivée.',
+      of: [{ type: 'string' }],
+      group: 'content',
+    },
+    {
       name: 'modules',
       type: 'array',
       title: 'Blocs de contenu',

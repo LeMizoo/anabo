@@ -31,7 +31,9 @@
     "subtitle": "Scopri i nostri suggerimenti di viaggio. Componi un tour che corrisponda perfettamente ai tuoi desideri.",
     "createTrip": "Crea il mio viaggio",
     "details": "Maggiori dettagli",
-    "noImage": "Nessuna immagine"
+    "noImage": "Nessuna immagine",
+    "itinerary": "Itinerario",
+    "viewRoute": "Vedi percorso"
   },
   "slider": {
     "learnMore": "Scopri di più"

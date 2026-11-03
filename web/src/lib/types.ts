@@ -44,24 +44,28 @@ export interface BlockSettings {
 
 export interface PuzzleItem {
   _key: string
-  image: SanityImage
-  size: 'small' | 'wide' | 'tall' | 'large'
+  image?: SanityImage
+  size?: 'small' | 'wide' | 'tall' | 'large'
   caption?: string
 }
 
 export interface PuzzleGalleryBlock {
   _type: 'puzzleGalleryBlock'
   title?: string
+  titleFont?: string
+  titleSize?: string
   items?: PuzzleItem[]
   settings?: BlockSettings
 }
 
 export interface AlternatingBlock {
   _type: 'alternatingBlock'
-  title: string
+  title?: string
   subtitle?: string
   subtitleFont?: string
+  subtitleSize?: string
   titleFont?: string
+  titleSize?: string
   titleWeight?: string
   subtitleWeight?: string
   content?: unknown[]
@@ -79,6 +83,7 @@ export interface AlternatingBlock {
       | 'bottom-right'
   }[]
   imagePosition?: 'left' | 'right'
+  imageSize?: 'sm' | 'md' | 'lg'
   backgroundColor?: 'white' | 'cream'
   settings?: BlockSettings
 }
@@ -87,6 +92,7 @@ export interface FeaturesBlock {
   _type: 'featuresBlock'
   title?: string
   titleFont?: string
+  titleSize?: string
   titleWeight?: string
   content?: string
   features?: {
@@ -105,6 +111,7 @@ export interface CommitmentsBlock {
   titleWeight?: string
   subtitle?: string
   subtitleFont?: string
+  subtitleSize?: string
   sections?: {
     _key: string
     title: string
@@ -122,8 +129,12 @@ export interface HeroBlock {
   title: string
   subtitle?: string
   titleFont?: string
+  titleSize?: string
   subtitleFont?: string
+  subtitleSize?: string
   backgroundImage?: SanityImage
+  backgroundImagePosition?: string
+  backgroundImageFit?: 'cover' | 'contain'
   overlay?: boolean
   alignment?: 'left' | 'center' | 'right'
   ctaPrimary?: PageCta
@@ -135,8 +146,10 @@ export interface TextMediaBlock {
   _type: 'textMediaBlock'
   title?: string
   titleFont?: string
+  titleSize?: string
   content?: unknown[]
   image?: SanityImage
+  imageSize?: 'sm' | 'md' | 'lg'
   imagePosition?: 'left' | 'right' | 'top' | 'bottom'
   cta?: PageCta
   settings?: BlockSettings
@@ -145,16 +158,20 @@ export interface TextMediaBlock {
 export interface CtaBlock {
   _type: 'ctaBlock'
   title?: string
+  titleFont?: string
+  titleSize?: string
   description?: string
   buttonLabel?: string
   buttonLink?: string
-  variant?: 'primary' | 'secondary' | 'brown'
+  variant?: 'primary' | 'secondary'
   settings?: BlockSettings
 }
 
 export interface ContactFormBlock {
   _type: 'contactFormBlock'
   title?: string
+  titleFont?: string
+  titleSize?: string
   description?: string
   formType?: 'contact' | 'quote'
   showWhatsapp?: boolean
@@ -163,16 +180,24 @@ export interface ContactFormBlock {
 
 export interface Slider3DSlide {
   title?: string
+  titleFont?: string
+  titleSize?: string
   subtitle?: string
+  subtitleFont?: string
+  subtitleSize?: string
   alt?: string
   linkLabel?: string
   linkUrl?: string
   imageUrl?: string
+  imagePosition?: string
+  imageFit?: 'cover' | 'contain'
 }
 
 export interface Slider3DBlock {
   _type: 'slider3dBlock'
   title?: string
+  titleFont?: string
+  titleSize?: string
   autoplay?: boolean
   interval?: number
   slides?: Slider3DSlide[]
@@ -182,6 +207,8 @@ export interface Slider3DBlock {
 export interface TestimonialBlock {
   _type: 'testimonialBlock'
   title?: string
+  titleFont?: string
+  titleSize?: string
   layout?: 'carousel' | 'grid'
   testimonials?: {
     _id: string
@@ -192,6 +219,36 @@ export interface TestimonialBlock {
     rating?: number
   }[]
   settings?: BlockSettings
+}
+
+export interface GalleryBlock {
+  _type: 'galleryBlock'
+  title?: string
+  titleFont?: string
+  titleSize?: string
+  images?: (SanityImage & { _key?: string; caption?: string })[]
+}
+
+export interface FaqBlock {
+  _type: 'faqBlock'
+  title?: string
+  titleFont?: string
+  titleSize?: string
+  items?: {
+    _key: string
+    question: string
+    answer?: unknown[]
+  }[]
+}
+
+export interface TripadvisorBlock {
+  _type: 'tripadvisorBlock'
+  title?: string
+  titleFont?: string
+  titleSize?: string
+  showBadge?: boolean
+  showCarousel?: boolean
+  reviewLimit?: number
 }
 
 // PageModule complet
@@ -206,6 +263,9 @@ export type PageModule =
   | FeaturesBlock
   | CommitmentsBlock
   | TestimonialBlock
+  | GalleryBlock
+  | FaqBlock
+  | TripadvisorBlock
 
 export interface PageSeo {
   metaTitle?: string
@@ -227,6 +287,7 @@ export interface Page {
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
+  routeStops?: string[]
   seo?: PageSeo
   modules?: PageModule[]
 }
@@ -240,6 +301,7 @@ export interface HomePage {
   pageType?: string
   excerpt?: string
   featuredImage?: SanityImage
+  routeStops?: string[]
   modules?: PageModule[]
 }
 

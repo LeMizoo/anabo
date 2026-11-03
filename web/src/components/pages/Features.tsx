@@ -1,11 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleSize?: string
     titleWeight?: string
     content?: string
     features?: { _key: string; title: string; description: string; icon?: string }[]
@@ -26,7 +28,7 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
     <section className="overflow-hidden bg-[#FDF8F5] dark:bg-gray-800 py-16 md:py-24">
       <div className="container-custom mx-auto max-w-6xl px-4">
         {block.title && (
-          <h2 className={`text-center text-3xl text-[#06245F] dark:text-white ${titleFont} ${titleWeight}`}>
+          <h2 className={`text-center text-[#06245F] dark:text-white ${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)}`}>
             {block.title}
           </h2>
         )}
