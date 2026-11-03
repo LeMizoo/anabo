@@ -1,4 +1,5 @@
 import { headingTypographyFields } from '../headingTypographyFields'
+import { imagePresentationField } from '../imagePresentationField'
 
 export default {
   name: 'slider3dBlock',
@@ -36,6 +37,7 @@ export default {
               title: 'Image',
               options: { hotspot: true },
               validation: (Rule: any) => Rule.required(),
+              fields: [imagePresentationField()],
             },
             {
               name: 'imagePosition',

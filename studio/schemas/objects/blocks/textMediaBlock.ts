@@ -1,5 +1,6 @@
 
 import { headingTypographyFields } from '../headingTypographyFields'
+import { imagePresentationField } from '../imagePresentationField'
 
 export default {
   name: 'textMediaBlock',
@@ -55,7 +56,10 @@ export default {
       type: 'image',
       title: 'Image',
       options: { hotspot: true },
-      fields: [{ name: 'alt', type: 'string', title: 'Texte alternatif' }],
+      fields: [
+        { name: 'alt', type: 'string', title: 'Texte alternatif' },
+        imagePresentationField(),
+      ],
     },
 
     {

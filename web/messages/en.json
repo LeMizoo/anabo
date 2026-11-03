@@ -33,7 +33,8 @@
     "details": "More details",
     "noImage": "No image",
     "itinerary": "Route",
-    "viewRoute": "View route"
+    "viewRoute": "View route",
+    "routeNotConfigured": "Route not configured in Sanity Studio."
   },
   "slider": {
     "learnMore": "Learn more"

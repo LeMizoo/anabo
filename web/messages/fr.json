@@ -33,7 +33,8 @@
     "details": "Plus de détails",
     "noImage": "Pas d'image",
     "itinerary": "Itinéraire",
-    "viewRoute": "Voir le trajet"
+    "viewRoute": "Voir le trajet",
+    "routeNotConfigured": "Itinéraire à renseigner dans Sanity Studio."
   },
   "slider": {
     "learnMore": "En savoir plus"

@@ -8,6 +8,7 @@ import { getImageUrl } from '@/lib/sanity'
 import { titleSizeClass } from '@/lib/typography'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
+import { ImageFrame, imageContentStyle } from './ImageFrame'
 
 type Props = {
   block: TextMediaBlock
@@ -93,16 +94,21 @@ export function TextMediaSection({ block }: Props) {
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative mx-auto aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
-              style={{ maxWidth: imageWidth }}
+              className="mx-auto w-full"
             >
-              <Image
-                src={imageUrl}
-                alt={block.image?.alt || ''}
-                fill
-                sizes="100vw"
-                className="object-cover"
-              />
+              <ImageFrame
+                className="relative aspect-[16/9] w-full"
+                presentation={block.image?.presentation}
+                style={{ maxWidth: imageWidth }}
+              >
+                <Image
+                  src={imageUrl}
+                  alt={block.image?.alt || ''}
+                  fill
+                  sizes="100vw"
+                  style={imageContentStyle(block.image?.presentation)}
+                />
+              </ImageFrame>
             </motion.div>
           )}
 
@@ -136,16 +142,21 @@ export function TextMediaSection({ block }: Props) {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative mx-auto aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-xl"
-              style={{ maxWidth: imageWidth }}
+              className="mx-auto w-full"
             >
-              <Image
-                src={imageUrl}
-                alt={block.image?.alt || ''}
-                fill
-                sizes="100vw"
-                className="object-cover"
-              />
+              <ImageFrame
+                className="relative aspect-[16/9] w-full"
+                presentation={block.image?.presentation}
+                style={{ maxWidth: imageWidth }}
+              >
+                <Image
+                  src={imageUrl}
+                  alt={block.image?.alt || ''}
+                  fill
+                  sizes="100vw"
+                  style={imageContentStyle(block.image?.presentation)}
+                />
+              </ImageFrame>
             </motion.div>
           )}
         </div>
@@ -193,15 +204,20 @@ export function TextMediaSection({ block }: Props) {
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
             className={imageFirst ? 'md:order-1' : 'md:order-2'}
           >
-            <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-xl" style={{ maxWidth: imageWidth }}>
+            <ImageFrame
+              className="relative mx-auto aspect-[4/3] w-full"
+              presentation={block.image?.presentation}
+              style={{ maxWidth: imageWidth }}
+            >
               <Image
                 src={imageUrl}
                 alt={block.image?.alt || ''}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover transition-transform duration-700 hover:scale-105"
+                className="transition-transform duration-700 hover:scale-105"
+                style={imageContentStyle(block.image?.presentation)}
               />
-            </div>
+            </ImageFrame>
           </motion.div>
         )}
       </div>

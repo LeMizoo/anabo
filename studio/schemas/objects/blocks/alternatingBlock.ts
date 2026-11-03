@@ -1,5 +1,6 @@
 
 import { headingTypographyFields } from '../headingTypographyFields'
+import { imagePresentationField } from '../imagePresentationField'
 
 export default {
   name: 'alternatingBlock',
@@ -32,6 +33,7 @@ export default {
       options: { hotspot: true },
       fields: [
         { name: 'alt', type: 'string', title: 'Alt' },
+        imagePresentationField(),
       ],
     },
 
@@ -56,6 +58,7 @@ export default {
               validation: (Rule: any) => Rule.required(),
               fields: [
                 { name: 'alt', type: 'string', title: 'Texte alternatif' },
+                imagePresentationField({ fit: 'contain' }),
               ],
             },
             {

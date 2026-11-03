@@ -1,4 +1,5 @@
 import { headingTypographyFields } from '../headingTypographyFields'
+import { imagePresentationField } from '../imagePresentationField'
 
 export default {
   name: 'puzzleGalleryBlock',
@@ -11,6 +12,21 @@ export default {
       title: 'Titre de la section (optionnel)',
     },
     ...headingTypographyFields({ titleFont: 'font-sans' }),
+    {
+      name: 'layout',
+      type: 'string',
+      title: 'Organisation des images',
+      description:
+        'La composition automatique répartit les images en mosaïque. Choisissez « Manuelle » pour utiliser la taille définie sur chaque image.',
+      options: {
+        list: [
+          { title: 'Mosaïque automatique', value: 'balanced' },
+          { title: 'Tailles manuelles', value: 'manual' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'balanced',
+    },
     {
       name: 'items',
       type: 'array',
@@ -25,12 +41,16 @@ export default {
               type: 'image', 
               title: 'Image', 
               options: { hotspot: true }, 
-              fields: [{ name: 'alt', type: 'string', title: 'Texte alternatif' }] 
+              fields: [
+                { name: 'alt', type: 'string', title: 'Texte alternatif' },
+                imagePresentationField(),
+              ]
             },
             { 
               name: 'size', 
               type: 'string', 
-              title: 'Taille dans la grille', 
+              title: 'Taille (organisation manuelle)',
+              description: 'Utilisée lorsque l’organisation de la galerie est réglée sur « Tailles manuelles ».',
               options: {
                 list: [
                   { title: 'Petit (1x1)', value: 'small' },
@@ -40,6 +60,54 @@ export default {
                 ]
               },
               initialValue: 'small'
+            },
+            {
+              name: 'overlap',
+              type: 'string',
+              title: 'Superposition',
+              description: 'Décale cette image au-dessus des voisines dans la mosaïque.',
+              options: {
+                list: [
+                  { title: 'Aucune', value: 'none' },
+                  { title: 'Vers le haut-gauche', value: 'top-left' },
+                  { title: 'Vers le haut-droite', value: 'top-right' },
+                  { title: 'Vers le bas-gauche', value: 'bottom-left' },
+                  { title: 'Vers le bas-droite', value: 'bottom-right' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'none',
+            },
+            {
+              name: 'pixelation',
+              type: 'string',
+              title: 'Pixelisation',
+              description: 'Réduit la résolution de l’image avant de l’agrandir pour créer un effet pixelisé.',
+              options: {
+                list: [
+                  { title: 'Aucune', value: 'none' },
+                  { title: 'Légère', value: 'low' },
+                  { title: 'Moyenne', value: 'medium' },
+                  { title: 'Forte', value: 'high' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'none',
+            },
+            {
+              name: 'overlay',
+              type: 'string',
+              title: 'Voile de couleur',
+              options: {
+                list: [
+                  { title: 'Aucun', value: 'none' },
+                  { title: 'Sombre', value: 'dark' },
+                  { title: 'Clair', value: 'light' },
+                  { title: 'Doré', value: 'accent' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'none',
             },
             { 
               name: 'caption', 

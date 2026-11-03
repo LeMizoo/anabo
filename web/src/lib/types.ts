@@ -26,7 +26,17 @@ export interface SanityImage {
   _id?: string
   asset?: { _id?: string; url?: string; [key: string]: unknown }
   alt?: string
+  presentation?: ImagePresentation
   [key: string]: unknown
+}
+
+export interface ImagePresentation {
+  rotation?: '-10' | '-5' | '0' | '5' | '10'
+  border?: 'none' | 'light' | 'dark' | 'accent'
+  radius?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  shadow?: 'none' | 'sm' | 'md' | 'lg'
+  fit?: 'cover' | 'contain'
+  position?: 'center' | 'top' | 'right' | 'bottom' | 'left'
 }
 
 export interface PageCta {
@@ -46,6 +56,9 @@ export interface PuzzleItem {
   _key: string
   image?: SanityImage
   size?: 'small' | 'wide' | 'tall' | 'large'
+  overlap?: 'none' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  pixelation?: 'none' | 'low' | 'medium' | 'high'
+  overlay?: 'none' | 'dark' | 'light' | 'accent'
   caption?: string
 }
 
@@ -54,6 +67,7 @@ export interface PuzzleGalleryBlock {
   title?: string
   titleFont?: string
   titleSize?: string
+  layout?: 'balanced' | 'manual'
   items?: PuzzleItem[]
   settings?: BlockSettings
 }
@@ -189,6 +203,7 @@ export interface Slider3DSlide {
   linkLabel?: string
   linkUrl?: string
   imageUrl?: string
+  imagePresentation?: ImagePresentation
   imagePosition?: string
   imageFit?: 'cover' | 'contain'
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getImageUrl } from '@/lib/sanity'
 import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
 import type { HeroBlock } from '@/lib/types'
+import { ImageFrame, imageContentStyle } from './ImageFrame'
 
 type Props = {
   block: HeroBlock
@@ -19,24 +20,40 @@ export function HeroSection({ block }: Props) {
   const imageUrl = block.backgroundImage
     ? getImageUrl(block.backgroundImage, 1920, 85)
     : null
+  const imagePresentation = block.backgroundImage?.presentation || {
+    border: 'none' as const,
+    radius: 'none' as const,
+    shadow: 'none' as const,
+  }
   const titleFont = block.titleFont || 'font-sans'
   const subtitleFont = block.subtitleFont || 'font-sans'
 
   return (
     <section className="relative min-h-[520px] overflow-hidden bg-[#06245F]">
       {imageUrl && (
-        <Image
-          src={imageUrl}
-          alt={block.backgroundImage?.alt || ''}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-          style={{
-            objectPosition: block.backgroundImagePosition || 'center',
-            objectFit: block.backgroundImageFit || 'cover',
-          }}
-        />
+        <ImageFrame
+          className="absolute inset-0"
+          presentation={imagePresentation}
+        >
+          <Image
+            src={imageUrl}
+            alt={block.backgroundImage?.alt || ''}
+            fill
+            priority
+            sizes="100vw"
+            style={{
+              ...imageContentStyle(imagePresentation),
+              objectPosition:
+                imagePresentation.position ||
+                block.backgroundImagePosition ||
+                'center',
+              objectFit:
+                imagePresentation.fit ||
+                block.backgroundImageFit ||
+                'cover',
+            }}
+          />
+        </ImageFrame>
       )}
 
       {block.overlay !== false && (

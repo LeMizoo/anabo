@@ -37,7 +37,7 @@ const pageModulesProjection = `
     titleSize,
     subtitleFont,
     subtitleSize,
-    backgroundImage{ ..., asset->, alt },
+    backgroundImage{ ..., asset->, alt, presentation },
     backgroundImagePosition,
     backgroundImageFit,
     overlay,
@@ -50,7 +50,7 @@ const pageModulesProjection = `
     titleFont,
     titleSize,
     content,
-    image{ ..., asset->, alt },
+    image{ ..., asset->, alt, presentation },
     imagePosition,
     imageSize,
     cta{ label, link }
@@ -89,6 +89,7 @@ const pageModulesProjection = `
       linkLabel,
       linkUrl,
       "imageUrl": image.asset->url,
+      "imagePresentation": image.presentation,
       imagePosition,
       imageFit
     }
@@ -106,23 +107,27 @@ const pageModulesProjection = `
     imagePosition,
     imageSize,
     backgroundColor,
-    image{ ..., asset->, alt },
+    image{ ..., asset->, alt, presentation },
     floatingImages[]{
       _key,
       size,
       position,
-      image{ ..., asset->, alt }
+      image{ ..., asset->, alt, presentation }
     }
   },
   _type == "puzzleGalleryBlock" => {
     title,
     titleFont,
     titleSize,
+    layout,
     items[]{
       _key,
       caption,
       size,
-      image{ ..., asset->, alt }
+      overlap,
+      pixelation,
+      overlay,
+      image{ ..., asset->, alt, presentation }
     }
   },
   _type == "featuresBlock" => {
@@ -151,7 +156,7 @@ const pageModulesProjection = `
     title,
     titleFont,
     titleSize,
-    images[]{ ..., asset->, alt, caption }
+    images[]{ ..., asset->, alt, caption, presentation }
   },
   _type == "testimonialBlock" => {
     title,

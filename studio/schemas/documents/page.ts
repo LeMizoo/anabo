@@ -1,3 +1,4 @@
+import { defineField } from 'sanity'
 import { isUniqueOtherThanLanguage } from '../../lib/isUniqueOtherThanLanguage'
 
 export default {
@@ -89,14 +90,31 @@ export default {
       rows: 3,
       group: 'content',
     },
-    {
+    defineField({
       name: 'routeStops',
       type: 'array',
       title: 'Étapes de l’itinéraire',
-      description: 'Laissez vide pour afficher un itinéraire par défaut depuis Antananarivo vers le titre de la page. Les étapes sont ordonnées du départ à l’arrivée.',
-      of: [{ type: 'string' }],
+      description:
+        'Visible pour les circuits et voyages sur mesure. Ajoutez une étape par élément, dans l’ordre réel du trajet, du départ à l’arrivée. Saisissez des lieux précis (ex. « Antananarivo, Madagascar »), pas le titre du circuit. Au moins deux étapes sont nécessaires pour afficher la carte.',
+      hidden: ({ document }) =>
+        document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
+      of: [
+        {
+          type: 'string',
+          validation: (Rule) => Rule.required().min(2),
+        },
+      ],
+      validation: (Rule) =>
+        Rule.custom((stops) => {
+          if (!Array.isArray(stops) || stops.length === 0) return true
+          if (stops.length < 2) return 'Ajoutez au moins deux étapes pour définir un itinéraire.'
+          if (stops.some((stop) => typeof stop !== 'string' || stop.trim().length < 2)) {
+            return 'Chaque étape doit contenir un nom de lieu précis.'
+          }
+          return true
+        }),
       group: 'content',
-    },
+    }),
     {
       name: 'modules',
       type: 'array',

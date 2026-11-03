@@ -50,17 +50,16 @@ export default async function TourIdeasPage({ params }: Props) {
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {
-          const configuredStops = tour.routeStops?.map((stop) => stop.trim()).filter(Boolean) || []
-          const stops = configuredStops.length >= 2
-            ? configuredStops
-            : [
-                'Antananarivo, Madagascar',
-                configuredStops[0] || (tour.slug.toLowerCase().includes('ampefy') || /ampefy/i.test(tour.title)
-                  ? 'Ampefy, Madagascar'
-                  : `${tour.title}, Madagascar`),
-              ]
-          const mapUrl = `https://maps.google.com/maps?output=embed&saddr=${encodeURIComponent(stops[0])}&daddr=${stops.slice(1).map((stop) => `to:${encodeURIComponent(stop)}`).join('+')}`
-          const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(stops[0])}&destination=${encodeURIComponent(stops[stops.length - 1])}${stops.length > 2 ? `&waypoints=${encodeURIComponent(stops.slice(1, -1).join('|'))}` : ''}`
+          const stops = tour.routeStops
+            ?.map((stop) => stop.trim())
+            .filter(Boolean)
+          const hasRoute = stops !== undefined && stops.length >= 2
+          const mapUrl = hasRoute
+            ? `https://maps.google.com/maps?output=embed&saddr=${encodeURIComponent(stops[0])}&daddr=${stops.slice(1).map((stop) => `to:${encodeURIComponent(stop)}`).join('+')}`
+            : undefined
+          const directionsUrl = hasRoute
+            ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(stops[0])}&destination=${encodeURIComponent(stops[stops.length - 1])}${stops.length > 2 ? `&waypoints=${encodeURIComponent(stops.slice(1, -1).join('|'))}` : ''}`
+            : undefined
 
           return (
             <article
@@ -107,25 +106,33 @@ export default async function TourIdeasPage({ params }: Props) {
                     <MapPinned size={15} aria-hidden="true" className="text-[#E0A01C]" />
                     {t('itinerary')}
                   </span>
-                  <a
-                    href={directionsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#06245F] hover:text-[#E0A01C]"
-                  >
-                    {t('viewRoute')}
-                    <ArrowUpRight size={13} aria-hidden="true" />
-                  </a>
+                  {directionsUrl && (
+                    <a
+                      href={directionsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#06245F] hover:text-[#E0A01C]"
+                    >
+                      {t('viewRoute')}
+                      <ArrowUpRight size={13} aria-hidden="true" />
+                    </a>
+                  )}
                 </div>
-                <div className="relative h-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
-                  <iframe
-                    title={`${t('itinerary')} — ${tour.title}`}
-                    src={mapUrl}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="absolute inset-0 h-full w-full border-0"
-                  />
-                </div>
+                {mapUrl ? (
+                  <div className="relative h-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
+                    <iframe
+                      title={`${t('itinerary')} — ${tour.title}`}
+                      src={mapUrl}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="absolute inset-0 h-full w-full border-0"
+                    />
+                  </div>
+                ) : (
+                  <p className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
+                    {t('routeNotConfigured')}
+                  </p>
+                )}
               </div>
             </article>
           )

@@ -1,5 +1,6 @@
 
 import { headingTypographyFields } from '../headingTypographyFields'
+import { imagePresentationField } from '../imagePresentationField'
 
 export default {
   name: 'heroBlock',
@@ -25,6 +26,7 @@ export default {
       options: { hotspot: true },
       fields: [
         { name: 'alt', type: 'string', title: 'Texte alternatif' },
+        imagePresentationField({ radius: 'none', shadow: 'none' }),
       ],
     },
     {

@@ -33,7 +33,8 @@
     "details": "Maggiori dettagli",
     "noImage": "Nessuna immagine",
     "itinerary": "Itinerario",
-    "viewRoute": "Vedi percorso"
+    "viewRoute": "Vedi percorso",
+    "routeNotConfigured": "Itinerario da configurare in Sanity Studio."
   },
   "slider": {
     "learnMore": "Scopri di più"

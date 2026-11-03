@@ -5,6 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import type { ImagePresentation } from '@/lib/types'
+import { imageContentStyle, imageFrameStyle } from './ImageFrame'
 
 type Slide = {
   title?: string
@@ -15,6 +17,7 @@ type Slide = {
   subtitleSize?: string
   imagePosition?: string
   imageFit?: 'cover' | 'contain'
+  imagePresentation?: ImagePresentation
   alt?: string
   linkLabel?: string
   linkUrl?: string
@@ -64,6 +67,7 @@ export function Slider3D({ block }: Props) {
             if (offset > n / 2) offset -= n
             if (offset < -n / 2) offset += n
             const abs = Math.abs(offset)
+            const presentationStyle = imageFrameStyle(s.imagePresentation)
 
             return (
               <div
@@ -71,7 +75,8 @@ export function Slider3D({ block }: Props) {
                 onClick={() => setActive(i)}
                 className="absolute left-1/2 top-0 h-full w-[70%] cursor-pointer overflow-hidden rounded-xl shadow-2xl transition-all duration-700 sm:w-[60%]"
                 style={{
-                  transform: `translateX(-50%) translateX(${offset * 55}%) translateZ(${-abs * 150}px) rotateY(${-offset * 35}deg)`,
+                  ...presentationStyle,
+                  transform: `translateX(-50%) translateX(${offset * 55}%) translateZ(${-abs * 150}px) rotateY(${-offset * 35}deg) rotateZ(${s.imagePresentation?.rotation || 0}deg)`,
                   opacity: abs > 2 ? 0 : 1 - abs * 0.25,
                   zIndex: 10 - abs,
                   pointerEvents: abs > 2 ? 'none' : 'auto',
@@ -81,12 +86,13 @@ export function Slider3D({ block }: Props) {
                   src={`${s.imageUrl}?w=900&auto=format`}
                   alt={s.alt || s.title || ''}
                   fill
-                  className="object-cover"
+                  className=""
                   sizes="(max-width: 640px) 70vw, 60vw"
                   priority={i === 0}
                   style={{
-                    objectPosition: s.imagePosition || 'center',
-                    objectFit: s.imageFit || 'cover',
+                    ...imageContentStyle(s.imagePresentation),
+                    objectPosition: s.imagePresentation?.position || s.imagePosition || 'center',
+                    objectFit: s.imagePresentation?.fit || s.imageFit || 'cover',
                   }}
                 />
                 

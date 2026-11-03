@@ -1,4 +1,5 @@
 import { headingTypographyFields } from '../headingTypographyFields'
+import { imagePresentationField } from '../imagePresentationField'
 
 export default {
   name: 'galleryBlock',
@@ -18,6 +19,7 @@ export default {
           fields: [
             { name: 'alt', type: 'string', title: 'Texte alternatif' },
             { name: 'caption', type: 'string', title: 'Légende' },
+            imagePresentationField(),
           ],
         },
       ],
