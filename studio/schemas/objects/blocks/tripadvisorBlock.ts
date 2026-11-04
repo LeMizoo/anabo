@@ -11,7 +11,7 @@ export default {
       title: 'Titre',
       initialValue: 'Ils nous ont fait confiance',
     },
-    ...headingTypographyFields({ titleFont: 'font-serif' }),
+    ...headingTypographyFields(),
     {
       name: 'showBadge',
       type: 'boolean',

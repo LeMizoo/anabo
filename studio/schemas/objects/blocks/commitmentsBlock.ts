@@ -6,7 +6,7 @@ export default {
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre principal (ex: Nos engagements)' },
-    ...headingTypographyFields({ subtitle: true, titleFont: 'font-serif', subtitleFont: 'font-script' }),
+    ...headingTypographyFields({ subtitle: true }),
     {
       name: 'titleWeight',
       type: 'string',

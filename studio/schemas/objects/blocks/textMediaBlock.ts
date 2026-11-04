@@ -9,7 +9,7 @@ export default {
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
 
-    ...headingTypographyFields({ titleFont: 'font-sans' }),
+    ...headingTypographyFields(),
 
     {
       name: 'content',

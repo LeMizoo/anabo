@@ -11,7 +11,7 @@ export default {
       type: 'string',
       title: 'Titre de la section (optionnel)',
     },
-    ...headingTypographyFields({ titleFont: 'font-sans' }),
+    ...headingTypographyFields(),
     {
       name: 'layout',
       type: 'string',

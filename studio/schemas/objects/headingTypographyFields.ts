@@ -33,7 +33,7 @@ type Options = {
 }
 
 export function headingTypographyFields({
-  titleFont = 'font-serif',
+  titleFont = 'font-script',
   subtitleFont = 'font-sans',
   subtitle = false,
 }: Options = {}) {
@@ -50,13 +50,14 @@ export function headingTypographyFields({
       type: 'string',
       title: 'Couleur du titre',
       options: { list: colorOptions, layout: 'radio' },
+      initialValue: 'gold',
     },
     {
       name: 'titleSize',
       type: 'string',
       title: 'Taille du titre',
       options: { list: sizeOptions, layout: 'radio' },
-      initialValue: 'md',
+      initialValue: '2xl',
     },
     ...(subtitle
       ? [
@@ -72,6 +73,7 @@ export function headingTypographyFields({
             type: 'string',
             title: 'Couleur du sous-titre',
             options: { list: colorOptions, layout: 'radio' },
+            initialValue: 'navy',
           },
           {
             name: 'subtitleSize',

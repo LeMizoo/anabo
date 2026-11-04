@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { ArrowUpRight, MapPinned } from 'lucide-react'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { sanityClient, getImageUrl } from '@/lib/sanity'
@@ -23,6 +24,50 @@ type TourIdea = {
   routeStops?: string[]
 }
 
+type SearchFaq = {
+  question: string
+  answer: string
+}
+
+function getSearchFaqs(value: unknown): SearchFaq[] {
+  if (!Array.isArray(value)) return []
+
+  return value.flatMap((item) => {
+    if (typeof item !== 'object' || item === null) return []
+
+    const question = 'question' in item ? item.question : undefined
+    const answer = 'answer' in item ? item.answer : undefined
+    return typeof question === 'string' && typeof answer === 'string'
+      ? [{ question, answer }]
+      : []
+  })
+}
+
+function getKeywords(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((keyword): keyword is string => typeof keyword === 'string')
+    : []
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: localeParam } = await params
+  if (!locales.includes(localeParam as Locale)) return {}
+
+  const t = await getTranslations({
+    locale: localeParam,
+    namespace: 'tourIdeas',
+  })
+  const title = t('metaTitle')
+  const description = t('metaDescription')
+
+  return {
+    title,
+    description,
+    keywords: getKeywords(t.raw('keywords')),
+    openGraph: { title, description },
+  }
+}
+
 export default async function TourIdeasPage({ params }: Props) {
   const { locale: localeParam } = await params
   if (!locales.includes(localeParam as Locale)) notFound()
@@ -31,7 +76,20 @@ export default async function TourIdeasPage({ params }: Props) {
   setRequestLocale(locale)
 
   const t = await getTranslations('tourIdeas')
+  const faqs = getSearchFaqs(t.raw('faqs'))
   const tours = await sanityClient.fetch<TourIdea[]>(tourIdeasQuery, { locale })
+  const faqStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: answer,
+      },
+    })),
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] pb-20">
@@ -42,9 +100,14 @@ export default async function TourIdeasPage({ params }: Props) {
             <MapPinned size={16} aria-hidden="true" />
             ANABO ROADTRIP MADAGASCAR
           </span>
-          <h1 className="font-serif text-4xl font-semibold md:text-6xl">{t('title')}</h1>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-white/80 md:text-lg">
+          <h1 className="font-script text-6xl font-semibold text-[#E0A01C] md:text-7xl">
+            {t('title')}
+          </h1>
+          <p className="mx-auto mt-6 w-fit max-w-3xl rounded-md bg-white px-4 py-2 font-sans text-lg leading-7 text-[#06245F] md:text-xl">
             {t('subtitle')}
+          </p>
+          <p className="mx-auto mt-4 max-w-3xl text-sm leading-7 text-white/75 md:text-base">
+            {t('intro')}
           </p>
         </div>
       </header>
@@ -134,6 +197,39 @@ export default async function TourIdeasPage({ params }: Props) {
           )
         })}
       </div>
+
+      {faqs.length > 0 && (
+        <section
+          aria-labelledby="tour-ideas-faq-title"
+          className="container-custom mx-auto mt-14 max-w-4xl"
+        >
+          <h2
+            id="tour-ideas-faq-title"
+            className="mb-6 font-script text-6xl font-bold text-[#E0A01C] md:text-7xl"
+          >
+            {t('faqTitle')}
+          </h2>
+          <div className="divide-y divide-gray-200 border-y border-gray-200">
+            {faqs.map(({ question, answer }) => (
+              <details key={question} className="group py-4">
+                <summary className="cursor-pointer pr-8 font-semibold text-gray-900">
+                  {question}
+                </summary>
+                <p className="mt-3 leading-7 text-gray-700">{answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqStructuredData).replace(/</g, '\\u003c'),
+          }}
+        />
+      )}
     </div>
   )
 }

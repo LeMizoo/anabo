@@ -28,7 +28,33 @@
   },
   "tourIdeas": {
     "title": "Idées de circuits à Madagascar",
-    "subtitle": "Découvrez nos suggestions de voyages. Composez un circuit qui correspond parfaitement à vos envies.",
+    "subtitle": "Madagascar, terre de merveilles naturelles et de trésors culturels, vous invite à imaginer votre propre aventure.",
+    "intro": "Avec ses paysages variés, sa faune singulière et sa culture riche, l’île offre mille façons de voyager. Les circuits présentés donnent un aperçu des possibilités et peuvent vous inspirer pour concevoir un itinéraire selon vos envies et vos centres d’intérêt. Je serai ravi de vous aider à choisir les étapes et le rythme qui vous conviennent.",
+    "metaTitle": "Idées de circuits à Madagascar | Anabo Roadtrip",
+    "metaDescription": "Découvrez des idées de circuits à Madagascar : RN7, Tsingy, baobabs, parcs, côte Est et Nosy Be. Voyagez avec un chauffeur-guide local.",
+    "keywords": [
+      "circuit Madagascar",
+      "idées voyage Madagascar",
+      "road trip Madagascar",
+      "circuit RN7",
+      "circuit Nosy Be",
+      "chauffeur-guide Madagascar"
+    ],
+    "faqTitle": "Questions pour choisir un circuit à Madagascar",
+    "faqs": [
+      {
+        "question": "Quels circuits peut-on faire à Madagascar ?",
+        "answer": "Les idées présentées incluent la RN7 et le Sud, les Tsingy et les baobabs, les parcs de l’Est, le Nord et Nosy Be, ainsi que des séjours dans les Hautes Terres."
+      },
+      {
+        "question": "Comment choisir un itinéraire adapté à mon voyage ?",
+        "answer": "Tenez compte de la durée du séjour, des régions souhaitées, de la saison et des conditions routières. Les étapes peuvent être discutées avec un chauffeur-guide local."
+      },
+      {
+        "question": "Les circuits proposés sont-ils personnalisables ?",
+        "answer": "Oui. Les suggestions servent de point de départ ; les étapes et le rythme peuvent être ajustés et doivent être confirmés selon les disponibilités et les conditions locales."
+      }
+    ],
     "createTrip": "Créer mon voyage",
     "details": "Plus de détails",
     "noImage": "Pas d'image",

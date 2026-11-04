@@ -11,7 +11,7 @@ export default {
       type: 'string',
       title: 'Titre',
     },
-    ...headingTypographyFields({ titleFont: 'font-sans' }),
+    ...headingTypographyFields(),
     {
       name: 'description',
       type: 'text',

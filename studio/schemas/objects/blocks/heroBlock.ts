@@ -18,7 +18,7 @@ export default {
       type: 'string',
       title: 'Sous-titre',
     },
-    ...headingTypographyFields({ subtitle: true, titleFont: 'font-sans', subtitleFont: 'font-sans' }),
+    ...headingTypographyFields({ subtitle: true }),
     {
       name: 'backgroundImage',
       type: 'image',

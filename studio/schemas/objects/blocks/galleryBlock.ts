@@ -7,7 +7,7 @@ export default {
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la galerie' },
-    ...headingTypographyFields({ titleFont: 'font-serif' }),
+    ...headingTypographyFields(),
     {
       name: 'images',
       type: 'array',

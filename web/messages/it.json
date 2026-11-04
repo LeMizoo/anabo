@@ -28,7 +28,33 @@
   },
   "tourIdeas": {
     "title": "Idee di viaggio in Madagascar",
-    "subtitle": "Scopri i nostri suggerimenti di viaggio. Componi un tour che corrisponda perfettamente ai tuoi desideri.",
+    "subtitle": "Il Madagascar, terra di meraviglie naturali e tesori culturali, ti invita a immaginare la tua avventura.",
+    "intro": "Tra paesaggi vari, fauna particolare e una cultura ricca, l’isola offre molti modi di viaggiare. I circuiti presentati mostrano alcune possibilità e possono ispirare un itinerario secondo i tuoi interessi. Sarò felice di aiutarti a scegliere tappe e ritmo più adatti.",
+    "metaTitle": "Idee di viaggio in Madagascar | Anabo Roadtrip",
+    "metaDescription": "Scopri idee di viaggio in Madagascar: RN7, Tsingy, baobab, parchi, costa orientale e Nosy Be con un autista-guida locale.",
+    "keywords": [
+      "idee viaggio Madagascar",
+      "itinerario Madagascar",
+      "road trip Madagascar",
+      "tour RN7 Madagascar",
+      "tour Nosy Be",
+      "autista-guida Madagascar"
+    ],
+    "faqTitle": "Domande per scegliere un circuito in Madagascar",
+    "faqs": [
+      {
+        "question": "Quali circuiti si possono fare in Madagascar?",
+        "answer": "Le proposte includono la RN7 e il Sud, gli Tsingy e i baobab, i parchi dell’Est, il Nord e Nosy Be, oltre agli Altipiani centrali."
+      },
+      {
+        "question": "Come scelgo un itinerario adatto al mio viaggio?",
+        "answer": "Considera la durata, le regioni desiderate, la stagione e le condizioni stradali. Puoi discutere il percorso e le tappe con un autista-guida locale."
+      },
+      {
+        "question": "I circuiti suggeriti si possono personalizzare?",
+        "answer": "Sì. Le proposte sono un punto di partenza: tappe e ritmo possono essere adattati e confermati in base alla disponibilità e alle condizioni locali."
+      }
+    ],
     "createTrip": "Crea il mio viaggio",
     "details": "Maggiori dettagli",
     "noImage": "Nessuna immagine",

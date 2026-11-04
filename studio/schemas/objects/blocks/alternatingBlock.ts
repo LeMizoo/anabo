@@ -17,7 +17,7 @@ export default {
       type: 'string',
       title: 'Titre principal',
     },
-    ...headingTypographyFields({ subtitle: true, titleFont: 'font-serif', subtitleFont: 'font-script' }),
+    ...headingTypographyFields({ subtitle: true }),
     {
       name: 'content',
       type: 'array',

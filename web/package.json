@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "import:tour-ideas": "node scripts/import-tour-ideas.mjs"
+    "import:tour-ideas": "node scripts/import-tour-ideas.mjs",
+    "localize:static-pages": "node scripts/localize-static-pages.mjs",
+    "populate:text-utile": "node scripts/populate-text-utile.mjs",
+    "style:all-pages": "node scripts/set-page-typography.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

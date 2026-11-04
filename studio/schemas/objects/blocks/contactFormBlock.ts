@@ -11,7 +11,7 @@ export default {
       title: 'Titre',
       initialValue: 'Contactez-nous',
     },
-    ...headingTypographyFields({ titleFont: 'font-sans' }),
+    ...headingTypographyFields(),
     { name: 'description', type: 'text', title: 'Description', rows: 2 },
     {
       name: 'formType',

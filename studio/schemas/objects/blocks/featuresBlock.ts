@@ -6,7 +6,7 @@ export default {
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
-    ...headingTypographyFields({ titleFont: 'font-serif' }),
+    ...headingTypographyFields(),
     {
       name: 'titleWeight',
       type: 'string',

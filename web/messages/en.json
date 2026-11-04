@@ -28,7 +28,33 @@
   },
   "tourIdeas": {
     "title": "Tour Ideas in Madagascar",
-    "subtitle": "Discover our travel suggestions. Compose a tour that perfectly matches your desires.",
+    "subtitle": "Madagascar, a land of natural wonders and cultural treasures, invites you to imagine your own adventure.",
+    "intro": "With varied landscapes, distinctive wildlife and a rich culture, the island offers many ways to travel. These circuits give you a glimpse of what is possible and inspiration for an itinerary shaped around your interests. I would be happy to help you choose suitable stops and a comfortable pace.",
+    "metaTitle": "Madagascar Tour Ideas | Anabo Roadtrip",
+    "metaDescription": "Explore Madagascar tour ideas: the RN7, Tsingy, baobabs, national parks, the East Coast and Nosy Be with a local driver-guide.",
+    "keywords": [
+      "Madagascar tour ideas",
+      "Madagascar itinerary",
+      "Madagascar road trip",
+      "RN7 tour Madagascar",
+      "Nosy Be tour",
+      "Madagascar driver-guide"
+    ],
+    "faqTitle": "Questions about choosing a Madagascar tour",
+    "faqs": [
+      {
+        "question": "What tours can I take in Madagascar?",
+        "answer": "Ideas include the RN7 and the South, the Tsingy and baobabs, eastern parks, the North and Nosy Be, and trips in the Central Highlands."
+      },
+      {
+        "question": "How do I choose an itinerary for my trip?",
+        "answer": "Consider your travel time, preferred regions, season and road conditions. A local driver-guide can help discuss the route and stops."
+      },
+      {
+        "question": "Can the suggested tours be customised?",
+        "answer": "Yes. Suggestions are a starting point; stops and pace can be adapted and confirmed according to local availability and conditions."
+      }
+    ],
     "createTrip": "Create my trip",
     "details": "More details",
     "noImage": "No image",

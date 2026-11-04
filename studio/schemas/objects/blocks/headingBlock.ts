@@ -14,7 +14,7 @@ export default {
   fields: [
     { name: 'title', type: 'string', title: 'Titre' },
     { name: 'subtitle', type: 'text', title: 'Sous-titre', rows: 3 },
-    ...headingTypographyFields({ subtitle: true, titleFont: 'font-serif' }),
+    ...headingTypographyFields({ subtitle: true }),
     {
       name: 'titleWeight',
       type: 'string',

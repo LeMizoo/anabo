@@ -11,7 +11,7 @@ export default {
       title: 'Titre',
       initialValue: 'Questions fréquentes',
     },
-    ...headingTypographyFields({ titleFont: 'font-serif' }),
+    ...headingTypographyFields(),
     {
       name: 'items',
       type: 'array',

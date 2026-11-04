@@ -1,5 +1,6 @@
 import nextEnv from '@next/env'
 import { createClient } from '@sanity/client'
+import { circuitTranslations, moduleLabels } from './tour-idea-translations.mjs'
 
 const { loadEnvConfig } = nextEnv
 loadEnvConfig(process.cwd())
@@ -8,11 +9,14 @@ const circuits = [
   {
     slug: 'sud-et-rn7',
     title: 'Madagascar Sud et le road trip RN7',
+    tagline: 'Les couleurs',
+    taglineSubtitle: 'Madagascar coloré',
     excerpt:
       'Un road trip entre les Hautes Terres et le sud de Madagascar, à travers villages, parcs nationaux, montagnes et plages.',
     routeStops: [
       'Antananarivo, Madagascar',
       'Antsirabe, Madagascar',
+      'Ambositra, Madagascar',
       'Ranomafana National Park, Madagascar',
       'Ambalavao, Madagascar',
       'Tsaranoro Valley, Madagascar',
@@ -54,13 +58,21 @@ const circuits = [
     ],
     days: [
       ['Jour 1 — Antananarivo à Antsirabe', 'Environ 160 km et 4 à 5 heures de route selon les conditions. Découverte des paysages des Hautes Terres et arrêt possible à Antsirabe.'],
-      ['Étapes suivantes', 'Le document source propose Ranomafana, Ambalavao, la vallée de Tsaranoro, Isalo, Toliara et Ifaty ou Anakao. L’ordre et le nombre de nuits sont à confirmer avec l’équipe avant réservation.'],
-      ['Retour', 'Le document source mentionne un vol entre Toliara et Antananarivo.'],
+      ['Jour 2 — Antsirabe à Ambositra', 'Continuation sur la RN7 à travers les Hautes Terres.'],
+      ['Jour 3 — Ambositra à Ranomafana', 'Route vers la forêt tropicale de Ranomafana.'],
+      ['Jour 4 — Ranomafana', 'Journée de découverte du parc national avec un guide local.'],
+      ['Jour 5 — Ranomafana à Tsaranoro', 'Traversée des paysages du sud vers la vallée de Tsaranoro.'],
+      ['Jour 6 — Vallée de Tsaranoro', 'Journée consacrée à la découverte de la vallée et à la randonnée.'],
+      ['Jour 7 — Tsaranoro à Isalo', 'Route vers les paysages de grès du parc national d’Isalo.'],
+      ['Jour 8 — Isalo', 'Journée de visite et de randonnée dans le parc national.'],
+      ['Jour 9 — Isalo à Ifaty ou Anakao', 'Continuation vers la côte sud-ouest; le choix entre Ifaty et Anakao est à confirmer.'],
+      ['Jour 10 — Ifaty', 'Temps libre et activités balnéaires selon les envies. Le document source mentionne aussi le retour vers Antananarivo par avion; transport et durée sont à confirmer.'],
     ],
   },
   {
     slug: 'baobab-et-tsingy',
     title: 'Circuit Baobab et Tsingy',
+    tagline: 'L’authentique',
     excerpt:
       'Explorez le sud-ouest de Madagascar, la région de Morondava, la rivière Tsiribihina, les Tsingy et l’Allée des Baobabs.',
     routeStops: [
@@ -108,6 +120,8 @@ const circuits = [
   {
     slug: 'circuit-nord-et-nosibe',
     title: 'Expédition du Nord et Nosibe',
+    tagline: 'Le Paradis',
+    taglineSubtitle: 'La magnifique Madagascar',
     excerpt:
       'Un grand voyage du nord de Madagascar jusqu’à Nosy Be, entre parcs, paysages de l’extrême nord, rencontres et plages.',
     routeStops: [
@@ -158,11 +172,14 @@ const circuits = [
   {
     slug: 'circuit-safari-en-voiture',
     title: 'Circuit safari en voiture',
+    tagline: 'L’exceptionnel',
+    taglineSubtitle: 'Madagascar, un lieu unique',
     excerpt:
       'Une découverte de la faune et de la flore malgaches à travers les parcs nationaux et les réserves de plusieurs régions de l’île.',
     routeStops: [
       'Antananarivo, Madagascar',
       'Andasibe-Mantadia National Park, Madagascar',
+      'Antananarivo, Madagascar',
       'Ankarafantsika National Park, Madagascar',
       'Antananarivo, Madagascar',
       'Antsirabe, Madagascar',
@@ -170,6 +187,7 @@ const circuits = [
       'Ambalavao, Madagascar',
       'Isalo National Park, Madagascar',
       'Ifaty, Madagascar',
+      'Antananarivo, Madagascar',
     ],
     duration: '18 jours (durée indicative du document source)',
     distance: '1 980 km (estimation du document source)',
@@ -205,6 +223,8 @@ const circuits = [
   {
     slug: 'cote-est-et-lemuriens',
     title: 'Voyage sur la côte est de Madagascar',
+    tagline: 'L’Evergreen',
+    taglineSubtitle: 'Nature et aventure',
     excerpt:
       'Un circuit d’Antananarivo à Sainte-Marie à travers la forêt d’Andasibe, le canal de Pangalanes et les paysages de la côte est.',
     routeStops: [
@@ -258,6 +278,7 @@ const circuits = [
   {
     slug: 'lemuriens-et-circuit-vers-l-est',
     title: 'Lémuriens et circuit vers l’est',
+    tagline: 'Le merveilleux',
     excerpt:
       'Un itinéraire centré sur Andasibe et la forêt tropicale, habitat de lémuriens, de caméléons et de plantes endémiques.',
     routeStops: [
@@ -297,6 +318,7 @@ const circuits = [
   {
     slug: 'train-manakara',
     title: 'Train Manakara',
+    tagline: 'Le vintage culturel',
     excerpt:
       'Un voyage culturel et d’aventure de Fianarantsoa à Manakara, à travers les paysages luxuriants de la côte est.',
     routeStops: [
@@ -328,6 +350,8 @@ const circuits = [
   {
     slug: 'voyage-hors-route-et-baobabs',
     title: 'Le road trip du Grand Sud — Tsingy, Baobabs et RN7',
+    tagline: 'L’unique',
+    taglineSubtitle: 'Le road trip du Grand Sud · Tsingy, Baobabs & RN7',
     excerpt:
       'Une grande aventure entre la rivière Tsiribihina, les Tsingy de Bemaraha, la côte sud-ouest, les baobabs et la RN7.',
     routeStops: [
@@ -383,6 +407,8 @@ const circuits = [
   {
     slug: 'ampefy-et-la-campagne',
     title: 'Ampéfy et la campagne',
+    tagline: 'Lacs et chutes d’eau',
+    taglineSubtitle: 'Les Hautes Terres de Madagascar',
     excerpt:
       'Une escapade depuis Antananarivo vers le lac Itasy, la cascade Lily, les geysers d’Analavory et la campagne Merina.',
     routeStops: [
@@ -444,8 +470,38 @@ function portableText(paragraphs) {
     }))
 }
 
-function toModules(circuit) {
+function localizeCircuit(circuit, locale) {
+  if (locale === 'fr') return circuit
+
+  const translation = circuitTranslations[locale]?.[circuit.slug]
+  if (!translation) {
+    throw new Error(`Traduction ${locale} manquante pour le circuit ${circuit.slug}.`)
+  }
+  if (
+    !translation.title ||
+    !translation.tagline ||
+    !translation.excerpt ||
+    !translation.duration ||
+    !translation.overview ||
+    (circuit.distance && !translation.distance) ||
+    translation.sections?.length !== circuit.sections.length ||
+    translation.days?.length !== circuit.days.length ||
+    translation.sections.some(
+      (section, index) =>
+        !section.title ||
+        section.paragraphs?.length !== circuit.sections[index].paragraphs.length
+    ) ||
+    translation.days.some(([title, description]) => !title || !description)
+  ) {
+    throw new Error(`Traduction ${locale} incomplète ou de structure incorrecte pour ${circuit.slug}.`)
+  }
+
+  return { ...circuit, ...translation }
+}
+
+function toModules(circuit, locale) {
   const prefix = 'tour-import'
+  const labels = moduleLabels[locale]
   const modules = [
     {
       _key: `${prefix}-hero`,
@@ -458,9 +514,24 @@ function toModules(circuit) {
       alignment: 'center',
     },
     {
+      _key: `${prefix}-tagline`,
+      _type: 'headingBlock',
+      title: circuit.tagline,
+      subtitle: circuit.taglineSubtitle,
+      titleFont: 'font-serif',
+      titleColor: 'gold',
+      titleSize: 'xl',
+      titleWeight: 'font-bold',
+      subtitleFont: 'font-sans',
+      subtitleColor: 'navy',
+      subtitleSize: 'md',
+      subtitleWeight: 'font-medium',
+      alignment: 'center',
+    },
+    {
       _key: `${prefix}-overview`,
       _type: 'textMediaBlock',
-      title: 'Aperçu du circuit',
+      title: labels.overview,
       content: portableText([circuit.overview]),
       imagePosition: 'right',
       imageSize: 'lg',
@@ -471,10 +542,8 @@ function toModules(circuit) {
     modules.push({
       _key: `${prefix}-draft-note`,
       _type: 'textMediaBlock',
-      title: 'Proposition de programme à confirmer',
-      content: portableText([
-        'Cette page a été complétée à partir des informations disponibles et d’une proposition de parcours. Les étapes, la durée, les transports et les prestations sont à valider avant toute publication comme offre confirmée.',
-      ]),
+      title: labels.draftTitle,
+      content: portableText([labels.draftNote]),
       imagePosition: 'right',
       imageSize: 'lg',
     })
@@ -492,7 +561,7 @@ function toModules(circuit) {
     {
       _key: `${prefix}-highlights`,
       _type: 'textMediaBlock',
-      title: 'Points forts',
+      title: labels.highlights,
       content: portableText(circuit.highlights.map((item) => `• ${item}`)),
       imagePosition: 'right',
       imageSize: 'lg',
@@ -500,11 +569,11 @@ function toModules(circuit) {
     {
       _key: `${prefix}-itinerary`,
       _type: 'textMediaBlock',
-      title: 'Itinéraire et informations pratiques',
+      title: labels.itinerary,
       content: portableText([
-        `Étapes : ${circuit.routeStops.map((stop) => stop.replace(/, Madagascar$/, '')).join(' – ')}`,
-        `Durée : ${circuit.duration}`,
-        ...(circuit.distance ? [`Distance indicative : ${circuit.distance}`] : []),
+        `${labels.stops} : ${circuit.routeStops.map((stop) => stop.replace(/, Madagascar$/, '')).join(' – ')}`,
+        `${labels.duration} : ${circuit.duration}`,
+        ...(circuit.distance ? [`${labels.estimatedDistance} : ${circuit.distance}`] : []),
       ]),
       imagePosition: 'right',
       imageSize: 'lg',
@@ -512,7 +581,7 @@ function toModules(circuit) {
     {
       _key: `${prefix}-program`,
       _type: 'textMediaBlock',
-      title: 'Programme jour par jour',
+      title: labels.program,
       content: portableText(
         circuit.days.flatMap(([title, description]) => [
           { text: title, style: 'h3' },
@@ -552,56 +621,105 @@ const client = createClient({
 })
 
 const pages = await client.fetch(
-  `*[_type == "page" && language == "fr" && slug.current in $slugs]{
-    _id, _rev, title, "slug": slug.current, language, pageType,
-    excerpt, routeStops, modules[]{...}
+  `*[_type == "page" && language in ["fr", "en", "it"] && slug.current in $slugs]{
+    _id, _rev, title, "slug": slug.current, language, pageType, translationGroup,
+    excerpt, routeStops, featuredImage, seo, modules[]{...}
   }`,
   { slugs: circuits.map((circuit) => circuit.slug) },
 )
 
-const pageBySlug = new Map(pages.map((page) => [page.slug, page]))
-const missing = circuits.filter((circuit) => !pageBySlug.has(circuit.slug))
+const pageByLocaleSlug = new Map(pages.map((page) => [`${page.language}:${page.slug}`, page]))
+const missingFrench = circuits.filter((circuit) => !pageByLocaleSlug.has(`fr:${circuit.slug}`))
 
-if (missing.length) {
-  throw new Error(`Pages françaises manquantes dans Sanity : ${missing.map((page) => page.slug).join(', ')}`)
+if (missingFrench.length) {
+  throw new Error(`Pages françaises manquantes dans Sanity : ${missingFrench.map((page) => page.slug).join(', ')}`)
+}
+
+const updates = circuits.flatMap((circuit) =>
+  ['fr', 'en', 'it'].map((locale) => {
+    const sourcePage = pageByLocaleSlug.get(`fr:${circuit.slug}`)
+    const page = pageByLocaleSlug.get(`${locale}:${circuit.slug}`)
+    const localizedCircuit = localizeCircuit(circuit, locale)
+    const translationGroup = sourcePage.translationGroup || circuit.slug
+    return {
+      circuit,
+      locale,
+      page,
+      sourcePage,
+      localizedCircuit,
+      translationGroup,
+      modules: toModules(localizedCircuit, locale),
+    }
+  }),
+)
+const missingPageIds = updates
+  .filter(({ page }) => !page)
+  .map(({ circuit, locale }) => `tour-import-${locale}-${circuit.slug}`)
+const existingNewIds = missingPageIds.length
+  ? await client.fetch('*[_id in $ids]._id', { ids: missingPageIds })
+  : []
+
+if (existingNewIds.length) {
+  throw new Error(`Identifiants Sanity déjà utilisés : ${existingNewIds.join(', ')}`)
 }
 
 console.log(`Mode : ${isApply ? 'écriture Sanity' : 'simulation sans écriture'}`)
-for (const circuit of circuits) {
-  const page = pageBySlug.get(circuit.slug)
+for (const update of updates) {
+  const { circuit, locale, page, localizedCircuit, modules } = update
   console.log(
-    `- ${page.title} (${page.slug}) : ${page.modules?.length ?? 0} bloc(s) existant(s), ${toModules(circuit).length} bloc(s) à importer${circuit.draft ? ' — programme provisoire à confirmer' : ''}`,
+    `- [${locale}] ${localizedCircuit.title} (${circuit.slug}) : ${page ? `${page.modules?.length ?? 0} bloc(s) existant(s)` : 'page à créer'}, ${modules.length} bloc(s) à importer${circuit.draft ? ' — programme provisoire à confirmer' : ''}`,
   )
 }
 
 if (!isApply) {
-  console.log('\nAucun document Sanity n’a été modifié. Relancez avec --apply pour importer.')
+  console.log('\nAucun document Sanity n’a été modifié. Relancez avec --apply pour importer les 27 versions linguistiques.')
 } else {
   const transaction = client.transaction()
 
-  for (const circuit of circuits) {
-    const page = pageBySlug.get(circuit.slug)
-    const existingModules = page.modules ?? []
+  for (const update of updates) {
+    const { circuit, locale, page, sourcePage, localizedCircuit, translationGroup, modules } = update
+    const existingModules = page?.modules ?? []
     const preservedModules = existingModules.filter(
       (module) => !module._key?.startsWith('tour-import-'),
     )
-    const importedModules = toModules(circuit)
-    const routeStops =
-      Array.isArray(page.routeStops) && page.routeStops.length >= 2
-        ? page.routeStops
-        : circuit.routeStops
+    const localizedSeo = {
+      ...(page?.seo ?? {}),
+      metaTitle: localizedCircuit.title.slice(0, 60),
+      metaDescription: localizedCircuit.excerpt.slice(0, 160),
+    }
 
-    transaction.patch(page._id, (patch) =>
-      patch
-        .ifRevisionId(page._rev)
-        .set({
-          excerpt: page.excerpt || circuit.excerpt,
-          routeStops,
-          modules: [...importedModules, ...preservedModules],
-        }),
-    )
+    if (page) {
+      transaction.patch(page._id, (patch) =>
+        patch
+          .ifRevisionId(page._rev)
+          .set({
+            ...(locale === 'fr' ? {} : { title: localizedCircuit.title }),
+            translationGroup,
+            excerpt: localizedCircuit.excerpt,
+            routeStops: circuit.routeStops,
+            seo: localizedSeo,
+            modules: [...modules, ...preservedModules],
+          }),
+      )
+    } else {
+      const newId = `tour-import-${locale}-${circuit.slug}`
+      transaction.create({
+        _id: newId,
+        _type: 'page',
+        title: localizedCircuit.title,
+        slug: { current: circuit.slug },
+        language: locale,
+        translationGroup,
+        pageType: sourcePage.pageType || 'circuit',
+        ...(sourcePage.featuredImage ? { featuredImage: sourcePage.featuredImage } : {}),
+        excerpt: localizedCircuit.excerpt,
+        routeStops: circuit.routeStops,
+        seo: localizedSeo,
+        modules: [...modules, ...preservedModules],
+      })
+    }
   }
 
   const result = await transaction.commit()
-  console.log(`Import terminé : ${result.results.length} page(s) mise(s) à jour.`)
+  console.log(`Import terminé : ${result.results.length} version(s) linguistique(s) mise(s) à jour ou créée(s).`)
 }

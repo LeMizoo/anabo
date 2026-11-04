@@ -7,7 +7,7 @@ export default {
   type: 'object',
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
-    ...headingTypographyFields({ titleFont: 'font-sans' }),
+    ...headingTypographyFields(),
     {
       name: 'autoplay',
       type: 'boolean',
@@ -71,7 +71,7 @@ export default {
             { name: 'alt', type: 'string', title: 'Texte alternatif' },
             { name: 'title', type: 'string', title: 'Titre' },
             { name: 'subtitle', type: 'string', title: 'Sous-titre' },
-            ...headingTypographyFields({ subtitle: true, titleFont: 'font-sans', subtitleFont: 'font-sans' }),
+            ...headingTypographyFields({ subtitle: true }),
             { name: 'linkLabel', type: 'string', title: 'Texte du lien' },
             {
               name: 'linkUrl',
