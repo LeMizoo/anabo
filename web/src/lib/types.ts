@@ -28,10 +28,6 @@ export interface SiteSettings {
     showLanguageSwitcher?: boolean
   }
   footer?: {
-    showLogo?: boolean
-    logoHeight?: number
-    logoOpacity?: number
-    invertLogo?: boolean
     showTagline?: boolean
     showDescription?: boolean
     showNavigation?: boolean

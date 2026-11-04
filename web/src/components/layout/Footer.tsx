@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { Facebook, Instagram, Mail, MapPin, Music2, Phone, Youtube } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import type { SiteSettings } from '@/lib/types'
@@ -40,15 +39,6 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
   const headingWeight = settings?.typography?.globalHeadingWeight || 'font-bold'
   const bodyFont = settings?.typography?.globalBodyFont || 'font-sans'
   const footer = settings?.footer
-  const logoUrl = settings?.logo?.asset?.url || '/images/logo.svg'
-  const logoHeight = Math.min(160, Math.max(24, footer?.logoHeight ?? 64))
-  const logoOpacity = Math.min(100, Math.max(0, footer?.logoOpacity ?? 100)) / 100
-  const dimensions = settings?.logo?.asset?.metadata?.dimensions
-  const logoRatio =
-    dimensions?.width && dimensions.height
-      ? dimensions.width / dimensions.height
-      : 372 / 374
-  const logoWidth = Math.min(320, Math.max(logoHeight, logoHeight * logoRatio))
 
   return (
     // 👇 Application de la police du corps au footer 👇
@@ -56,34 +46,17 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
       <div className="container-custom py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           
-          {/* Logo et description */}
-          {(footer?.showLogo !== false ||
-            (footer?.showTagline !== false && tagline) ||
-            (footer?.showDescription !== false && description)) && <div className="lg:col-span-2">
-            {footer?.showLogo !== false && <Link
-              href={`/${locale}`}
-              className="inline-block"
-              aria-label={settings?.logo?.alt || `${siteName} — Accueil`}
-            >
-              <Image
-                src={logoUrl}
-                alt={settings?.logo?.alt || siteName}
-                width={Math.round(logoWidth)}
-                height={logoHeight}
-                sizes={`${Math.round(logoWidth)}px`}
-                className={`w-auto max-w-[320px] object-contain ${footer?.invertLogo === true ? 'brightness-0 invert' : ''}`}
-                style={{ height: logoHeight, opacity: logoOpacity }}
-              />
-            </Link>}
-
+          {/* Slogan et description */}
+          {((footer?.showTagline !== false && tagline) ||
+            (footer?.showDescription !== false && description)) && <div className="lg:col-span-2 space-y-4">
             {footer?.showTagline !== false && tagline && (
-              <p className="mt-4 max-w-md text-gray-400">
+              <p className="max-w-md text-gray-400">
                 {tagline}
               </p>
             )}
 
             {footer?.showDescription !== false && description && (
-              <p className="mt-4 max-w-xl text-sm leading-7 text-gray-500">
+              <p className="max-w-xl text-sm leading-7 text-gray-500">
                 {description}
               </p>
             )}

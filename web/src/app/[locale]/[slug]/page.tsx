@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { sanityClient } from '@/lib/sanity'
 import { pageBySlugQuery, circuitsQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import type { Page, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
+import { getTourRouteStops } from '@/lib/tour-routes'
+import { MapPinned } from 'lucide-react'
 
 type Props = {
   params: Promise<{
@@ -105,5 +107,44 @@ export default async function PageBySlug({ params }: Props) {
     )
   }
 
-  return <PageRenderer modules={page.modules} circuits={circuits} />
+  const itineraryStops = page.pageType === 'circuit' || page.pageType === 'custom-trip'
+    ? getTourRouteStops(page)
+    : undefined
+  const t = await getTranslations('tourIdeas')
+  const hasHeroModule = page.modules?.some((module) => module._type === 'heroBlock')
+
+  return (
+    <>
+      {itineraryStops && (
+        <section className="container-custom py-10 md:py-14">
+          <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8">
+            {hasHeroModule ? (
+              <h2 className="font-serif text-3xl font-semibold text-[#06245F] md:text-4xl">
+                {page.title}
+              </h2>
+            ) : (
+              <h1 className="font-serif text-3xl font-semibold text-[#06245F] md:text-4xl">
+                {page.title}
+              </h1>
+            )}
+            <p className="mt-3 text-sm leading-6 text-slate-600">{t('suggestedRoute')}</p>
+            <div className="mt-6 flex items-start gap-3">
+              <MapPinned className="mt-1 h-5 w-5 shrink-0 text-[#E0A01C]" aria-hidden="true" />
+              <ol className="flex flex-wrap gap-2" aria-label={t('itinerary')}>
+                {itineraryStops.map((stop, index) => (
+                  <li
+                    key={`${stop}-${index}`}
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700"
+                  >
+                    {stop.replace(/, Madagascar$/, '')}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+      )}
+      <PageRenderer modules={page.modules} circuits={circuits} />
+    </>
+  )
 }

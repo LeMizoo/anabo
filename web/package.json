@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "import:tour-ideas": "node scripts/import-tour-ideas.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

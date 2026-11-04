@@ -9,11 +9,11 @@ type Props = {
 
 export function ImageBlockSection({ block }: Props) {
   const image = block.image
-  if (!image?.asset?.url) return null
+  if (!image) return null
   const imageUrl = getImageUrl(image)
   if (!imageUrl) return null
 
-  const { width, height } = image.asset.metadata?.dimensions ?? {}
+  const { width, height } = image.asset?.metadata?.dimensions ?? {}
   const aspectRatios = {
     square: '1 / 1',
     landscape: '16 / 9',

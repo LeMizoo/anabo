@@ -4,6 +4,7 @@ import { ArrowUpRight, MapPinned } from 'lucide-react'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { sanityClient, getImageUrl } from '@/lib/sanity'
 import { tourIdeasQuery } from '@/lib/queries'
+import { getRouteMapUrls, getTourRouteStops } from '@/lib/tour-routes'
 import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
 import type { SanityImage } from '@/lib/types'
@@ -50,16 +51,8 @@ export default async function TourIdeasPage({ params }: Props) {
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {
-          const stops = tour.routeStops
-            ?.map((stop) => stop.trim())
-            .filter(Boolean)
-          const hasRoute = stops !== undefined && stops.length >= 2
-          const mapUrl = hasRoute
-            ? `https://maps.google.com/maps?output=embed&saddr=${encodeURIComponent(stops[0])}&daddr=${stops.slice(1).map((stop) => `to:${encodeURIComponent(stop)}`).join('+')}`
-            : undefined
-          const directionsUrl = hasRoute
-            ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(stops[0])}&destination=${encodeURIComponent(stops[stops.length - 1])}${stops.length > 2 ? `&waypoints=${encodeURIComponent(stops.slice(1, -1).join('|'))}` : ''}`
-            : undefined
+          const stops = getTourRouteStops(tour)
+          const routeUrls = stops ? getRouteMapUrls(stops) : null
           const featuredImageUrl = tour.featuredImage
             ? getImageUrl(tour.featuredImage, 900, 85)
             : null
@@ -109,9 +102,9 @@ export default async function TourIdeasPage({ params }: Props) {
                     <MapPinned size={15} aria-hidden="true" className="text-[#E0A01C]" />
                     {t('itinerary')}
                   </span>
-                  {directionsUrl && (
+                  {routeUrls && (
                     <a
-                      href={directionsUrl}
+                      href={routeUrls.directionsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs font-semibold text-[#06245F] hover:text-[#E0A01C]"
@@ -121,11 +114,11 @@ export default async function TourIdeasPage({ params }: Props) {
                     </a>
                   )}
                 </div>
-                {mapUrl ? (
+                {routeUrls ? (
                   <div className="relative h-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
                     <iframe
                       title={`${t('itinerary')} — ${tour.title}`}
-                      src={mapUrl}
+                      src={routeUrls.embedUrl}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
                       className="absolute inset-0 h-full w-full border-0"

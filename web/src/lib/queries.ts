@@ -27,10 +27,6 @@ export const siteSettingsQuery = `
       showLanguageSwitcher
     },
     footer {
-      showLogo,
-      logoHeight,
-      logoOpacity,
-      invertLogo,
       showTagline,
       showDescription,
       showNavigation,

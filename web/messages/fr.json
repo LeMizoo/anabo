@@ -34,7 +34,8 @@
     "noImage": "Pas d'image",
     "itinerary": "Itinéraire",
     "viewRoute": "Voir le trajet",
-    "routeNotConfigured": "Itinéraire à renseigner dans Sanity Studio."
+    "routeNotConfigured": "Itinéraire à renseigner dans Sanity Studio.",
+    "suggestedRoute": "Parcours indicatif, à confirmer selon la durée du séjour, la saison et les conditions de route."
   },
   "slider": {
     "learnMore": "En savoir plus"

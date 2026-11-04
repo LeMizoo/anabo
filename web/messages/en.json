@@ -34,7 +34,8 @@
     "noImage": "No image",
     "itinerary": "Route",
     "viewRoute": "View route",
-    "routeNotConfigured": "Route not configured in Sanity Studio."
+    "routeNotConfigured": "Route not configured in Sanity Studio.",
+    "suggestedRoute": "Suggested route, to be confirmed according to trip length, season, and road conditions."
   },
   "slider": {
     "learnMore": "Learn more"

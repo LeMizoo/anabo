@@ -34,7 +34,8 @@
     "noImage": "Nessuna immagine",
     "itinerary": "Itinerario",
     "viewRoute": "Vedi percorso",
-    "routeNotConfigured": "Itinerario da configurare in Sanity Studio."
+    "routeNotConfigured": "Itinerario da configurare in Sanity Studio.",
+    "suggestedRoute": "Itinerario indicativo, da confermare in base alla durata del viaggio, alla stagione e alle condizioni stradali."
   },
   "slider": {
     "learnMore": "Scopri di più"
