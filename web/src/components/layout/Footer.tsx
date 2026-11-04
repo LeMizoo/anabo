@@ -71,7 +71,7 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
                 width={Math.round(logoWidth)}
                 height={logoHeight}
                 sizes={`${Math.round(logoWidth)}px`}
-                className={`w-auto max-w-[320px] object-contain ${footer?.invertLogo === false ? '' : 'brightness-0 invert'}`}
+                className={`w-auto max-w-[320px] object-contain ${footer?.invertLogo === true ? 'brightness-0 invert' : ''}`}
                 style={{ height: logoHeight, opacity: logoOpacity }}
               />
             </Link>}
