@@ -11,7 +11,6 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import type { SiteSettings } from '@/lib/types'
 
 const navigation = [
-  { key: 'home', href: '' },
   { key: 'madagascar', href: '/madagascar' },
   { key: 'tourIdeas', href: '/tour-ideas' },
   { key: 'tripGuidelines', href: '/trip-guidelines' },
@@ -87,10 +86,7 @@ export function Header({ settings }: { settings?: SiteSettings | null }) {
           {showNavigation && <nav className="hidden items-center gap-6 lg:flex">
             {navigation.map((item) => {
               const href = getHref(item.href)
-              const active =
-                item.href === ''
-                  ? pathname === href
-                  : pathname.startsWith(href)
+              const active = pathname.startsWith(href)
 
               return (
                 <Link
@@ -160,10 +156,7 @@ export function Header({ settings }: { settings?: SiteSettings | null }) {
             {showNavigation && <nav className="flex flex-col">
               {navigation.map((item) => {
                 const href = getHref(item.href)
-                const active =
-                  item.href === ''
-                    ? pathname === href
-                    : pathname.startsWith(href)
+                const active = pathname.startsWith(href)
 
                 return (
                   <Link
