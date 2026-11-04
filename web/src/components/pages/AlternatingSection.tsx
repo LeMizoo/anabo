@@ -43,6 +43,7 @@ export function AlternatingSection({
       : 'bg-white dark:bg-gray-900'
 
   const imageFirst = block.imagePosition === 'left'
+  const imageUrl = block.image ? getImageUrl(block.image, 800, 85) : null
 
   const titleFont = block.titleFont || globalHeadingFont || 'font-serif'
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-bold'
@@ -88,7 +89,7 @@ export function AlternatingSection({
           </motion.div>
 
           {/* Bloc Image principale et images flottantes */}
-          {block.image && (
+          {imageUrl && block.image && (
             <motion.div
               initial={{ opacity: 0, x: imageFirst ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -103,7 +104,7 @@ export function AlternatingSection({
                 style={{ width: block.imageSize === 'sm' ? '65%' : block.imageSize === 'lg' ? '100%' : '85%' }}
               >
                 <Image
-                  src={getImageUrl(block.image, 800, 85)}
+                  src={imageUrl}
                   alt={block.image.alt || block.title || 'Illustration de la section'}
                   fill
                   className="transition-transform duration-700 hover:scale-105"
@@ -114,6 +115,7 @@ export function AlternatingSection({
               {/* Images flottantes indépendantes */}
               {block.floatingImages?.map((floatImg, index) => {
                 const floatUrl = getImageUrl(floatImg.image, 400, 85)
+                if (!floatUrl) return null
                 const sizeClass =
                   SIZE_CLASSES[floatImg.size] || SIZE_CLASSES.md
                 const positionClass =

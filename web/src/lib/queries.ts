@@ -201,7 +201,7 @@ const pageModulesProjection = `
     images[]{ ..., asset->, alt, caption, presentation }
   },
   _type == "imageBlock" => {
-    image{ ..., asset->{url, metadata{dimensions}}, alt, presentation },
+    image{ ..., asset->{_id, url, metadata{dimensions}}, alt, presentation },
     scale,
     crop
   },

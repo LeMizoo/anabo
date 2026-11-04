@@ -10,6 +10,8 @@ type Props = {
 export function ImageBlockSection({ block }: Props) {
   const image = block.image
   if (!image?.asset?.url) return null
+  const imageUrl = getImageUrl(image)
+  if (!imageUrl) return null
 
   const { width, height } = image.asset.metadata?.dimensions ?? {}
   const aspectRatios = {
@@ -34,7 +36,7 @@ export function ImageBlockSection({ block }: Props) {
           style={{ aspectRatio }}
         >
           <Image
-            src={getImageUrl(image)}
+            src={imageUrl}
             alt={image.alt || ''}
             fill
             sizes="(max-width: 1280px) 100vw, 1152px"

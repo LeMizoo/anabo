@@ -49,37 +49,46 @@ export function TestimonialsSection({ block }: Props) {
     </div>
   )
 
-  const renderAuthor = (t: Testimonial) => (
-    <div className="flex items-center gap-3 mt-6">
-      {t.authorPhoto?.asset?.url ? (
-        <div className="relative w-12 h-12 rounded-full overflow-hidden">
-          <Image
-            src={getImageUrl(t.authorPhoto, 100, 80)}
-            alt={t.authorName}
-            fill
-            className="object-cover"
-          />
+  const renderAuthor = (t: Testimonial) => {
+    const authorPhotoUrl = t.authorPhoto
+      ? getImageUrl(t.authorPhoto, 100, 80)
+      : null
+
+    return (
+      <div className="flex items-center gap-3 mt-6">
+        {authorPhotoUrl ? (
+          <div className="relative w-12 h-12 rounded-full overflow-hidden">
+            <Image
+              src={authorPhotoUrl}
+              alt={t.authorName}
+              fill
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-[#06245F] text-white flex items-center justify-center font-bold">
+            {t.authorName.charAt(0)}
+          </div>
+        )}
+        <div>
+          <p className="font-semibold text-gray-900">{t.authorName}</p>
+          {t.authorCountry && <p className="text-xs text-gray-500">{t.authorCountry}</p>}
         </div>
-      ) : (
-        <div className="w-12 h-12 rounded-full bg-[#06245F] text-white flex items-center justify-center font-bold">
-          {t.authorName.charAt(0)}
-        </div>
-      )}
-      <div>
-        <p className="font-semibold text-gray-900">{t.authorName}</p>
-        {t.authorCountry && <p className="text-xs text-gray-500">{t.authorCountry}</p>}
       </div>
-    </div>
-  )
+    )
+  }
 
   const renderTestimonialImage = (t: Testimonial) => {
-    if (!t.testimonialImage?.asset?.url) return null
+    const imageUrl = t.testimonialImage
+      ? getImageUrl(t.testimonialImage, 1000, 85)
+      : null
+    if (!imageUrl) return null
 
     return (
       <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-xl bg-gray-100">
         <Image
-          src={getImageUrl(t.testimonialImage, 1000, 85)}
-          alt={t.testimonialImage.alt || `Photo du voyage de ${t.authorName}`}
+          src={imageUrl}
+          alt={t.testimonialImage?.alt || `Photo du voyage de ${t.authorName}`}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover"

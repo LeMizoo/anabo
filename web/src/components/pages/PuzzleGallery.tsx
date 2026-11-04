@@ -68,55 +68,64 @@ export function PuzzleGallery({ block }: Props) {
         )}
 
         <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[150px] md:auto-rows-[200px]">
-          {items.map((item, index) => (
-            <motion.div
-              key={item._key}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              style={{
-                x: item.overlap?.endsWith('left') ? -16 : item.overlap?.endsWith('right') ? 16 : 0,
-                y: item.overlap?.startsWith('top') ? -16 : item.overlap?.startsWith('bottom') ? 16 : 0,
-                zIndex: item.overlap && item.overlap !== 'none' ? 1 : undefined,
-              }}
-              className={`relative group ${getItemClasses(
-                block.layout === 'manual'
-                  ? item.size || 'small'
-                  : automaticSizes[index % automaticSizes.length] || 'small',
-              )}`}
-            >
-              <ImageFrame
-                className="absolute inset-0"
-                presentation={item.image.presentation}
+          {items.map((item, index) => {
+            const imageUrl = getImageUrl(
+              item.image,
+              pixelWidths[item.pixelation || 'none'],
+              80,
+            )
+            if (!imageUrl) return null
+
+            return (
+              <motion.div
+                key={item._key}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                style={{
+                  x: item.overlap?.endsWith('left') ? -16 : item.overlap?.endsWith('right') ? 16 : 0,
+                  y: item.overlap?.startsWith('top') ? -16 : item.overlap?.startsWith('bottom') ? 16 : 0,
+                  zIndex: item.overlap && item.overlap !== 'none' ? 1 : undefined,
+                }}
+                className={`relative group ${getItemClasses(
+                  block.layout === 'manual'
+                    ? item.size || 'small'
+                    : automaticSizes[index % automaticSizes.length] || 'small',
+                )}`}
               >
-                <Image
-                  src={getImageUrl(item.image, pixelWidths[item.pixelation || 'none'], 80)}
-                  alt={item.image.alt || item.caption || 'Galerie'}
-                  fill
-                  unoptimized={Boolean(item.pixelation && item.pixelation !== 'none')}
-                  className="transition-transform duration-700 ease-in-out group-hover:scale-110"
-                  style={{
-                    ...imageContentStyle(item.image.presentation),
-                    imageRendering: item.pixelation && item.pixelation !== 'none' ? 'pixelated' : undefined,
-                  }}
-                />
-              </ImageFrame>
-              {item.overlay && item.overlay !== 'none' && (
-                <div
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute inset-0 rounded-xl ${overlayClasses[item.overlay]}`}
-                />
-              )}
-              <div className="absolute inset-0 flex items-end rounded-xl bg-black/40 p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                {item.caption && (
-                  <p className="text-white font-medium text-sm md:text-base translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    {item.caption}
-                  </p>
+                <ImageFrame
+                  className="absolute inset-0"
+                  presentation={item.image.presentation}
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={item.image.alt || item.caption || 'Galerie'}
+                    fill
+                    unoptimized={Boolean(item.pixelation && item.pixelation !== 'none')}
+                    className="transition-transform duration-700 ease-in-out group-hover:scale-110"
+                    style={{
+                      ...imageContentStyle(item.image.presentation),
+                      imageRendering: item.pixelation && item.pixelation !== 'none' ? 'pixelated' : undefined,
+                    }}
+                  />
+                </ImageFrame>
+                {item.overlay && item.overlay !== 'none' && (
+                  <div
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute inset-0 rounded-xl ${overlayClasses[item.overlay]}`}
+                  />
                 )}
-              </div>
-            </motion.div>
-          ))}
+                <div className="absolute inset-0 flex items-end rounded-xl bg-black/40 p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  {item.caption && (
+                    <p className="text-white font-medium text-sm md:text-base translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      {item.caption}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
     </section>

@@ -60,6 +60,9 @@ export default async function TourIdeasPage({ params }: Props) {
           const directionsUrl = hasRoute
             ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(stops[0])}&destination=${encodeURIComponent(stops[stops.length - 1])}${stops.length > 2 ? `&waypoints=${encodeURIComponent(stops.slice(1, -1).join('|'))}` : ''}`
             : undefined
+          const featuredImageUrl = tour.featuredImage
+            ? getImageUrl(tour.featuredImage, 900, 85)
+            : null
 
           return (
             <article
@@ -68,10 +71,10 @@ export default async function TourIdeasPage({ params }: Props) {
             >
               <Link href={`/${locale}/${tour.slug}`} className="flex flex-1 flex-col">
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-200">
-                  {tour.featuredImage ? (
+                  {featuredImageUrl ? (
                     <Image
-                      src={getImageUrl(tour.featuredImage, 900, 85)}
-                      alt={tour.featuredImage.alt || tour.title}
+                      src={featuredImageUrl}
+                      alt={tour.featuredImage?.alt || tour.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover transition duration-700 group-hover:scale-105"
