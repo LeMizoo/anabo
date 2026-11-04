@@ -40,6 +40,11 @@
     "learnMore": "Learn more"
   },
   "contactForm": {
+    "openContact": "Contact us",
+    "openQuote": "Request a quote",
+    "contactTitle": "Contact form",
+    "quoteTitle": "Quote request",
+    "close": "Close",
     "circuit": "Main desired tour",
     "circuitDefault": "Tailor-made / I don't know yet",
     "circuitExtras": "Would you like to add an extension?",

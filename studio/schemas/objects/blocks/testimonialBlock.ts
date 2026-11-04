@@ -26,6 +26,11 @@ export default {
       },
       initialValue: 'carousel',
     },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ],
   preview: {
     prepare() {

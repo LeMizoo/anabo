@@ -42,6 +42,20 @@ export default {
       },
       initialValue: 'md',
     },
+    {
+      name: 'contentWidth',
+      type: 'string',
+      title: 'Largeur horizontale du contenu',
+      options: {
+        list: [
+          { title: 'Standard', value: 'standard' },
+          { title: 'Large', value: 'wide' },
+          { title: 'Pleine largeur', value: 'full' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'standard',
+    },
     { name: 'hidden', type: 'boolean', title: 'Masquer ce bloc (sans le supprimer)', initialValue: false },
   ],
 }

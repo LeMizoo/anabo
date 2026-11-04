@@ -55,6 +55,11 @@ export default {
           }
         }
       ]
-    }
+    },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ]
 }

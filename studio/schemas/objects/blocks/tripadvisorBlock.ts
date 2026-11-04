@@ -30,6 +30,11 @@ export default {
       title: 'Nombre d\'avis affichés',
       initialValue: 6,
     },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ],
   preview: {
     prepare() {

@@ -64,7 +64,12 @@ const pageModulesProjection = `
     backgroundImage{ ..., asset->, alt, presentation },
     backgroundImagePosition,
     backgroundImageFit,
+    backgroundImageMotion,
+    backgroundImageMotionDuration,
+    contentAnimation,
+    height,
     overlay,
+    overlayOpacity,
     alignment,
     ctaPrimary{ label, link },
     ctaSecondary{ label, link }
@@ -194,6 +199,24 @@ const pageModulesProjection = `
     titleColor,
     titleSize,
     images[]{ ..., asset->, alt, caption, presentation }
+  },
+  _type == "imageBlock" => {
+    image{ ..., asset->{url, metadata{dimensions}}, alt, presentation },
+    scale,
+    crop
+  },
+  _type == "headingBlock" => {
+    title,
+    subtitle,
+    titleFont,
+    titleColor,
+    titleSize,
+    titleWeight,
+    subtitleFont,
+    subtitleColor,
+    subtitleSize,
+    subtitleWeight,
+    alignment
   },
   _type == "testimonialBlock" => {
     title,

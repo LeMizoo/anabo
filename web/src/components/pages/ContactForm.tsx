@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
 import { brandTextColor, titleSizeClass } from '@/lib/typography'
 
@@ -25,7 +25,14 @@ export function ContactForm({ block, circuits = [] }: Props) {
   // 👇 Récupération des traductions 👇
   const t = useTranslations('contactForm')
 
-  const isQuote = block.formType === 'quote'
+  const isModalChoice = block.formType === 'both'
+  const [activeModalForm, setActiveModalForm] = useState<'contact' | 'quote' | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const isQuote = isModalChoice
+    ? activeModalForm === 'quote'
+    : block.formType === 'quote'
 
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
@@ -33,6 +40,49 @@ export function ContactForm({ block, circuits = [] }: Props) {
   
   const [selectedCircuit, setSelectedCircuit] = useState('')
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!activeModalForm) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    closeButtonRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveModalForm(null)
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )
+      if (!focusableElements?.length) {
+        event.preventDefault()
+        return
+      }
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+      triggerRef.current?.focus()
+    }
+  }, [activeModalForm])
 
   const toggleExtraCircuit = (slug: string) => {
     setExtraCircuits(prev => 
@@ -109,9 +159,8 @@ export function ContactForm({ block, circuits = [] }: Props) {
   const inputClass =
     'mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100'
 
-  return (
-    <section>
-      <div className="mx-auto max-w-3xl px-4">
+  const formCard = (
+    <div className="mx-auto max-w-3xl px-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
           {block.title && (
             <h2
@@ -253,6 +302,83 @@ export function ContactForm({ block, circuits = [] }: Props) {
           )}
         </div>
       </div>
+  )
+
+  if (isModalChoice) {
+    return (
+      <section>
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          {block.title && (
+            <h2
+              className={`mb-3 font-bold ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'}`}
+              style={{ color: brandTextColor(block.titleColor) }}
+            >
+              {block.title}
+            </h2>
+          )}
+          {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={activeModalForm === 'contact'}
+              className="rounded-full border border-primary-600 px-7 py-3 font-semibold text-primary-700 transition-colors hover:bg-primary-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+              onClick={(event) => {
+                triggerRef.current = event.currentTarget
+                setActiveModalForm('contact')
+              }}
+            >
+              {t('openContact')}
+            </button>
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={activeModalForm === 'quote'}
+              className="rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+              onClick={(event) => {
+                triggerRef.current = event.currentTarget
+                setActiveModalForm('quote')
+              }}
+            >
+              {t('openQuote')}
+            </button>
+          </div>
+        </div>
+
+        {activeModalForm && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setActiveModalForm(null)
+            }}
+          >
+            <div
+              ref={dialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={t(isQuote ? 'quoteTitle' : 'contactTitle')}
+              className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl"
+            >
+              <button
+                ref={closeButtonRef}
+                type="button"
+                aria-label={t('close')}
+                className="absolute right-7 top-7 z-10 rounded-full bg-white p-2 text-gray-700 shadow transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+                onClick={() => setActiveModalForm(null)}
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+              {formCard}
+            </div>
+          </div>
+        )}
+      </section>
+    )
+  }
+
+  return (
+    <section>
+      {formCard}
     </section>
   )
 }

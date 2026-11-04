@@ -24,9 +24,14 @@ export function BlockWrapper({ settings, children, className = '' }: Props) {
 
   const bgClass = BG_CLASSES[settings?.background || 'white']
   const spacingClass = SPACING_CLASSES[settings?.spacing || 'md']
+  const contentWidth = settings?.contentWidth || 'standard'
 
   return (
-    <section id={settings?.anchorId} className={`${bgClass} ${spacingClass} ${className}`}>
+    <section
+      id={settings?.anchorId}
+      data-block-width={contentWidth}
+      className={`${bgClass} ${spacingClass} ${className}`}
+    >
       {children}
     </section>
   )

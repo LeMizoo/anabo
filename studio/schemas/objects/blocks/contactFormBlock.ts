@@ -21,6 +21,7 @@ export default {
         list: [
           { title: 'Contact', value: 'contact' },
           { title: 'Devis', value: 'quote' },
+          { title: 'Contact et devis (boutons + modales)', value: 'both' },
         ],
         layout: 'radio',
       },
@@ -31,6 +32,11 @@ export default {
       type: 'boolean',
       title: 'Afficher WhatsApp',
       initialValue: true,
+    },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
     },
   ],
   preview: {

@@ -20,10 +20,115 @@
   .container-custom {
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
+
+  [data-block-width='wide'] .container-custom,
+  [data-block-width='wide'] .container-custom > [class*='max-w-'] {
+    max-width: 90rem !important;
+  }
+
+  [data-block-width='full'] .container-custom,
+  [data-block-width='full'] .container-custom > [class*='max-w-'] {
+    max-width: none !important;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .hero-image-pan-left {
+    animation: hero-pan-left 20s ease-in-out infinite alternate;
+  }
+
+  .hero-image-pan-right {
+    animation: hero-pan-right 20s ease-in-out infinite alternate;
+  }
+
+  .hero-image-pan-up {
+    animation: hero-pan-up 20s ease-in-out infinite alternate;
+  }
+
+  .hero-image-pan-down {
+    animation: hero-pan-down 20s ease-in-out infinite alternate;
+  }
+
+  .hero-image-ken-burns {
+    animation: hero-ken-burns 20s ease-in-out infinite alternate;
+  }
+
+  .hero-content-fade-in {
+    animation: hero-content-fade-in 900ms ease-out both;
+  }
+
+  .hero-content-fade-up {
+    animation: hero-content-fade-up 900ms ease-out both;
+  }
+
+  .hero-content-slide-left {
+    animation: hero-content-slide-left 900ms ease-out both;
+  }
+
+  .hero-content-slide-right {
+    animation: hero-content-slide-right 900ms ease-out both;
+  }
+}
+
+@keyframes hero-pan-left {
+  from { transform: scale(1.12) translateX(0); }
+  to { transform: scale(1.12) translateX(-5%); }
+}
+
+@keyframes hero-pan-right {
+  from { transform: scale(1.12) translateX(-5%); }
+  to { transform: scale(1.12) translateX(0); }
+}
+
+@keyframes hero-pan-up {
+  from { transform: scale(1.12) translateY(0); }
+  to { transform: scale(1.12) translateY(-5%); }
+}
+
+@keyframes hero-pan-down {
+  from { transform: scale(1.12) translateY(-5%); }
+  to { transform: scale(1.12) translateY(0); }
+}
+
+@keyframes hero-ken-burns {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+@keyframes hero-content-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hero-content-fade-up {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-content-slide-left {
+  from { opacity: 0; transform: translateX(2rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hero-content-slide-right {
+  from { opacity: 0; transform: translateX(-2rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-image-pan-left,
+  .hero-image-pan-right,
+  .hero-image-pan-up,
+  .hero-image-pan-down,
+  .hero-image-ken-burns,
+  .hero-content-fade-in,
+  .hero-content-fade-up,
+  .hero-content-slide-left,
+  .hero-content-slide-right {
+    animation: none;
   }
 }

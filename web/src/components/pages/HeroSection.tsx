@@ -27,9 +27,34 @@ export function HeroSection({ block }: Props) {
   }
   const titleFont = block.titleFont || 'font-sans'
   const subtitleFont = block.subtitleFont || 'font-sans'
+  const heightClasses = {
+    compact: 'min-h-[420px]',
+    standard: 'min-h-[520px]',
+    tall: 'min-h-[680px]',
+    screen: 'min-h-screen',
+  } as const
+  const contentAnimationClasses = {
+    none: '',
+    'fade-in': 'hero-content-fade-in',
+    'fade-up': 'hero-content-fade-up',
+    'slide-left': 'hero-content-slide-left',
+    'slide-right': 'hero-content-slide-right',
+  } as const
+  const imageMotionClasses = {
+    none: '',
+    'pan-left': 'hero-image-pan-left',
+    'pan-right': 'hero-image-pan-right',
+    'pan-up': 'hero-image-pan-up',
+    'pan-down': 'hero-image-pan-down',
+    'ken-burns': 'hero-image-ken-burns',
+  } as const
+  const heightClass = heightClasses[block.height || 'standard']
+  const imageMotionClass = imageMotionClasses[block.backgroundImageMotion || 'none']
+  const contentAnimationClass = contentAnimationClasses[block.contentAnimation || 'fade-up']
+  const imageMotionDuration = block.backgroundImageMotionDuration || 20
 
   return (
-    <section className="relative min-h-[520px] overflow-hidden bg-[#06245F]">
+    <section className={`relative ${heightClass} overflow-hidden bg-[#06245F]`}>
       {imageUrl && (
         <ImageFrame
           className="absolute inset-0"
@@ -41,8 +66,10 @@ export function HeroSection({ block }: Props) {
             fill
             priority
             sizes="100vw"
+            className={imageMotionClass}
             style={{
               ...imageContentStyle(imagePresentation),
+              animationDuration: imageMotionClass ? `${imageMotionDuration}s` : undefined,
               objectPosition:
                 imagePresentation.position ||
                 block.backgroundImagePosition ||
@@ -57,11 +84,14 @@ export function HeroSection({ block }: Props) {
       )}
 
       {block.overlay !== false && (
-        <div className="absolute inset-0 bg-black/45" />
+        <div
+          className="absolute inset-0 bg-black"
+          style={{ opacity: (block.overlayOpacity ?? 45) / 100 }}
+        />
       )}
 
-      <div className="container-custom relative z-10 flex min-h-[520px] flex-col justify-center py-20">
-        <div className={`flex max-w-4xl flex-col ${alignment}`}>
+      <div className={`container-custom relative z-10 flex ${heightClass} flex-col justify-center py-20`}>
+        <div className={`flex max-w-4xl flex-col ${alignment} ${contentAnimationClass}`}>
           <h1
             className={`${titleSizeClass(block.titleSize)} ${titleFont} font-bold text-white`}
             style={{ color: brandTextColor(block.titleColor) }}

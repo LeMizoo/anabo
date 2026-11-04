@@ -37,6 +37,11 @@ export default {
           select: { title: 'title', subtitle: 'description' }
         }
       }]
-    }
+    },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ]
 }

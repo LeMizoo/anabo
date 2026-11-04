@@ -134,6 +134,8 @@ export default {
         { type: 'featuresBlock' },
         // 👇 AJOUT IMPORTANT ICI 👇
         { type: 'commitmentsBlock' },
+        { type: 'imageBlock' },
+        { type: 'headingBlock' },
       ],
       group: 'content',
     },

@@ -19,6 +19,8 @@ import puzzleGalleryBlock from './objects/blocks/puzzleGalleryBlock'
 import alternatingBlock from './objects/blocks/alternatingBlock'
 import featuresBlock from './objects/blocks/featuresBlock'
 import commitmentsBlock from './objects/blocks/commitmentsBlock'
+import imageBlock from './objects/blocks/imageBlock'
+import headingBlock from './objects/blocks/headingBlock'
 
 export const schemaTypes = [
   page,
@@ -39,4 +41,6 @@ export const schemaTypes = [
   alternatingBlock,
   featuresBlock,
   commitmentsBlock,
+  imageBlock,
+  headingBlock,
 ]

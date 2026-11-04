@@ -24,6 +24,11 @@ export default {
         },
       ],
     },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ],
   preview: {
     select: { title: 'title', images: 'images' },

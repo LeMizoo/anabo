@@ -78,6 +78,7 @@ export interface BlockSettings {
   anchorId?: string
   background?: 'white' | 'cream' | 'navy'
   spacing?: 'sm' | 'md' | 'lg'
+  contentWidth?: 'standard' | 'wide' | 'full'
   hidden?: boolean
 }
 
@@ -186,7 +187,12 @@ export interface HeroBlock {
   backgroundImage?: SanityImage
   backgroundImagePosition?: string
   backgroundImageFit?: 'cover' | 'contain'
+  backgroundImageMotion?: 'none' | 'pan-left' | 'pan-right' | 'pan-up' | 'pan-down' | 'ken-burns'
+  backgroundImageMotionDuration?: number
+  contentAnimation?: 'none' | 'fade-in' | 'fade-up' | 'slide-left' | 'slide-right'
+  height?: 'compact' | 'standard' | 'tall' | 'screen'
   overlay?: boolean
+  overlayOpacity?: number
   alignment?: 'left' | 'center' | 'right'
   ctaPrimary?: PageCta
   ctaSecondary?: PageCta
@@ -227,7 +233,7 @@ export interface ContactFormBlock {
   titleColor?: BrandTextColor
   titleSize?: string
   description?: string
-  formType?: 'contact' | 'quote'
+  formType?: 'contact' | 'quote' | 'both'
   showWhatsapp?: boolean
   settings?: BlockSettings
 }
@@ -288,6 +294,31 @@ export interface GalleryBlock {
   titleColor?: BrandTextColor
   titleSize?: string
   images?: (SanityImage & { _key?: string; caption?: string })[]
+  settings?: BlockSettings
+}
+
+export interface ImageBlock {
+  _type: 'imageBlock'
+  image?: SanityImage
+  scale?: '25' | '50' | '75' | '100'
+  crop?: 'original' | 'square' | 'landscape' | 'portrait'
+  settings?: BlockSettings
+}
+
+export interface HeadingBlock {
+  _type: 'headingBlock'
+  title?: string
+  subtitle?: string
+  titleFont?: string
+  titleColor?: BrandTextColor
+  titleSize?: string
+  titleWeight?: string
+  subtitleFont?: string
+  subtitleColor?: BrandTextColor
+  subtitleSize?: string
+  subtitleWeight?: string
+  alignment?: 'left' | 'center' | 'right'
+  settings?: BlockSettings
 }
 
 export interface FaqBlock {
@@ -301,6 +332,7 @@ export interface FaqBlock {
     question: string
     answer?: unknown[]
   }[]
+  settings?: BlockSettings
 }
 
 export interface TripadvisorBlock {
@@ -312,6 +344,7 @@ export interface TripadvisorBlock {
   showBadge?: boolean
   showCarousel?: boolean
   reviewLimit?: number
+  settings?: BlockSettings
 }
 
 // PageModule complet
@@ -327,6 +360,8 @@ export type PageModule =
   | CommitmentsBlock
   | TestimonialBlock
   | GalleryBlock
+  | ImageBlock
+  | HeadingBlock
   | FaqBlock
   | TripadvisorBlock
 

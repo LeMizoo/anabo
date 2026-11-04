@@ -11,6 +11,8 @@ import { Features } from './Features'
 import { CommitmentsSection } from './CommitmentsSection'
 import { TestimonialsSection } from './TestimonialsSection'
 import { GallerySection } from './GallerySection'
+import { ImageBlockSection } from './ImageBlockSection'
+import { HeadingSection } from './HeadingSection'
 import { FaqSection } from './FaqSection'
 import { TrustindexWidget } from './TrustindexWidget'
 
@@ -27,7 +29,9 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
   return (
     <>
       {safeModules.map((module, index) => {
-        const settings = (module as any).settings
+        const settings = module.settings
+
+        if (settings?.hidden) return null
 
         const content = (() => {
           switch (module._type) {
@@ -53,6 +57,10 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
               return <TestimonialsSection block={module as any} />
             case 'galleryBlock':
               return <GallerySection block={module} />
+            case 'imageBlock':
+              return <ImageBlockSection block={module} />
+            case 'headingBlock':
+              return <HeadingSection block={module} />
             case 'faqBlock':
               return <FaqSection block={module} />
             case 'tripadvisorBlock':
@@ -73,7 +81,15 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
 
         // Le Hero gère son propre plein écran, on ne l'enveloppe pas
         if (module._type === 'heroBlock') {
-          return <div key={index}>{content}</div>
+          return (
+            <div
+              key={index}
+              id={settings?.anchorId}
+              data-block-width={settings?.contentWidth || 'standard'}
+            >
+              {content}
+            </div>
+          )
         }
 
         return (

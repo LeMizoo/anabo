@@ -162,5 +162,10 @@ export default {
       },
       initialValue: 'white',
     },
+    {
+      name: 'settings',
+      type: 'blockSettings',
+      title: 'Réglages de la section',
+    },
   ],
 }

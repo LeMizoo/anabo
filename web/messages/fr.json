@@ -40,6 +40,11 @@
     "learnMore": "En savoir plus"
   },
   "contactForm": {
+    "openContact": "Nous contacter",
+    "openQuote": "Demander un devis",
+    "contactTitle": "Formulaire de contact",
+    "quoteTitle": "Demande de devis",
+    "close": "Fermer",
     "circuit": "Circuit principal souhaité",
     "circuitDefault": "Sur-mesure / Je ne sais pas encore",
     "circuitExtras": "Souhaitez-vous ajouter une extension ?",

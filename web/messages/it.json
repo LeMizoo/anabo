@@ -40,6 +40,11 @@
     "learnMore": "Scopri di più"
   },
   "contactForm": {
+    "openContact": "Contattaci",
+    "openQuote": "Richiedi un preventivo",
+    "contactTitle": "Modulo di contatto",
+    "quoteTitle": "Richiesta di preventivo",
+    "close": "Chiudi",
     "circuit": "Tour principale desiderato",
     "circuitDefault": "Su misura / Non lo so ancora",
     "circuitExtras": "Desideri aggiungere un'estensione?",
