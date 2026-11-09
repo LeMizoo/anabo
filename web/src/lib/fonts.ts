@@ -1,5 +1,12 @@
 import localFont from 'next/font/local'
 
+export const dmSans = localFont({
+  src: '../../public/fonts/dm-sans-latin.woff2',
+  weight: '100 1000',
+  variable: '--font-dm-sans',
+  display: 'swap',
+})
+
 // Police pour le corps de texte (lecture facile, moderne)
 export const inter = localFont({
   src: [

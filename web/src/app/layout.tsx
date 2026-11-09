@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 // 👇 Ajout des imports
 import {
+  dmSans,
   euphoriaScript,
   haigrastScript,
   inter,
@@ -39,6 +40,7 @@ export default function RootLayout({
       lang="fr" 
       className={`
         ${inter.variable} 
+        ${dmSans.variable}
         ${poppins.variable} 
         ${playfair.variable} 
         ${perfectGirlScript.variable} 
