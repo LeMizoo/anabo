@@ -14,11 +14,12 @@ import {
   scriptAlt,
   scriptIn,
 } from '@/lib/fonts'
+import { SITE_NAME } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: {
-    default: 'ANABO ROADTRIP MADAGASCAR',
-    template: '%s | ANABO ROADTRIP',
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     'Circuits privés, roadtrips et voyages sur mesure à Madagascar avec chauffeur-guide.',

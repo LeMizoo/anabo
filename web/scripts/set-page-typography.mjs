@@ -6,12 +6,26 @@ nextEnv.loadEnvConfig(process.cwd())
 const titleStyle = {
   titleFont: 'font-script',
   titleColor: 'gold',
-  titleSize: '2xl',
+  titleSize: 'h2',
 }
 const subtitleStyle = {
   subtitleFont: 'font-sans',
   subtitleColor: 'navy',
-  subtitleSize: 'md',
+  subtitleSize: 'h3',
+}
+const homeHeroText = {
+  fr: {
+    title: 'Créez le Road Trip de vos rêves à Madagascar',
+    subtitle: 'Location de voiture avec chauffeur-guide à Madagascar',
+  },
+  en: {
+    title: 'Create your dream road trip in Madagascar',
+    subtitle: 'Car rental with a driver-guide in Madagascar',
+  },
+  it: {
+    title: 'Create il viaggio on the road dei vostri sogni in Madagascar',
+    subtitle: 'Noleggio auto con autista-guida in Madagascar',
+  },
 }
 const styleableTypes = new Set([
   'alternatingBlock',
@@ -58,22 +72,41 @@ const client = createClient({
   ...(isApply ? { token } : {}),
 })
 
-function applyStyles(value, counter) {
+function applyStyles(value, counter, homeLocale) {
   if (Array.isArray(value)) {
-    return value.map((item) => applyStyles(item, counter))
+    return value.map((item) => applyStyles(item, counter, homeLocale))
   }
   if (!value || typeof value !== 'object') return value
 
   const updated = Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [key, applyStyles(item, counter)]),
+    Object.entries(value).map(([key, item]) => [key, applyStyles(item, counter, homeLocale)]),
   )
 
   if (styleableTypes.has(updated._type)) {
     let changed = false
-    for (const [key, style] of Object.entries(titleStyle)) {
+    const headingStyle = {
+      ...titleStyle,
+      titleSize: homeLocale && updated._type === 'heroBlock' ? 'h1' : 'h2',
+    }
+    for (const [key, style] of Object.entries(headingStyle)) {
       if (updated[key] !== style) {
         updated[key] = style
         changed = true
+      }
+    }
+
+    if (homeLocale && updated._type === 'heroBlock') {
+      const currentHomeHero = homeHeroText[homeLocale]
+      if (
+        currentHomeHero &&
+        updated.title === currentHomeHero.title &&
+        updated.subtitle === currentHomeHero.subtitle
+      ) {
+        const title = updated.title
+        updated.title = updated.subtitle
+        updated.subtitle = title
+        changed = true
+        counter.homeHeroSwaps += 1
       }
     }
 
@@ -101,9 +134,12 @@ const pages = await client.fetch(
 const updates = []
 
 for (const page of pages) {
-  const counter = { blocks: 0 }
-  const modules = applyStyles(page.modules || [], counter)
+  const counter = { blocks: 0, homeHeroSwaps: 0 }
+  const modules = applyStyles(page.modules || [], counter, page.slug === 'home' ? page.language : undefined)
   if (counter.blocks) updates.push({ page, modules, blocks: counter.blocks })
+  if (counter.homeHeroSwaps) {
+    console.log(`- Correction titre/sous-titre accueil [${page.language}]`)
+  }
 }
 
 console.log(`Mode : ${isApply ? 'écriture Sanity' : 'simulation sans écriture'}`)

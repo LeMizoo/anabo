@@ -3,6 +3,7 @@
     "home": "Accueil",
     "madagascar": "Madagascar",
     "tourIdeas": "Idées de circuits",
+    "gallery": "Galerie",
     "tripGuidelines": "Conseils de voyage",
     "aboutUs": "À propos",
     "contact": "Contact"
@@ -13,7 +14,7 @@
     "madagascar": "Madagascar"
   },
   "home": {
-    "eyebrow": "ANABO ROADTRIP MADAGASCAR",
+    "eyebrow": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
     "fallbackTitle": "Découvrez Madagascar avec un chauffeur-guide local",
     "fallbackDescription": "Explorez Madagascar à travers des roadtrips authentiques et des voyages sur mesure."
   },
@@ -23,7 +24,7 @@
     "country": "Madagascar"
   },
   "metadata": {
-    "title": "ANABO Roadtrip Madagascar | Chauffeur-guide",
+    "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
     "description": "Découvrez Madagascar avec un chauffeur-guide local. Explorez l'île à travers des road trips authentiques et des voyages sur mesure."
   },
   "tourIdeas": {

@@ -2,11 +2,14 @@ import Link from 'next/link'
 import { Facebook, Instagram, Mail, MapPin, Music2, Phone, Youtube } from 'lucide-react'
 import { getLocale, getTranslations } from 'next-intl/server'
 import type { SiteSettings } from '@/lib/types'
+import { titleCase } from '@/lib/typography'
+import { SITE_NAME } from '@/lib/site'
 
 const navigation = [
   { key: 'home', href: '' },
   { key: 'madagascar', href: '/madagascar' },
   { key: 'tourIdeas', href: '/tour-ideas' },
+  { key: 'gallery', href: '/gallery' },
   { key: 'tripGuidelines', href: '/trip-guidelines' },
   { key: 'aboutUs', href: '/about-us' },
   { key: 'contact', href: '/contact' },
@@ -27,10 +30,6 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
   ])
 
   const localized = settings?.localized?.[locale as 'en' | 'fr' | 'it']
-  const siteName =
-    localized?.siteName ||
-    settings?.siteName ||
-    'ANABO ROADTRIP MADAGASCAR'
   const tagline = localized?.tagline || settings?.tagline
   const description = localized?.description || settings?.description
 
@@ -64,8 +63,8 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
 
           {/* Liens de navigation */}
           {footer?.showNavigation !== false && <div>
-            <h2 className={`text-sm font-semibold uppercase tracking-wider ${headingFont} ${headingWeight}`}>
-              {t('navigation')}
+            <h2 className={`text-sm font-semibold tracking-wider ${headingFont} ${headingWeight}`}>
+              {titleCase(t('navigation'), locale)}
             </h2>
 
             <nav className="mt-4 flex flex-col gap-3">
@@ -83,8 +82,8 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
 
           {/* Contact */}
           {footer?.showContact !== false && <div>
-            <h2 className={`text-sm font-semibold uppercase tracking-wider ${headingFont} ${headingWeight}`}>
-              {t('contact')}
+            <h2 className={`text-sm font-semibold tracking-wider ${headingFont} ${headingWeight}`}>
+              {titleCase(t('contact'), locale)}
             </h2>
 
             <div className="mt-4 space-y-4">
@@ -144,7 +143,7 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
         {/* Copyright */}
         <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {siteName}
+            © {new Date().getFullYear()} {SITE_NAME}
           </p>
 
           <p>{t('country')}</p>

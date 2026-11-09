@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
+import { titleCase, titleSizeClass } from '@/lib/typography'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,8 +46,8 @@ export default async function DevisPage({ params, searchParams }: Props) {
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="mx-auto max-w-2xl rounded-xl bg-white p-8 shadow-sm border border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Votre devis {quote.reference}
+        <h1 className={`font-bold text-gray-900 mb-2 ${titleSizeClass('md')}`}>
+          {titleCase(`Votre devis ${quote.reference}`, locale)}
         </h1>
         <p className="text-sm text-gray-600 mb-6">
           {quote.firstName} {quote.lastName} — {quote.email}

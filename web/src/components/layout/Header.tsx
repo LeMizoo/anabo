@@ -9,10 +9,12 @@ import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import type { SiteSettings } from '@/lib/types'
+import { SITE_NAME } from '@/lib/site'
 
 const navigation = [
   { key: 'madagascar', href: '/madagascar' },
   { key: 'tourIdeas', href: '/tour-ideas' },
+  { key: 'gallery', href: '/gallery' },
   { key: 'tripGuidelines', href: '/trip-guidelines' },
   { key: 'aboutUs', href: '/about-us' },
   { key: 'contact', href: '/contact' },
@@ -68,11 +70,11 @@ export function Header({ settings }: { settings?: SiteSettings | null }) {
             href={getHref('')}
             className="flex items-center"
             onClick={() => setMobileOpen(false)}
-            aria-label={settings?.logo?.alt || 'ANABO ROADTRIP — Accueil'}
+            aria-label={SITE_NAME}
           >
             <Image
               src={logoUrl}
-              alt={settings?.logo?.alt || 'ANABO ROADTRIP'}
+              alt={SITE_NAME}
               width={Math.round(logoWidth)}
               height={logoHeight}
               sizes={`${Math.round(logoWidth)}px`}

@@ -15,6 +15,7 @@ import { locales, type Locale } from '@/lib/i18n'
 import { sanityClient } from '@/lib/sanity'
 import { siteSettingsQuery } from '@/lib/queries'
 import type { SiteSettings } from '@/lib/types'
+import { SITE_NAME } from '@/lib/site'
 
 type Props = {
   children: React.ReactNode
@@ -44,8 +45,8 @@ export async function generateMetadata({
 
   return {
     title: {
-      template: '%s | ANABO ROADTRIP',
-      default: t('title'),
+      template: `%s | ${SITE_NAME}`,
+      default: SITE_NAME,
     },
     description: t('description'),
     alternates: {
@@ -59,14 +60,14 @@ export async function generateMetadata({
     openGraph: {
       type: 'website',
       url: `${siteUrl}/${locale}`,
-      siteName: 'ANABO ROADTRIP MADAGASCAR',
+      siteName: SITE_NAME,
       locale,
-      title: t('title'),
+      title: SITE_NAME,
       description: t('description'),
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('title'),
+      title: SITE_NAME,
       description: t('description'),
     },
   }

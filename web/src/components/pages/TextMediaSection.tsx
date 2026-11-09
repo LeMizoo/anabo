@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -42,10 +42,10 @@ const portableTextComponents: PortableTextComponents = {
   },
   block: {
     h2: ({ children }: { children?: ReactNode }) => (
-      <h3 className="text-2xl font-bold text-[#06245F] mt-8 mb-4 font-serif">{children}</h3>
+      <h3 className="text-[clamp(1.25rem,3vw,1.875rem)] font-bold text-[#06245F] mt-8 mb-4 font-serif">{children}</h3>
     ),
     h3: ({ children }: { children?: ReactNode }) => (
-      <h4 className="text-xl font-bold text-[#06245F] mt-6 mb-3 font-serif">{children}</h4>
+      <h4 className="text-[clamp(1.125rem,2.5vw,1.5rem)] font-bold text-[#06245F] mt-6 mb-3 font-serif">{children}</h4>
     ),
     blockquote: ({ children }: { children?: ReactNode }) => (
       <blockquote className="border-l-4 border-[#E0A01C] pl-4 italic text-gray-600 my-6">
@@ -122,7 +122,7 @@ export function TextMediaSection({ block }: Props) {
                 className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}
                 style={{ color: brandTextColor(block.titleColor) }}
               >
-                {block.title}
+                {titleCase(block.title)}
               </h2>
             )}
             {block.content && block.content.length > 0 && (
@@ -184,7 +184,7 @@ export function TextMediaSection({ block }: Props) {
               className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {block.title}
+              {titleCase(block.title)}
             </h2>
           )}
           {block.content && block.content.length > 0 && (

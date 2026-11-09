@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PortableText } from '@portabletext/react'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import type { AlternatingBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -70,15 +70,15 @@ export function AlternatingSection({
                 className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} block text-[#E0A01C] dark:text-[#E0A01C]`}
                 style={{ color: brandTextColor(block.subtitleColor) }}
               >
-                {block.subtitle}
+                {block.subtitle && titleCase(block.subtitle)}
               </span>
             )}
 
             <h2
-              className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white`}
+              className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} text-[#06245F] dark:text-white`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {block.title}
+              {block.title && titleCase(block.title)}
             </h2>
 
             {block.content && (

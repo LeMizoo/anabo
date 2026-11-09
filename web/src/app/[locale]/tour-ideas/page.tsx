@@ -4,11 +4,14 @@ import type { Metadata } from 'next'
 import { ArrowUpRight, MapPinned } from 'lucide-react'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { sanityClient, getImageUrl } from '@/lib/sanity'
-import { tourIdeasQuery } from '@/lib/queries'
+import { pageBySlugQuery, tourIdeasQuery } from '@/lib/queries'
 import { getRouteMapUrls, getTourRouteStops } from '@/lib/tour-routes'
 import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
-import type { SanityImage } from '@/lib/types'
+import type { Page, SanityImage } from '@/lib/types'
+import { PageRenderer } from '@/components/pages/PageRenderer'
+import { titleCase, titleSizeClass } from '@/lib/typography'
+import { SITE_NAME } from '@/lib/site'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -57,13 +60,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     locale: localeParam,
     namespace: 'tourIdeas',
   })
-  const title = t('metaTitle')
-  const description = t('metaDescription')
+  const page = await sanityClient.fetch<Page | null>(
+    pageBySlugQuery,
+    { slug: 'tour-ideas', locale: localeParam },
+  )
+  const title = page?.seo?.metaTitle || page?.title || t('metaTitle')
+  const description = page?.seo?.metaDescription || page?.excerpt || t('metaDescription')
 
   return {
     title,
     description,
-    keywords: getKeywords(t.raw('keywords')),
+    keywords: page?.seo?.keywords || getKeywords(t.raw('keywords')),
     openGraph: { title, description },
   }
 }
@@ -77,13 +84,16 @@ export default async function TourIdeasPage({ params }: Props) {
 
   const t = await getTranslations('tourIdeas')
   const faqs = getSearchFaqs(t.raw('faqs'))
-  const tours = await sanityClient.fetch<TourIdea[]>(tourIdeasQuery, { locale })
+  const [page, tours] = await Promise.all([
+    sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'tour-ideas', locale }),
+    sanityClient.fetch<TourIdea[]>(tourIdeasQuery, { locale }),
+  ])
   const faqStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faqs.map(({ question, answer }) => ({
       '@type': 'Question',
-      name: question,
+      name: titleCase(question, locale),
       acceptedAnswer: {
         '@type': 'Answer',
         text: answer,
@@ -98,19 +108,20 @@ export default async function TourIdeasPage({ params }: Props) {
         <div className="relative mx-auto max-w-4xl">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90">
             <MapPinned size={16} aria-hidden="true" />
-            ANABO ROADTRIP MADAGASCAR
+            {SITE_NAME}
           </span>
-          <h1 className="font-script text-6xl font-semibold text-[#E0A01C] md:text-7xl">
-            {t('title')}
+          <h1 className={`font-script font-semibold text-[#E0A01C] ${titleSizeClass('2xl')}`}>
+            {titleCase(page?.title || t('title'), locale)}
           </h1>
-          <p className="mx-auto mt-6 w-fit max-w-3xl rounded-md bg-white px-4 py-2 font-sans text-lg leading-7 text-[#06245F] md:text-xl">
-            {t('subtitle')}
-          </p>
-          <p className="mx-auto mt-4 max-w-3xl text-sm leading-7 text-white/75 md:text-base">
-            {t('intro')}
-          </p>
         </div>
       </header>
+
+      {page?.excerpt && !page.modules?.length && (
+        <p className="container-custom mx-auto mt-8 max-w-4xl text-center text-sm leading-7 text-slate-600 md:text-base">
+          {page.excerpt}
+        </p>
+      )}
+      {page?.modules?.length ? <PageRenderer modules={page.modules} /> : null}
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {
@@ -144,8 +155,8 @@ export default async function TourIdeasPage({ params }: Props) {
                   <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#06245F] shadow-sm">
                     {tour.pageType === 'custom-trip' ? t('createTrip') : t('details')}
                   </span>
-                  <h2 className="absolute inset-x-5 bottom-5 font-serif text-2xl font-semibold leading-tight text-white drop-shadow md:text-3xl">
-                    {tour.title}
+                  <h2 className={`absolute inset-x-5 bottom-5 font-serif font-semibold leading-tight text-white drop-shadow ${titleSizeClass('md')}`}>
+                    {titleCase(tour.title, locale)}
                   </h2>
                 </div>
                 <div className="flex flex-1 flex-col p-5">
@@ -161,7 +172,7 @@ export default async function TourIdeasPage({ params }: Props) {
 
               <div className="border-t border-slate-100 bg-slate-50/80 p-4">
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider text-slate-600">
                     <MapPinned size={15} aria-hidden="true" className="text-[#E0A01C]" />
                     {t('itinerary')}
                   </span>
@@ -180,7 +191,7 @@ export default async function TourIdeasPage({ params }: Props) {
                 {routeUrls ? (
                   <div className="relative h-40 overflow-hidden rounded-xl border border-slate-200 bg-slate-200">
                     <iframe
-                      title={`${t('itinerary')} — ${tour.title}`}
+                      title={`${titleCase(t('itinerary'), locale)} — ${titleCase(tour.title, locale)}`}
                       src={routeUrls.embedUrl}
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
@@ -205,15 +216,15 @@ export default async function TourIdeasPage({ params }: Props) {
         >
           <h2
             id="tour-ideas-faq-title"
-            className="mb-6 font-script text-6xl font-bold text-[#E0A01C] md:text-7xl"
+            className={`mb-6 font-script font-bold text-[#E0A01C] ${titleSizeClass('2xl')}`}
           >
-            {t('faqTitle')}
+            {titleCase(t('faqTitle'), locale)}
           </h2>
           <div className="divide-y divide-gray-200 border-y border-gray-200">
             {faqs.map(({ question, answer }) => (
               <details key={question} className="group py-4">
                 <summary className="cursor-pointer pr-8 font-semibold text-gray-900">
-                  {question}
+                  {titleCase(question, locale)}
                 </summary>
                 <p className="mt-3 leading-7 text-gray-700">{answer}</p>
               </details>

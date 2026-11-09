@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: {
@@ -42,15 +42,15 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
             className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} text-[#E0A01C] block mb-2`}
             style={{ color: brandTextColor(block.subtitleColor) }}
           >
-            {block.subtitle}
+            {titleCase(block.subtitle)}
           </span>
         )}
         {block.title && (
           <h2
-            className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} uppercase tracking-wide text-[#06245F] dark:text-white mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}
+            className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} text-[#06245F] dark:text-white mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {block.title}
+            {titleCase(block.title)}
           </h2>
         )}
 
@@ -63,13 +63,13 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <h3 className={`text-lg font-bold text-[#06245F] dark:text-white uppercase flex items-center gap-2 mb-4`}>
+              <h3 className="text-[clamp(1rem,2vw,1.25rem)] font-bold text-[#06245F] dark:text-white flex items-center gap-2 mb-4">
                 <span className="text-[#E0A01C]">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </span>
-                {section.title}
+                {titleCase(section.title)}
               </h3>
               <ul className="space-y-2 pl-8">
                 {section.items?.map((item) => (

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 
 type Props = {
   block: {
@@ -33,7 +33,7 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
             className={`text-center text-[#06245F] dark:text-white ${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {block.title}
+            {titleCase(block.title)}
           </h2>
         )}
         {block.content && (
@@ -54,8 +54,8 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
               <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#E0A01C] text-sm font-semibold text-white">
                 {i + 1}
               </span>
-              <h3 className={`text-lg font-semibold text-[#06245F] dark:text-white ${titleFont}`}>
-                {f.title}
+              <h3 className={`text-[clamp(1rem,2vw,1.25rem)] font-semibold text-[#06245F] dark:text-white ${titleFont}`}>
+                {titleCase(f.title)}
               </h3>
               <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
                 {f.description}

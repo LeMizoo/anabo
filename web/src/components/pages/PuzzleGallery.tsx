@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 import type { PuzzleGalleryBlock, PuzzleItem, SanityImage } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -63,7 +63,7 @@ export function PuzzleGallery({ block }: Props) {
             className={`text-center font-bold text-[#06245F] mb-6 ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {block.title}
+            {titleCase(block.title)}
           </motion.h2>
         )}
 

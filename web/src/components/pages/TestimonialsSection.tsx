@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 import type { SanityImage } from '@/lib/types'
 
 type Testimonial = {
@@ -106,14 +106,14 @@ export function TestimonialsSection({ block }: Props) {
             className={`text-center text-[#06245F] mb-8 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {block.title || 'Ce que nos voyageurs disent'}
+            {titleCase(block.title || 'Ce que nos voyageurs disent')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {testimonials.map((t) => (
               <div key={t._id} className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
                 {renderTestimonialImage(t)}
                 {renderStars(t.rating)}
-                <p className="text-gray-700 italic flex-1 leading-relaxed">"{t.content}"</p>
+                <p className="text-gray-700 italic flex-1 leading-relaxed">&ldquo;{t.content}&rdquo;</p>
                 {renderAuthor(t)}
               </div>
             ))}
@@ -131,7 +131,7 @@ export function TestimonialsSection({ block }: Props) {
           className={`text-center text-[#06245F] mb-8 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
-          {block.title || 'Ce que nos voyageurs disent'}
+          {titleCase(block.title || 'Ce que nos voyageurs disent')}
         </h2>
 
         <div className="relative max-w-4xl mx-auto">
@@ -148,7 +148,7 @@ export function TestimonialsSection({ block }: Props) {
                 {renderTestimonialImage(testimonials[currentIndex])}
                 <div className="flex justify-center">{renderStars(testimonials[currentIndex].rating)}</div>
                 <p className="text-xl md:text-2xl text-gray-700 italic leading-relaxed mb-8">
-                  "{testimonials[currentIndex].content}"
+                  &ldquo;{testimonials[currentIndex].content}&rdquo;
                 </p>
                 <div className="flex justify-center">
                   {renderAuthor(testimonials[currentIndex])}

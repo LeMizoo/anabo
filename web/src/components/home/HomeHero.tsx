@@ -3,8 +3,9 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
-import { subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import type { HeroBlock, BlockSettings } from '@/lib/types'
+import { SITE_NAME } from '@/lib/site'
 
 type HomeHeroProps = {
   hero: HeroBlock
@@ -62,18 +63,18 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
       <div className="container-custom flex min-h-[calc(100vh-5rem)] items-center py-20">
         <div className={`flex w-full max-w-4xl flex-col ${alignment}`}>
           <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
-            {t('eyebrow')}
+            {SITE_NAME}
           </p>
 
           {/* 👇 Application de la police du titre */}
           <h1 className={`max-w-4xl font-bold leading-tight text-white ${titleSizeClass(hero.titleSize)} ${titleFont}`}>
-            {hero.title || t('fallbackTitle')}
+            {titleCase(hero.title || t('fallbackTitle'))}
           </h1>
 
           {hero.subtitle && (
             /* 👇 Application de la police du sous-titre */
             <p className={`mt-6 max-w-2xl leading-8 text-white/90 ${subtitleSizeClass(hero.subtitleSize)} ${subtitleFont}`}>
-              {hero.subtitle}
+              {titleCase(hero.subtitle)}
             </p>
           )}
 

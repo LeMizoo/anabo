@@ -11,6 +11,7 @@ const config: Config = {
   ],
   safelist: [
     'font-sans',
+    'font-dm-sans',
     'font-poppins',
     'font-serif',
     'font-playfair-sc',
@@ -53,6 +54,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        'dm-sans': ['DM Sans', 'system-ui', 'sans-serif'],
         display: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
         poppins: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
         serif: ['var(--font-playfair)', 'Georgia', 'serif'],

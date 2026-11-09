@@ -1,4 +1,4 @@
-import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import type { HeadingBlock } from '@/lib/types'
 
 type Props = {
@@ -24,7 +24,7 @@ export function HeadingSection({ block }: Props) {
             className={`${block.titleFont || 'font-serif'} ${block.titleWeight || 'font-bold'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {block.title}
+            {titleCase(block.title)}
           </h2>
         )}
         {block.subtitle && (
@@ -32,7 +32,7 @@ export function HeadingSection({ block }: Props) {
             className={`mt-3 whitespace-pre-line ${block.subtitleFont || 'font-sans'} ${block.subtitleWeight || 'font-normal'} ${subtitleSizeClass(block.subtitleSize)}`}
             style={{ color: brandTextColor(block.subtitleColor) }}
           >
-            {block.subtitle}
+            {titleCase(block.subtitle)}
           </p>
         )}
       </div>

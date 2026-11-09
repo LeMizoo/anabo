@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useLocale } from 'next-intl'
-import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 import type { BrandTextColor } from '@/lib/types'
 
 const LOADER_SRC = 'https://cdn.trustindex.io/loader.js?acb2ed78468d8473bb4605f645f'
@@ -94,7 +94,7 @@ export function TrustindexWidget({ title, titleFont, titleColor, titleSize }: Pr
           className={`mb-12 text-center font-bold text-[#06245F] ${titleFont || 'font-serif'} ${titleSizeClass(titleSize)}`}
           style={{ color: brandTextColor(titleColor) }}
         >
-          {title || t.title}
+          {titleCase(title || t.title)}
         </h2>
         <div ref={containerRef} className="min-h-[200px]">
           {!loaded && !failed && (

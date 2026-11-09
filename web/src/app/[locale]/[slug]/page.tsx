@@ -6,7 +6,9 @@ import { pageBySlugQuery, circuitsQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import type { Page, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
+import { ImagePlaceholderGallery } from '@/components/pages/ImagePlaceholderGallery'
 import { getTourRouteStops } from '@/lib/tour-routes'
+import { titleCase, titleSizeClass } from '@/lib/typography'
 import { MapPinned } from 'lucide-react'
 
 type Props = {
@@ -112,6 +114,16 @@ export default async function PageBySlug({ params }: Props) {
     : undefined
   const t = await getTranslations('tourIdeas')
   const hasHeroModule = page.modules?.some((module) => module._type === 'heroBlock')
+  const hasGalleryImages = page.modules?.some(
+    (module) =>
+      module._type === 'galleryBlock' &&
+      module.images?.some(
+        (image) =>
+          typeof image.asset?.url === 'string' ||
+          typeof image.asset?._id === 'string' ||
+          typeof image.asset?._ref === 'string',
+      ),
+  ) ?? false
 
   return (
     <>
@@ -119,12 +131,12 @@ export default async function PageBySlug({ params }: Props) {
         <section className="container-custom py-10 md:py-14">
           <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8">
             {hasHeroModule ? (
-              <h2 className="font-serif text-3xl font-semibold text-[#06245F] md:text-4xl">
-                {page.title}
+              <h2 className={`font-serif font-semibold text-[#06245F] ${titleSizeClass('lg')}`}>
+                {titleCase(page.title, locale)}
               </h2>
             ) : (
-              <h1 className="font-serif text-3xl font-semibold text-[#06245F] md:text-4xl">
-                {page.title}
+              <h1 className={`font-serif font-semibold text-[#06245F] ${titleSizeClass('lg')}`}>
+                {titleCase(page.title, locale)}
               </h1>
             )}
             <p className="mt-3 text-sm leading-6 text-slate-600">{t('suggestedRoute')}</p>
@@ -145,6 +157,9 @@ export default async function PageBySlug({ params }: Props) {
         </section>
       )}
       <PageRenderer modules={page.modules} circuits={circuits} />
+      {slug === 'gallery' && !hasGalleryImages && (
+        <ImagePlaceholderGallery locale={locale} />
+      )}
     </>
   )
 }

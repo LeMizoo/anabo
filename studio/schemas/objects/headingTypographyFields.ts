@@ -1,5 +1,6 @@
 const fontOptions = [
   { title: 'Inter (Sans-serif)', value: 'font-sans' },
+  { title: 'DM Sans', value: 'font-dm-sans' },
   { title: 'Poppins', value: 'font-poppins' },
   { title: 'Playfair (Serif)', value: 'font-serif' },
   { title: 'Playfair Display SC', value: 'font-playfair-sc' },
@@ -18,12 +19,10 @@ const colorOptions = [
   { title: 'Blanc', value: 'white' },
 ]
 
-const sizeOptions = [
-  { title: 'Petit', value: 'sm' },
-  { title: 'Moyen', value: 'md' },
-  { title: 'Grand', value: 'lg' },
-  { title: 'Très grand', value: 'xl' },
-  { title: 'Extra large', value: '2xl' },
+const headingLevelOptions = [
+  { title: 'H1 — Grand', value: 'h1' },
+  { title: 'H2 — Moyen', value: 'h2' },
+  { title: 'H3 — Plus petit', value: 'h3' },
 ]
 
 type Options = {
@@ -33,7 +32,7 @@ type Options = {
 }
 
 export function headingTypographyFields({
-  titleFont = 'font-script',
+  titleFont = 'font-dm-sans',
   subtitleFont = 'font-sans',
   subtitle = false,
 }: Options = {}) {
@@ -55,9 +54,10 @@ export function headingTypographyFields({
     {
       name: 'titleSize',
       type: 'string',
-      title: 'Taille du titre',
-      options: { list: sizeOptions, layout: 'radio' },
-      initialValue: '2xl',
+      title: 'Niveau visuel du titre',
+      description: 'Choisissez une taille de titre adaptée à l’écran. Le niveau HTML est défini par le bloc.',
+      options: { list: headingLevelOptions, layout: 'radio' },
+      initialValue: 'h2',
     },
     ...(subtitle
       ? [
@@ -78,9 +78,10 @@ export function headingTypographyFields({
           {
             name: 'subtitleSize',
             type: 'string',
-            title: 'Taille du sous-titre',
-            options: { list: sizeOptions, layout: 'radio' },
-            initialValue: 'md',
+            title: 'Niveau visuel du sous-titre',
+            description: 'Choisissez une taille de sous-titre adaptée à l’écran. Le niveau HTML est défini par le bloc.',
+            options: { list: headingLevelOptions, layout: 'radio' },
+            initialValue: 'h3',
           },
         ]
       : []),

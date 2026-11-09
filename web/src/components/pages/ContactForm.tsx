@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
-import { brandTextColor, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 
 type Circuit = {
   slug: string
@@ -167,7 +167,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
               className={`mb-3 font-bold text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {block.title}
+              {titleCase(block.title)}
             </h2>
           )}
           {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
@@ -313,7 +313,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
               className={`mb-3 font-bold ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {block.title}
+              {titleCase(block.title)}
             </h2>
           )}
           {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}

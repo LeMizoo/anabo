@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { brandTextColor, subtitleSizeClass, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import type { BrandTextColor, ImagePresentation } from '@/lib/types'
 import { imageContentStyle, imageFrameStyle } from './ImageFrame'
 
@@ -62,7 +62,7 @@ export function Slider3D({ block }: Props) {
             className={`mb-8 text-center font-bold ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {block.title}
+            {titleCase(block.title)}
           </h2>
         )}
 
@@ -111,7 +111,7 @@ export function Slider3D({ block }: Props) {
                         className={`${s.titleFont || 'font-sans'} font-semibold ${titleSizeClass(s.titleSize)}`}
                         style={{ color: brandTextColor(s.titleColor) }}
                       >
-                        {s.title}
+                        {s.title && titleCase(s.title)}
                       </h3>
                     )}
                     {s.subtitle && (
@@ -119,7 +119,7 @@ export function Slider3D({ block }: Props) {
                         className={`mt-1 ${s.subtitleFont || 'font-sans'} ${subtitleSizeClass(s.subtitleSize)}`}
                         style={{ color: brandTextColor(s.subtitleColor) }}
                       >
-                        {s.subtitle}
+                        {s.subtitle && titleCase(s.subtitle)}
                       </p>
                     )}
                     

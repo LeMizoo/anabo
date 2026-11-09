@@ -14,7 +14,7 @@ export default {
       name: 'siteName',
       type: 'string',
       title: 'Nom du site',
-      initialValue: 'ANABO ROADTRIP MADAGASCAR',
+      initialValue: 'Madagascar Car Rental with Driver-Guide - Malagasy Company',
       group: 'general',
     },
     { name: 'tagline', type: 'string', title: 'Slogan', group: 'general' },
@@ -36,7 +36,7 @@ export default {
           type: 'object',
           title: 'English',
           fields: [
-            { name: 'siteName', type: 'string', title: 'Site name' },
+            { name: 'siteName', type: 'string', title: 'Site name', initialValue: 'Madagascar Car Rental with Driver-Guide - Malagasy Company' },
             { name: 'tagline', type: 'string', title: 'Tagline' },
             { name: 'description', type: 'text', title: 'Description', rows: 5 },
           ],
@@ -46,7 +46,7 @@ export default {
           type: 'object',
           title: 'Francais',
           fields: [
-            { name: 'siteName', type: 'string', title: 'Nom du site' },
+            { name: 'siteName', type: 'string', title: 'Nom du site', initialValue: 'Madagascar Car Rental with Driver-Guide - Malagasy Company' },
             { name: 'tagline', type: 'string', title: 'Slogan' },
             { name: 'description', type: 'text', title: 'Description', rows: 5 },
           ],
@@ -56,7 +56,7 @@ export default {
           type: 'object',
           title: 'Italiano',
           fields: [
-            { name: 'siteName', type: 'string', title: 'Nome del sito' },
+            { name: 'siteName', type: 'string', title: 'Nome del sito', initialValue: 'Madagascar Car Rental with Driver-Guide - Malagasy Company' },
             { name: 'tagline', type: 'string', title: 'Slogan' },
             { name: 'description', type: 'text', title: 'Descrizione', rows: 5 },
           ],
@@ -91,13 +91,14 @@ export default {
           type: 'string',
           options: {
             list: [
+              { title: 'DM Sans', value: 'font-dm-sans' },
               { title: 'Playfair (Serif)', value: 'font-serif' },
               { title: 'Perfect Girl Sans', value: 'font-perfect-sans' },
               { title: 'Perfect Girl Script', value: 'font-script' },
               { title: 'Poppins', value: 'font-poppins' },
             ],
           },
-          initialValue: 'font-serif',
+          initialValue: 'font-dm-sans',
         },
         {
           name: 'globalHeadingWeight',
