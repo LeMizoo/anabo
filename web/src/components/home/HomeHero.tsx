@@ -5,14 +5,17 @@ import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
 import { subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import type { HeroBlock, BlockSettings } from '@/lib/types'
+import type { Locale } from '@/lib/i18n'
 import { SITE_NAME } from '@/lib/site'
+import { ImagePlaceholder } from '@/components/pages/ImagePlaceholder'
 
 type HomeHeroProps = {
   hero: HeroBlock
   settings?: BlockSettings
+  locale: Locale
 }
 
-export async function HomeHero({ hero, settings }: HomeHeroProps) {
+export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
   // 👇 Si le bloc est masqué, on ne l'affiche pas du tout
   if (settings?.hidden) return null
 
@@ -39,7 +42,7 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
       id={settings?.anchorId} 
       className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-gray-900"
     >
-      {backgroundImage && (
+      {backgroundImage ? (
         <Image
           src={backgroundImage}
           alt={hero.backgroundImage?.alt || ''}
@@ -52,6 +55,8 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
             objectFit: hero.backgroundImageFit || 'cover',
           }}
         />
+      ) : (
+        <ImagePlaceholder locale={locale} variant="cover" className="absolute inset-0 -z-20" />
       )}
 
       <div

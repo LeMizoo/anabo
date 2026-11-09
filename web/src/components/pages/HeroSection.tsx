@@ -2,14 +2,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import type { Locale } from '@/lib/i18n'
 import type { HeroBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
+import { ImagePlaceholder } from './ImagePlaceholder'
 
 type Props = {
   block: HeroBlock
+  locale: Locale
 }
 
-export function HeroSection({ block }: Props) {
+export function HeroSection({ block, locale }: Props) {
   const alignment =
     block.alignment === 'left'
       ? 'items-start text-left'
@@ -55,7 +58,7 @@ export function HeroSection({ block }: Props) {
 
   return (
     <section className={`relative ${heightClass} overflow-hidden bg-[#06245F]`}>
-      {imageUrl && (
+      {imageUrl ? (
         <ImageFrame
           className="absolute inset-0"
           presentation={imagePresentation}
@@ -81,6 +84,8 @@ export function HeroSection({ block }: Props) {
             }}
           />
         </ImageFrame>
+      ) : (
+        <ImagePlaceholder locale={locale} variant="cover" className="absolute inset-0" />
       )}
 
       {block.overlay !== false && (

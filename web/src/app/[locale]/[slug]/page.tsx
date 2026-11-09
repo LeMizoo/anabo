@@ -114,15 +114,8 @@ export default async function PageBySlug({ params }: Props) {
     : undefined
   const t = await getTranslations('tourIdeas')
   const hasHeroModule = page.modules?.some((module) => module._type === 'heroBlock')
-  const hasGalleryImages = page.modules?.some(
-    (module) =>
-      module._type === 'galleryBlock' &&
-      module.images?.some(
-        (image) =>
-          typeof image.asset?.url === 'string' ||
-          typeof image.asset?._id === 'string' ||
-          typeof image.asset?._ref === 'string',
-      ),
+  const hasGalleryBlock = page.modules?.some(
+    (module) => module._type === 'galleryBlock',
   ) ?? false
 
   return (
@@ -156,8 +149,8 @@ export default async function PageBySlug({ params }: Props) {
           </div>
         </section>
       )}
-      <PageRenderer modules={page.modules} circuits={circuits} />
-      {slug === 'gallery' && !hasGalleryImages && (
+      <PageRenderer modules={page.modules} circuits={circuits} locale={locale} />
+      {slug === 'gallery' && !hasGalleryBlock && (
         <ImagePlaceholderGallery locale={locale} />
       )}
     </>

@@ -5,8 +5,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import type { Locale } from '@/lib/i18n'
 import type { BrandTextColor, ImagePresentation } from '@/lib/types'
 import { imageContentStyle, imageFrameStyle } from './ImageFrame'
+import { ImagePlaceholder } from './ImagePlaceholder'
 
 type Slide = {
   title?: string
@@ -38,11 +40,14 @@ type Props = {
     interval?: number
     slides?: Slide[]
   }
+  locale: Locale
 }
 
-export function Slider3D({ block }: Props) {
+export function Slider3D({ block, locale }: Props) {
   const t = useTranslations('slider')
-  const slides = (block.slides ?? []).filter((s) => s.imageUrl)
+  const slides: Slide[] = block.slides?.length
+    ? block.slides
+    : Array.from({ length: 3 }, () => ({}))
   const n = slides.length
   const autoplay = block.autoplay ?? true
   const interval = block.interval ?? 5
@@ -53,8 +58,6 @@ export function Slider3D({ block }: Props) {
     const timer = setInterval(() => setActive((a) => (a + 1) % n), interval * 1000)
     return () => clearInterval(timer)
   }, [autoplay, interval, n])
-
-  if (n === 0) return null
 
   return (
     <section className="overflow-hidden">
@@ -92,19 +95,23 @@ export function Slider3D({ block }: Props) {
                   pointerEvents: abs > 2 ? 'none' : 'auto',
                 }}
               >
-                <Image
-                  src={`${s.imageUrl}?w=900&auto=format`}
-                  alt={s.alt || s.title || ''}
-                  fill
-                  className=""
-                  sizes="(max-width: 640px) 70vw, 60vw"
-                  priority={i === 0}
-                  style={{
-                    ...imageContentStyle(s.imagePresentation),
-                    objectPosition: s.imagePresentation?.position || s.imagePosition || 'center',
-                    objectFit: s.imagePresentation?.fit || s.imageFit || 'cover',
-                  }}
-                />
+                {s.imageUrl ? (
+                  <Image
+                    src={`${s.imageUrl}?w=900&auto=format`}
+                    alt={s.alt || s.title || ''}
+                    fill
+                    className=""
+                    sizes="(max-width: 640px) 70vw, 60vw"
+                    priority={i === 0}
+                    style={{
+                      ...imageContentStyle(s.imagePresentation),
+                      objectPosition: s.imagePresentation?.position || s.imagePosition || 'center',
+                      objectFit: s.imagePresentation?.fit || s.imageFit || 'cover',
+                    }}
+                  />
+                ) : (
+                  <ImagePlaceholder locale={locale} />
+                )}
                 
                 {(s.title || s.subtitle) && (
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">

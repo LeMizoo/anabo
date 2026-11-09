@@ -6,12 +6,15 @@ import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import type { Locale } from '@/lib/i18n'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
+import { ImagePlaceholder } from './ImagePlaceholder'
 
 type Props = {
   block: TextMediaBlock
+  locale: Locale
 }
 
 const portableTextComponents: PortableTextComponents = {
@@ -70,7 +73,7 @@ const portableTextComponents: PortableTextComponents = {
   },
 }
 
-export function TextMediaSection({ block }: Props) {
+export function TextMediaSection({ block, locale }: Props) {
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
   const titleFontClass = block.titleFont || 'font-euphoria'
   const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
@@ -78,10 +81,7 @@ export function TextMediaSection({ block }: Props) {
   // Nouvelles positions
   const isImageTop = block.imagePosition === 'top'
   const isImageBottom = block.imagePosition === 'bottom'
-  const isImageSide = block.imagePosition === 'left' || block.imagePosition === 'right'
   const imageFirst = block.imagePosition === 'left'
-
-  const isTextOnly = !imageUrl
 
   // Rendu pour les positions "haut" et "bas" (colonne unique)
   if (isImageTop || isImageBottom) {
@@ -89,7 +89,7 @@ export function TextMediaSection({ block }: Props) {
       <section className="container-custom overflow-hidden">
         <div className="max-w-5xl mx-auto flex flex-col gap-8">
           
-          {isImageTop && imageUrl && (
+          {isImageTop && (
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -101,13 +101,17 @@ export function TextMediaSection({ block }: Props) {
                 presentation={block.image?.presentation}
                 style={{ maxWidth: imageWidth }}
               >
-                <Image
-                  src={imageUrl}
-                  alt={block.image?.alt || ''}
-                  fill
-                  sizes="100vw"
-                  style={imageContentStyle(block.image?.presentation)}
-                />
+                {imageUrl ? (
+                  <Image
+                    src={imageUrl}
+                    alt={block.image?.alt || ''}
+                    fill
+                    sizes="100vw"
+                    style={imageContentStyle(block.image?.presentation)}
+                  />
+                ) : (
+                  <ImagePlaceholder locale={locale} />
+                )}
               </ImageFrame>
             </motion.div>
           )}
@@ -140,7 +144,7 @@ export function TextMediaSection({ block }: Props) {
             )}
           </motion.div>
 
-          {isImageBottom && imageUrl && (
+          {isImageBottom && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -152,13 +156,17 @@ export function TextMediaSection({ block }: Props) {
                 presentation={block.image?.presentation}
                 style={{ maxWidth: imageWidth }}
               >
-                <Image
-                  src={imageUrl}
-                  alt={block.image?.alt || ''}
-                  fill
-                  sizes="100vw"
-                  style={imageContentStyle(block.image?.presentation)}
-                />
+                {imageUrl ? (
+                  <Image
+                    src={imageUrl}
+                    alt={block.image?.alt || ''}
+                    fill
+                    sizes="100vw"
+                    style={imageContentStyle(block.image?.presentation)}
+                  />
+                ) : (
+                  <ImagePlaceholder locale={locale} />
+                )}
               </ImageFrame>
             </motion.div>
           )}
@@ -170,7 +178,7 @@ export function TextMediaSection({ block }: Props) {
   // Rendu pour les positions "gauche" et "droite" (2 colonnes classiques)
   return (
     <section className="container-custom overflow-hidden">
-      <div className={`grid items-center gap-10 md:gap-16 ${isTextOnly ? 'max-w-5xl mx-auto' : 'md:grid-cols-2'}`}>
+      <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
         
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
@@ -202,19 +210,19 @@ export function TextMediaSection({ block }: Props) {
           )}
         </motion.div>
 
-        {imageUrl && (
-          <motion.div 
-            initial={{ opacity: 0, x: imageFirst ? -40 : 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-            className={imageFirst ? 'md:order-1' : 'md:order-2'}
+        <motion.div
+          initial={{ opacity: 0, x: imageFirst ? -40 : 40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+          className={imageFirst ? 'md:order-1' : 'md:order-2'}
+        >
+          <ImageFrame
+            className="relative mx-auto aspect-[4/3] w-full"
+            presentation={block.image?.presentation}
+            style={{ maxWidth: imageWidth }}
           >
-            <ImageFrame
-              className="relative mx-auto aspect-[4/3] w-full"
-              presentation={block.image?.presentation}
-              style={{ maxWidth: imageWidth }}
-            >
+            {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={block.image?.alt || ''}
@@ -223,9 +231,11 @@ export function TextMediaSection({ block }: Props) {
                 className="transition-transform duration-700 hover:scale-105"
                 style={imageContentStyle(block.image?.presentation)}
               />
-            </ImageFrame>
-          </motion.div>
-        )}
+            ) : (
+              <ImagePlaceholder locale={locale} />
+            )}
+          </ImageFrame>
+        </motion.div>
       </div>
     </section>
   )

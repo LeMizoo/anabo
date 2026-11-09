@@ -6,7 +6,9 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import type { Locale } from '@/lib/i18n'
 import type { SanityImage } from '@/lib/types'
+import { ImagePlaceholder } from './ImagePlaceholder'
 
 type Testimonial = {
   _id: string
@@ -28,9 +30,10 @@ type Props = {
     layout?: 'carousel' | 'grid'
     testimonials?: Testimonial[]
   }
+  locale: Locale
 }
 
-export function TestimonialsSection({ block }: Props) {
+export function TestimonialsSection({ block, locale }: Props) {
   const testimonials = block.testimonials || []
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -83,17 +86,21 @@ export function TestimonialsSection({ block }: Props) {
     const imageUrl = t.testimonialImage
       ? getImageUrl(t.testimonialImage, 1000, 85)
       : null
-    if (!imageUrl) return null
+    if (!t.testimonialImage) return null
 
     return (
       <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-xl bg-gray-100">
-        <Image
-          src={imageUrl}
-          alt={t.testimonialImage?.alt || `Photo du voyage de ${t.authorName}`}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-        />
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={t.testimonialImage.alt || `Photo du voyage de ${t.authorName}`}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+          />
+        ) : (
+          <ImagePlaceholder locale={locale} />
+        )}
       </div>
     )
   }

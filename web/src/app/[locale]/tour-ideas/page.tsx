@@ -10,6 +10,7 @@ import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
 import type { Page, SanityImage } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
+import { ImagePlaceholder } from '@/components/pages/ImagePlaceholder'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import { SITE_NAME } from '@/lib/site'
 
@@ -121,7 +122,7 @@ export default async function TourIdeasPage({ params }: Props) {
           {page.excerpt}
         </p>
       )}
-      {page?.modules?.length ? <PageRenderer modules={page.modules} /> : null}
+      {page?.modules?.length ? <PageRenderer modules={page.modules} locale={locale} /> : null}
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {
@@ -147,9 +148,7 @@ export default async function TourIdeasPage({ params }: Props) {
                       className="object-cover transition duration-700 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 text-slate-500">
-                      {t('noImage')}
-                    </div>
+                    <ImagePlaceholder locale={locale} />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#04183E]/80 via-transparent to-black/10" />
                   <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#06245F] shadow-sm">

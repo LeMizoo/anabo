@@ -1,4 +1,5 @@
 import type { PageModule, Circuit } from '@/lib/types'
+import type { Locale } from '@/lib/i18n'
 import { BlockWrapper } from './BlockWrapper'
 import { HeroSection } from './HeroSection'
 import { TextMediaSection } from './TextMediaSection'
@@ -21,9 +22,10 @@ type Props = {
   circuits?: Circuit[]
   globalHeadingFont?: string
   globalHeadingWeight?: string
+  locale: Locale
 }
 
-export function PageRenderer({ modules, circuits = [], globalHeadingFont, globalHeadingWeight }: Props) {
+export function PageRenderer({ modules, circuits = [], globalHeadingFont, globalHeadingWeight, locale }: Props) {
   const safeModules = Array.isArray(modules) ? modules : []
 
   return (
@@ -36,29 +38,29 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
         const content = (() => {
           switch (module._type) {
             case 'heroBlock':
-              return <HeroSection block={module} />
+              return <HeroSection block={module} locale={locale} />
             case 'textMediaBlock':
-              return <TextMediaSection block={module} />
+              return <TextMediaSection block={module} locale={locale} />
             case 'ctaBlock':
               return <CtaSection block={module} />
             case 'contactFormBlock':
               return <ContactForm block={module} circuits={circuits} />
             case 'slider3dBlock':
-              return <Slider3D block={module} />
+              return <Slider3D block={module} locale={locale} />
             case 'puzzleGalleryBlock':
-              return <PuzzleGallery block={module as any} />
+              return <PuzzleGallery block={module as any} locale={locale} />
             case 'alternatingBlock':
-              return <AlternatingSection block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+              return <AlternatingSection block={module as any} locale={locale} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'featuresBlock':
               return <Features block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'commitmentsBlock':
               return <CommitmentsSection block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'testimonialBlock':
-              return <TestimonialsSection block={module as any} />
+              return <TestimonialsSection block={module as any} locale={locale} />
             case 'galleryBlock':
-              return <GallerySection block={module} />
+              return <GallerySection block={module} locale={locale} />
             case 'imageBlock':
-              return <ImageBlockSection block={module} />
+              return <ImageBlockSection block={module} locale={locale} />
             case 'headingBlock':
               return <HeadingSection block={module} />
             case 'faqBlock':

@@ -4,11 +4,14 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
-import type { PuzzleGalleryBlock, PuzzleItem, SanityImage } from '@/lib/types'
+import type { Locale } from '@/lib/i18n'
+import type { PuzzleGalleryBlock, PuzzleItem } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
+import { ImagePlaceholder } from './ImagePlaceholder'
 
 type Props = {
   block: PuzzleGalleryBlock
+  locale: Locale
 }
 
 const automaticSizes: PuzzleItem['size'][] = [
@@ -36,12 +39,13 @@ const overlayClasses: Record<NonNullable<PuzzleItem['overlay']>, string> = {
   accent: 'bg-[#e0a01c]/30',
 }
 
-export function PuzzleGallery({ block }: Props) {
-  const items = block.items?.filter(
-    (item): item is PuzzleItem & { image: SanityImage & { asset: NonNullable<SanityImage['asset']> } } =>
-      Boolean(item.image?.asset?._ref || item.image?.asset?._id || item.image?.asset?.url),
-  )
-  if (!items?.length) return null
+export function PuzzleGallery({ block, locale }: Props) {
+  const items: PuzzleItem[] = block.items?.length
+    ? block.items
+    : automaticSizes.slice(0, 6).map((size, index) => ({
+        _key: `placeholder-${index}`,
+        size,
+      }))
 
   const getItemClasses = (size: NonNullable<PuzzleItem['size']>) => {
     switch (size) {
@@ -74,8 +78,6 @@ export function PuzzleGallery({ block }: Props) {
               pixelWidths[item.pixelation || 'none'],
               80,
             )
-            if (!imageUrl) return null
-
             return (
               <motion.div
                 key={item._key}
@@ -94,22 +96,28 @@ export function PuzzleGallery({ block }: Props) {
                     : automaticSizes[index % automaticSizes.length] || 'small',
                 )}`}
               >
-                <ImageFrame
-                  className="absolute inset-0"
-                  presentation={item.image.presentation}
-                >
-                  <Image
-                    src={imageUrl}
-                    alt={item.image.alt || item.caption || 'Galerie'}
-                    fill
-                    unoptimized={Boolean(item.pixelation && item.pixelation !== 'none')}
-                    className="transition-transform duration-700 ease-in-out group-hover:scale-110"
-                    style={{
-                      ...imageContentStyle(item.image.presentation),
-                      imageRendering: item.pixelation && item.pixelation !== 'none' ? 'pixelated' : undefined,
-                    }}
-                  />
-                </ImageFrame>
+                <div className="absolute inset-0">
+                  {imageUrl && item.image ? (
+                    <ImageFrame
+                      className="h-full w-full"
+                      presentation={item.image.presentation}
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt={item.image.alt || item.caption || 'Galerie'}
+                        fill
+                        unoptimized={Boolean(item.pixelation && item.pixelation !== 'none')}
+                        className="transition-transform duration-700 ease-in-out group-hover:scale-110"
+                        style={{
+                          ...imageContentStyle(item.image.presentation),
+                          imageRendering: item.pixelation && item.pixelation !== 'none' ? 'pixelated' : undefined,
+                        }}
+                      />
+                    </ImageFrame>
+                  ) : (
+                    <ImagePlaceholder locale={locale} />
+                  )}
+                </div>
                 {item.overlay && item.overlay !== 'none' && (
                   <div
                     aria-hidden="true"
