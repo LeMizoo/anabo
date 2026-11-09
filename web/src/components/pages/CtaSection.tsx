@@ -20,7 +20,7 @@ export function CtaSection({ block }: Props) {
       >
         {block.title && (
           <h2
-            className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-sans'} font-bold ${
+            className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${
               secondary ? 'text-[#06245F]' : 'text-white'
             }`}
             style={{ color: brandTextColor(block.titleColor) }}

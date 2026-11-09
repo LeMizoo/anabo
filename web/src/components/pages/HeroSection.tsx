@@ -25,7 +25,7 @@ export function HeroSection({ block }: Props) {
     radius: 'none' as const,
     shadow: 'none' as const,
   }
-  const titleFont = block.titleFont || 'font-sans'
+  const titleFont = block.titleFont || 'font-euphoria'
   const subtitleFont = block.subtitleFont || 'font-sans'
   const heightClasses = {
     compact: 'min-h-[420px]',
@@ -93,7 +93,7 @@ export function HeroSection({ block }: Props) {
       <div className={`container-custom relative z-10 flex ${heightClass} flex-col justify-center py-20`}>
         <div className={`flex max-w-4xl flex-col ${alignment} ${contentAnimationClass}`}>
           <h1
-            className={`${titleSizeClass(block.titleSize)} ${titleFont} font-bold text-white`}
+            className={`${titleSizeClass(block.titleSize)} ${titleFont} ${block.titleWeight || 'font-normal'} text-white`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title)}

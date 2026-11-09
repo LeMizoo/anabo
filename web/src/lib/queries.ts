@@ -52,6 +52,7 @@ const pageModulesProjection = `
     title,
     subtitle,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     subtitleFont,
@@ -73,6 +74,7 @@ const pageModulesProjection = `
   _type == "textMediaBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     content,
@@ -84,6 +86,7 @@ const pageModulesProjection = `
   _type == "ctaBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     description,
@@ -94,6 +97,7 @@ const pageModulesProjection = `
   _type == "contactFormBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     description,
@@ -103,6 +107,7 @@ const pageModulesProjection = `
   _type == "slider3dBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     autoplay,
@@ -110,6 +115,7 @@ const pageModulesProjection = `
     slides[]{
       title,
       titleFont,
+      titleWeight,
       titleColor,
       titleSize,
       subtitle,
@@ -151,6 +157,7 @@ const pageModulesProjection = `
   _type == "puzzleGalleryBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     layout,
@@ -167,18 +174,18 @@ const pageModulesProjection = `
   _type == "featuresBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
-    titleWeight,
     content,
     features[]{ _key, title, description, icon }
   },
   _type == "commitmentsBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
-    titleWeight,
     subtitle,
     subtitleFont,
     subtitleColor,
@@ -192,6 +199,7 @@ const pageModulesProjection = `
   _type == "galleryBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     images[]{ ..., asset->, alt, caption, presentation }
@@ -217,6 +225,7 @@ const pageModulesProjection = `
   _type == "testimonialBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     layout,
@@ -233,6 +242,7 @@ const pageModulesProjection = `
   _type == "faqBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     items[]{ _key, question, answer }
@@ -240,6 +250,7 @@ const pageModulesProjection = `
   _type == "tripadvisorBlock" => {
     title,
     titleFont,
+    titleWeight,
     titleColor,
     titleSize,
     showBadge,

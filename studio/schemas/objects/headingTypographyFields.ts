@@ -25,6 +25,11 @@ const headingLevelOptions = [
   { title: 'H3 — Plus petit', value: 'h3' },
 ]
 
+const weightOptions = [
+  { title: 'Normal', value: 'font-normal' },
+  { title: 'Gras', value: 'font-bold' },
+]
+
 type Options = {
   titleFont?: string
   subtitleFont?: string
@@ -32,7 +37,7 @@ type Options = {
 }
 
 export function headingTypographyFields({
-  titleFont = 'font-dm-sans',
+  titleFont = 'font-euphoria',
   subtitleFont = 'font-sans',
   subtitle = false,
 }: Options = {}) {
@@ -43,6 +48,13 @@ export function headingTypographyFields({
       title: 'Police du titre',
       options: { list: fontOptions, layout: 'radio' },
       initialValue: titleFont,
+    },
+    {
+      name: 'titleWeight',
+      type: 'string',
+      title: 'Graisse du titre',
+      options: { list: weightOptions, layout: 'radio' },
+      initialValue: 'font-normal',
     },
     {
       name: 'titleColor',

@@ -92,6 +92,7 @@ export interface PuzzleGalleryBlock {
   _type: 'puzzleGalleryBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   layout?: 'balanced' | 'manual'
@@ -175,6 +176,7 @@ export interface HeroBlock {
   title: string
   subtitle?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   subtitleFont?: string
@@ -199,6 +201,7 @@ export interface TextMediaBlock {
   _type: 'textMediaBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   content?: unknown[]
@@ -213,6 +216,7 @@ export interface CtaBlock {
   _type: 'ctaBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   description?: string
@@ -226,6 +230,7 @@ export interface ContactFormBlock {
   _type: 'contactFormBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   description?: string
@@ -237,6 +242,7 @@ export interface ContactFormBlock {
 export interface Slider3DSlide {
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   subtitle?: string
@@ -256,6 +262,7 @@ export interface Slider3DBlock {
   _type: 'slider3dBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   autoplay?: boolean
@@ -268,6 +275,7 @@ export interface TestimonialBlock {
   _type: 'testimonialBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   layout?: 'carousel' | 'grid'
@@ -287,6 +295,7 @@ export interface GalleryBlock {
   _type: 'galleryBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   images?: (SanityImage & { _key?: string; caption?: string })[]
@@ -321,6 +330,7 @@ export interface FaqBlock {
   _type: 'faqBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   items?: {
@@ -335,6 +345,7 @@ export interface TripadvisorBlock {
   _type: 'tripadvisorBlock'
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   showBadge?: boolean

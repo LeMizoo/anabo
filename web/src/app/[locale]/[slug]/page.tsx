@@ -131,11 +131,11 @@ export default async function PageBySlug({ params }: Props) {
         <section className="container-custom py-10 md:py-14">
           <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8">
             {hasHeroModule ? (
-              <h2 className={`font-serif font-semibold text-[#06245F] ${titleSizeClass('lg')}`}>
+              <h2 className={`font-euphoria font-normal text-[#06245F] ${titleSizeClass('lg')}`}>
                 {titleCase(page.title, locale)}
               </h2>
             ) : (
-              <h1 className={`font-serif font-semibold text-[#06245F] ${titleSizeClass('lg')}`}>
+              <h1 className={`font-euphoria font-normal text-[#06245F] ${titleSizeClass('lg')}`}>
                 {titleCase(page.title, locale)}
               </h1>
             )}

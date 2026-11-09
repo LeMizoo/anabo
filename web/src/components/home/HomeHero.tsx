@@ -30,7 +30,7 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
         : 'items-center text-center'
 
   // 👇 Récupération des polices depuis Sanity
-  const titleFont = hero.titleFont || 'font-sans'
+  const titleFont = hero.titleFont || 'font-euphoria'
   const subtitleFont = hero.subtitleFont || 'font-sans'
 
   return (
@@ -67,7 +67,7 @@ export async function HomeHero({ hero, settings }: HomeHeroProps) {
           </p>
 
           {/* 👇 Application de la police du titre */}
-          <h1 className={`max-w-4xl font-bold leading-tight text-white ${titleSizeClass(hero.titleSize)} ${titleFont}`}>
+          <h1 className={`max-w-4xl leading-tight text-white ${titleSizeClass(hero.titleSize)} ${titleFont} ${hero.titleWeight || 'font-normal'}`}>
             {titleCase(hero.title || t('fallbackTitle'))}
           </h1>
 

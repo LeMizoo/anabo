@@ -7,19 +7,6 @@ export default {
   fields: [
     { name: 'title', type: 'string', title: 'Titre principal (ex: Nos engagements)' },
     ...headingTypographyFields({ subtitle: true }),
-    {
-      name: 'titleWeight',
-      type: 'string',
-      title: 'Graisse du titre',
-      options: {
-        list: [
-          { title: 'Normal', value: 'font-normal' },
-          { title: 'Gras (Bold)', value: 'font-bold' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-bold',
-    },
     { name: 'subtitle', type: 'string', title: 'Sous-titre manuscrit (ex: Salama)' },
     {
       name: 'sections',

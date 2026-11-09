@@ -91,6 +91,7 @@ export default {
           type: 'string',
           options: {
             list: [
+              { title: 'Euphoria Script', value: 'font-euphoria' },
               { title: 'DM Sans', value: 'font-dm-sans' },
               { title: 'Playfair (Serif)', value: 'font-serif' },
               { title: 'Perfect Girl Sans', value: 'font-perfect-sans' },
@@ -98,7 +99,7 @@ export default {
               { title: 'Poppins', value: 'font-poppins' },
             ],
           },
-          initialValue: 'font-dm-sans',
+          initialValue: 'font-euphoria',
         },
         {
           name: 'globalHeadingWeight',
@@ -110,7 +111,7 @@ export default {
               { title: 'Gras (Bold)', value: 'font-bold' },
             ],
           },
-          initialValue: 'font-bold',
+          initialValue: 'font-normal',
         },
         {
           name: 'globalBodyFont',

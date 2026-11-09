@@ -30,8 +30,8 @@ type Props = {
 
 export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeight }: Props) {
   // 👇 Logique de priorité : local > global > défaut 👇
-  const titleFont = block.titleFont || globalHeadingFont || 'font-serif'
-  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-bold'
+  const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
+  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
   const subtitleFont = block.subtitleFont || 'font-script'
 
   return (
@@ -63,7 +63,7 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <h3 className="text-[clamp(1rem,2vw,1.25rem)] font-bold text-[#06245F] dark:text-white flex items-center gap-2 mb-4">
+              <h3 className={`text-[clamp(1rem,2vw,1.25rem)] text-[#06245F] dark:text-white flex items-center gap-2 mb-4 ${titleFont} ${titleWeight}`}>
                 <span className="text-[#E0A01C]">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>

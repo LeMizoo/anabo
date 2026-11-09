@@ -22,6 +22,7 @@ type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleWeight?: string
     titleColor?: 'navy' | 'gold' | 'charcoal' | 'white'
     titleSize?: string
     layout?: 'carousel' | 'grid'
@@ -103,7 +104,7 @@ export function TestimonialsSection({ block }: Props) {
       <section className="bg-gray-50">
         <div className="container-custom">
           <h2
-            className={`text-center text-[#06245F] mb-8 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
+            className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title || 'Ce que nos voyageurs disent')}
@@ -128,7 +129,7 @@ export function TestimonialsSection({ block }: Props) {
     <section className="bg-gray-50 overflow-hidden">
       <div className="container-custom">
         <h2
-          className={`text-center text-[#06245F] mb-8 font-bold ${block.titleFont || 'font-serif'} ${titleSizeClass(block.titleSize)}`}
+          className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
           {titleCase(block.title || 'Ce que nos voyageurs disent')}

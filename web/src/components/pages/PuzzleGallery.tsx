@@ -60,7 +60,7 @@ export function PuzzleGallery({ block }: Props) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`text-center font-bold text-[#06245F] mb-6 ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
+            className={`text-center text-[#06245F] mb-6 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title)}

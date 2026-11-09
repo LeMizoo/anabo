@@ -68,6 +68,7 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
                 <TrustindexWidget
                   title={module.title}
                   titleFont={module.titleFont}
+                  titleWeight={module.titleWeight}
                   titleColor={module.titleColor}
                   titleSize={module.titleSize}
                 />

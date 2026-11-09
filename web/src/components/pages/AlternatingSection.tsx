@@ -45,8 +45,8 @@ export function AlternatingSection({
   const imageFirst = block.imagePosition === 'left'
   const imageUrl = block.image ? getImageUrl(block.image, 800, 85) : null
 
-  const titleFont = block.titleFont || globalHeadingFont || 'font-serif'
-  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-bold'
+  const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
+  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
   const subtitleFont = block.subtitleFont || 'font-script'
 
   return (

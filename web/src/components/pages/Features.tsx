@@ -22,8 +22,8 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
   if (features.length === 0 && !block.title) return null
 
   // 👇 Logique de priorité : local > global > défaut 👇
-  const titleFont = block.titleFont || globalHeadingFont || 'font-serif'
-  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-bold'
+  const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
+  const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
 
   return (
     <section className="overflow-hidden bg-[#FDF8F5] dark:bg-gray-800">
@@ -54,7 +54,7 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
               <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#E0A01C] text-sm font-semibold text-white">
                 {i + 1}
               </span>
-              <h3 className={`text-[clamp(1rem,2vw,1.25rem)] font-semibold text-[#06245F] dark:text-white ${titleFont}`}>
+              <h3 className={`text-[clamp(1rem,2vw,1.25rem)] text-[#06245F] dark:text-white ${titleFont} ${titleWeight}`}>
                 {titleCase(f.title)}
               </h3>
               <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">

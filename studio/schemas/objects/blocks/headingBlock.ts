@@ -1,12 +1,5 @@
 import { headingTypographyFields } from '../headingTypographyFields'
 
-const weightOptions = [
-  { title: 'Fin', value: 'font-normal' },
-  { title: 'Moyen', value: 'font-medium' },
-  { title: 'Semi-gras', value: 'font-semibold' },
-  { title: 'Gras', value: 'font-bold' },
-]
-
 export default {
   name: 'headingBlock',
   title: 'Titre et sous-titre',
@@ -16,17 +9,18 @@ export default {
     { name: 'subtitle', type: 'text', title: 'Sous-titre', rows: 3 },
     ...headingTypographyFields({ subtitle: true }),
     {
-      name: 'titleWeight',
-      type: 'string',
-      title: 'Graisse du titre',
-      options: { list: weightOptions, layout: 'radio' },
-      initialValue: 'font-bold',
-    },
-    {
       name: 'subtitleWeight',
       type: 'string',
       title: 'Graisse du sous-titre',
-      options: { list: weightOptions, layout: 'radio' },
+      options: {
+        list: [
+          { title: 'Fin', value: 'font-normal' },
+          { title: 'Moyen', value: 'font-medium' },
+          { title: 'Semi-gras', value: 'font-semibold' },
+          { title: 'Gras', value: 'font-bold' },
+        ],
+        layout: 'radio',
+      },
       initialValue: 'font-normal',
     },
     {

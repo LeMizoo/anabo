@@ -72,7 +72,7 @@ const portableTextComponents: PortableTextComponents = {
 
 export function TextMediaSection({ block }: Props) {
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
-  const titleFontClass = block.titleFont || 'font-sans'
+  const titleFontClass = block.titleFont || 'font-euphoria'
   const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
   
   // Nouvelles positions
@@ -119,7 +119,7 @@ export function TextMediaSection({ block }: Props) {
           >
             {block.title && (
               <h2
-                className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}
+                className={`${titleSizeClass(block.titleSize)} ${block.titleWeight || 'font-normal'} text-[#06245F] ${titleFontClass}`}
                 style={{ color: brandTextColor(block.titleColor) }}
               >
                 {titleCase(block.title)}
@@ -181,7 +181,7 @@ export function TextMediaSection({ block }: Props) {
         >
           {block.title && (
             <h2
-              className={`${titleSizeClass(block.titleSize)} font-bold text-[#06245F] ${titleFontClass}`}
+              className={`${titleSizeClass(block.titleSize)} ${block.titleWeight || 'font-normal'} text-[#06245F] ${titleFontClass}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
               {titleCase(block.title)}

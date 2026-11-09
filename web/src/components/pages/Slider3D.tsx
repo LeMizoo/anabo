@@ -11,6 +11,7 @@ import { imageContentStyle, imageFrameStyle } from './ImageFrame'
 type Slide = {
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
   subtitle?: string
@@ -30,6 +31,7 @@ type Props = {
   block: {
     title?: string
     titleFont?: string
+    titleWeight?: string
     titleColor?: BrandTextColor
     titleSize?: string
     autoplay?: boolean
@@ -59,7 +61,7 @@ export function Slider3D({ block }: Props) {
       <div className="container-custom">
         {block.title && (
           <h2
-            className={`mb-8 text-center font-bold ${block.titleFont || 'font-sans'} ${titleSizeClass(block.titleSize)}`}
+            className={`mb-8 text-center ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title)}
@@ -108,7 +110,7 @@ export function Slider3D({ block }: Props) {
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
                     {s.title && (
                       <h3
-                        className={`${s.titleFont || 'font-sans'} font-semibold ${titleSizeClass(s.titleSize)}`}
+                        className={`${s.titleFont || 'font-euphoria'} ${s.titleWeight || 'font-normal'} ${titleSizeClass(s.titleSize)}`}
                         style={{ color: brandTextColor(s.titleColor) }}
                       >
                         {s.title && titleCase(s.title)}

@@ -7,19 +7,6 @@ export default {
   fields: [
     { name: 'title', type: 'string', title: 'Titre de la section' },
     ...headingTypographyFields(),
-    {
-      name: 'titleWeight',
-      type: 'string',
-      title: 'Graisse du titre',
-      options: {
-        list: [
-          { title: 'Normal', value: 'font-normal' },
-          { title: 'Gras (Bold)', value: 'font-bold' },
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'font-bold',
-    },
     { name: 'content', type: 'text', title: 'Texte d\'introduction', rows: 3 },
     {
       name: 'features',

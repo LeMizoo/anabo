@@ -28,11 +28,12 @@ const TEXTS: Record<
 type Props = {
   title?: string
   titleFont?: string
+  titleWeight?: string
   titleColor?: BrandTextColor
   titleSize?: string
 }
 
-export function TrustindexWidget({ title, titleFont, titleColor, titleSize }: Props = {}) {
+export function TrustindexWidget({ title, titleFont, titleWeight, titleColor, titleSize }: Props = {}) {
   const locale = useLocale()
   const t = TEXTS[locale] ?? TEXTS.fr
   const containerRef = useRef<HTMLDivElement>(null)
@@ -91,7 +92,7 @@ export function TrustindexWidget({ title, titleFont, titleColor, titleSize }: Pr
         `}</style>
 
         <h2
-          className={`mb-12 text-center font-bold text-[#06245F] ${titleFont || 'font-serif'} ${titleSizeClass(titleSize)}`}
+          className={`mb-12 text-center text-[#06245F] ${titleFont || 'font-euphoria'} ${titleWeight || 'font-normal'} ${titleSizeClass(titleSize)}`}
           style={{ color: brandTextColor(titleColor) }}
         >
           {titleCase(title || t.title)}

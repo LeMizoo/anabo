@@ -3,30 +3,6 @@ import { createClient } from '@sanity/client'
 
 nextEnv.loadEnvConfig(process.cwd())
 
-const titleStyle = {
-  titleFont: 'font-script',
-  titleColor: 'gold',
-  titleSize: 'h2',
-}
-const subtitleStyle = {
-  subtitleFont: 'font-sans',
-  subtitleColor: 'navy',
-  subtitleSize: 'h3',
-}
-const homeHeroText = {
-  fr: {
-    title: 'Créez le Road Trip de vos rêves à Madagascar',
-    subtitle: 'Location de voiture avec chauffeur-guide à Madagascar',
-  },
-  en: {
-    title: 'Create your dream road trip in Madagascar',
-    subtitle: 'Car rental with a driver-guide in Madagascar',
-  },
-  it: {
-    title: 'Create il viaggio on the road dei vostri sogni in Madagascar',
-    subtitle: 'Noleggio auto con autista-guida in Madagascar',
-  },
-}
 const styleableTypes = new Set([
   'alternatingBlock',
   'commitmentsBlock',
@@ -43,13 +19,6 @@ const styleableTypes = new Set([
   'testimonialBlock',
   'textMediaBlock',
   'tripadvisorBlock',
-])
-const subtitleTypes = new Set([
-  'alternatingBlock',
-  'commitmentsBlock',
-  'headingBlock',
-  'heroBlock',
-  'slide',
 ])
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
@@ -72,74 +41,46 @@ const client = createClient({
   ...(isApply ? { token } : {}),
 })
 
-function applyStyles(value, counter, homeLocale) {
+function applyTypography(value, counter) {
   if (Array.isArray(value)) {
-    return value.map((item) => applyStyles(item, counter, homeLocale))
+    return value.map((item) => applyTypography(item, counter))
   }
   if (!value || typeof value !== 'object') return value
 
   const updated = Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [key, applyStyles(item, counter, homeLocale)]),
+    Object.entries(value).map(([key, item]) => [key, applyTypography(item, counter)]),
   )
 
-  if (styleableTypes.has(updated._type)) {
-    let changed = false
-    const headingStyle = {
-      ...titleStyle,
-      titleSize: homeLocale && updated._type === 'heroBlock' ? 'h1' : 'h2',
-    }
-    for (const [key, style] of Object.entries(headingStyle)) {
-      if (updated[key] !== style) {
-        updated[key] = style
-        changed = true
-      }
-    }
+  if (!styleableTypes.has(updated._type)) return updated
 
-    if (homeLocale && updated._type === 'heroBlock') {
-      const currentHomeHero = homeHeroText[homeLocale]
-      if (
-        currentHomeHero &&
-        updated.title === currentHomeHero.title &&
-        updated.subtitle === currentHomeHero.subtitle
-      ) {
-        const title = updated.title
-        updated.title = updated.subtitle
-        updated.subtitle = title
-        changed = true
-        counter.homeHeroSwaps += 1
-      }
-    }
-
-    if (
-      subtitleTypes.has(updated._type) &&
-      Object.prototype.hasOwnProperty.call(updated, 'subtitle')
-    ) {
-      for (const [key, style] of Object.entries(subtitleStyle)) {
-        if (updated[key] !== style) {
-          updated[key] = style
-          changed = true
-        }
-      }
-    }
-
-    if (changed) counter.blocks += 1
+  let changed = false
+  if (updated.titleFont !== 'font-euphoria') {
+    updated.titleFont = 'font-euphoria'
+    changed = true
   }
+  if (!updated.titleWeight) {
+    updated.titleWeight = 'font-normal'
+    changed = true
+  }
+  if (changed) counter.blocks += 1
 
   return updated
 }
 
-const pages = await client.fetch(
-  '*[_type == "page"]{_id, _rev, language, "slug": slug.current, modules[]{...}}',
-)
-const updates = []
+const [pages, siteSettings] = await Promise.all([
+  client.fetch('*[_type == "page"]{_id, _rev, language, "slug": slug.current, modules[]{...}}'),
+  client.fetch('*[_type == "siteSettings"][0]{_id, _rev}'),
+])
 
+if (!siteSettings) {
+  throw new Error('Le document Sanity "siteSettings" est introuvable.')
+}
+
+const updates = []
 for (const page of pages) {
-  const counter = { blocks: 0, homeHeroSwaps: 0 }
-  const modules = applyStyles(page.modules || [], counter, page.slug === 'home' ? page.language : undefined)
+  const counter = { blocks: 0 }
+  const modules = applyTypography(page.modules || [], counter)
   if (counter.blocks) updates.push({ page, modules, blocks: counter.blocks })
-  if (counter.homeHeroSwaps) {
-    console.log(`- Correction titre/sous-titre accueil [${page.language}]`)
-  }
 }
 
 console.log(`Mode : ${isApply ? 'écriture Sanity' : 'simulation sans écriture'}`)
@@ -149,16 +90,38 @@ for (const { page, blocks } of updates) {
 }
 
 if (!isApply) {
-  console.log('\nAucun document Sanity n’a été modifié. Relancez avec --apply pour appliquer les styles.')
-} else if (updates.length) {
+  console.log('\nAucun document Sanity n’a été modifié. Relancez avec --apply pour appliquer la typographie.')
+} else {
   const transaction = client.transaction()
   for (const { page, modules } of updates) {
     transaction.patch(page._id, (patch) =>
       patch.ifRevisionId(page._rev).set({ modules }),
     )
   }
+  transaction.patch(siteSettings._id, (patch) =>
+    patch.ifRevisionId(siteSettings._rev).set({
+      'typography.globalHeadingFont': 'font-euphoria',
+      'typography.globalHeadingWeight': 'font-normal',
+    }),
+  )
   const result = await transaction.commit()
-  console.log(`Mise à jour terminée : ${result.results.length} page(s) modifiée(s).`)
-} else {
-  console.log('Toutes les pages possèdent déjà ces styles.')
+  console.log(`Mise à jour terminée : ${result.results.length} document(s) modifié(s).`)
+
+  const [verifiedPages, verifiedSettings] = await Promise.all([
+    client.fetch('*[_type == "page"]{modules[]{...}}'),
+    client.fetch('*[_type == "siteSettings"][0]{typography}'),
+  ])
+  const remaining = verifiedPages.reduce((count, page) => {
+    const counter = { blocks: 0 }
+    applyTypography(page.modules || [], counter)
+    return count + counter.blocks
+  }, 0)
+  if (
+    remaining ||
+    verifiedSettings?.typography?.globalHeadingFont !== 'font-euphoria' ||
+    verifiedSettings?.typography?.globalHeadingWeight !== 'font-normal'
+  ) {
+    throw new Error('La vérification après écriture Sanity a détecté des valeurs de typographie manquantes.')
+  }
+  console.log(`Vérification terminée : ${verifiedPages.length} pages et la typographie globale sont à jour.`)
 }
