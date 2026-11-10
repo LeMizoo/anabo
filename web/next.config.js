@@ -36,7 +36,7 @@ const nextConfig = {
   },
 
   productionBrowserSourceMaps: false,
-  eslint: { ignoreDuringBuilds: true },
+  eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
 
   webpack: (config, { isServer }) => {

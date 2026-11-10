@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminUsersPage() {
   const session = await auth()
-  const userRole = (session?.user as any)?.role
+  const userRole = (session?.user as { role?: string })?.role
 
   if (userRole !== 'SUPER_ADMIN') {
     redirect('/admin/dashboard')
@@ -22,7 +22,7 @@ export default async function AdminUsersPage() {
     <div className="max-w-6xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Gestion des utilisateurs</h1>
-        <p className="text-gray-500 mt-1">Gérez les accès à l'administration.</p>
+        <p className="text-gray-500 mt-1">Gérez les accès à l&apos;administration.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

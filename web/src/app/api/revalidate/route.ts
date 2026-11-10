@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ status: 200, revalidated: true })
   } catch (err) {
+    console.error('Revalidate error:', err)
     return new Response('Internal Server Error', { status: 500 })
   }
 }

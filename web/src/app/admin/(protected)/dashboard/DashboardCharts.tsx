@@ -76,11 +76,14 @@ export default function DashboardCharts({ data, statusData }: { data: ChartData[
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: any, name: any) => [value, STATUS_LABELS[name] || name]}
+                formatter={(value, name) => {
+                  if (value === undefined) return ['', ''];
+                  return [value, STATUS_LABELS[String(name)] || String(name)];
+                }}
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
               />
               <Legend 
-                formatter={(value) => STATUS_LABELS[value] || value}
+                formatter={(value) => STATUS_LABELS[String(value)] || String(value)}
                 iconType="circle"
                 wrapperStyle={{ fontSize: '14px' }}
               />

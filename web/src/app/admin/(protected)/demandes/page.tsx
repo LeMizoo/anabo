@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { StatusSelect } from '@/components/admin/StatusSelect'
 import { QuoteFilters } from '@/components/admin/QuoteFilters'
-import { Prisma } from '@prisma/client'
+import { Prisma, QuoteStatus } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +34,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
   }
   
   if (status) {
-    whereClause.status = status as any
+    whereClause.status = status as QuoteStatus
   }
 
   const [quotes, totalQuotes] = await Promise.all([
