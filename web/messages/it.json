@@ -93,5 +93,12 @@
     "reference": "Riferimento della richiesta",
     "error": "Si è verificato un errore. Riprova.",
     "required": "Compila i campi obbligatori."
+  },
+  "NotFound": {
+    "badge": "ANABO ROADTRIP",
+    "title": "Ops, sei finito fuori strada!",
+    "description": "Sembra che la pagina che stai cercando sia stata spostata o non esista più. Non preoccuparti, la tua prossima avventura ti aspetta.",
+    "backHome": "Torna alla home",
+    "exploreTours": "Esplora i tour"
   }
 }
