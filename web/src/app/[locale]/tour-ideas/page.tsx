@@ -12,11 +12,12 @@ import type { Page, SanityImage } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { ImagePlaceholder } from '@/components/pages/ImagePlaceholder'
 import { titleCase, titleSizeClass } from '@/lib/typography'
-import { SITE_NAME } from '@/lib/site'
 
 type Props = {
   params: Promise<{ locale: string }>
 }
+
+export const dynamic = 'force-dynamic'
 
 type TourIdea = {
   _id: string
@@ -64,6 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = await sanityClient.fetch<Page | null>(
     pageBySlugQuery,
     { slug: 'tour-ideas', locale: localeParam },
+    { cache: 'no-store' },
   )
   const title = page?.seo?.metaTitle || page?.title || t('metaTitle')
   const description = page?.seo?.metaDescription || page?.excerpt || t('metaDescription')
@@ -86,9 +88,30 @@ export default async function TourIdeasPage({ params }: Props) {
   const t = await getTranslations('tourIdeas')
   const faqs = getSearchFaqs(t.raw('faqs'))
   const [page, tours] = await Promise.all([
-    sanityClient.fetch<Page | null>(pageBySlugQuery, { slug: 'tour-ideas', locale }),
-    sanityClient.fetch<TourIdea[]>(tourIdeasQuery, { locale }),
+    sanityClient.fetch<Page | null>(
+      pageBySlugQuery,
+      { slug: 'tour-ideas', locale },
+      { cache: 'no-store' },
+    ),
+    sanityClient.fetch<TourIdea[]>(
+      tourIdeasQuery,
+      { locale },
+      { cache: 'no-store' },
+    ),
   ])
+  const heroModule = page?.modules?.find(
+    (module) => module._type === 'heroBlock' && !module.settings?.hidden,
+  )
+  const remainingModules = heroModule
+    ? page?.modules?.filter(
+        (module) =>
+          module !== heroModule &&
+          !(
+            module._type === 'headingBlock' &&
+            module.title?.trim().toLowerCase() === page.title.trim().toLowerCase()
+          ),
+      )
+    : page?.modules
   const faqStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -104,25 +127,14 @@ export default async function TourIdeasPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] pb-20">
-      <header className="relative overflow-hidden bg-[#06245F] px-4 py-16 text-center text-white md:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#28528D] via-[#06245F] to-[#04183E]" />
-        <div className="relative mx-auto max-w-4xl">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90">
-            <MapPinned size={16} aria-hidden="true" />
-            {SITE_NAME}
-          </span>
-          <h1 className={`font-euphoria font-normal text-[#E0A01C] ${titleSizeClass('2xl')}`}>
-            {titleCase(page?.title || t('title'), locale)}
-          </h1>
-        </div>
-      </header>
+      {heroModule && <PageRenderer modules={[heroModule]} locale={locale} />}
 
       {page?.excerpt && !page.modules?.length && (
         <p className="container-custom mx-auto mt-8 max-w-4xl text-center text-sm leading-7 text-slate-600 md:text-base">
           {page.excerpt}
         </p>
       )}
-      {page?.modules?.length ? <PageRenderer modules={page.modules} locale={locale} /> : null}
+      {remainingModules?.length ? <PageRenderer modules={remainingModules} locale={locale} /> : null}
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {

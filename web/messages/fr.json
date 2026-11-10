@@ -21,7 +21,14 @@
   "footer": {
     "navigation": "Navigation",
     "contact": "Contact",
-    "country": "Madagascar"
+    "country": "Madagascar",
+    "socialLinks": "Réseaux sociaux"
+  },
+  "cookieBanner": {
+    "description": "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et afficher nos avis Tripadvisor. Conformément à la réglementation, nous vous demandons votre autorisation.",
+    "learnMore": "En savoir plus",
+    "reject": "Tout refuser",
+    "accept": "Tout accepter"
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
@@ -65,7 +72,41 @@
     "suggestedRoute": "Parcours indicatif, à confirmer selon la durée du séjour, la saison et les conditions de route."
   },
   "slider": {
-    "learnMore": "En savoir plus"
+    "learnMore": "En savoir plus",
+    "slide": "Diapositive {number}"
+  },
+  "testimonials": {
+    "title": "Ce que nos voyageurs disent",
+    "photoAlt": "Photo du voyage de {authorName}",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "goToTestimonial": "Aller au témoignage {number}"
+  },
+  "cookiePolicy": {
+    "title": "Politique relative aux cookies",
+    "whatIsCookie": "Qu'est-ce qu'un cookie ?",
+    "cookieDescription": "Un cookie est un petit fichier texte déposé sur votre terminal (ordinateur, tablette, smartphone) lors de la visite d'un site. Il permet de conserver des données utilisateur afin de faciliter la navigation et de permettre certaines fonctionnalités.",
+    "cookiesWeUse": "Quels cookies utilisons-nous ?",
+    "necessaryLabel": "Cookies strictement nécessaires :",
+    "necessaryDescription": "Ils sont indispensables au fonctionnement du site (par exemple, pour mémoriser votre choix de langue ou votre session si vous êtes administrateur). Ils ne nécessitent pas votre consentement.",
+    "thirdPartyLabel": "Cookies tiers (Tripadvisor / Trustindex) :",
+    "thirdPartyDescription": "Lorsque vous acceptez, nous chargeons un widget fourni par Trustindex pour afficher les avis de notre page Tripadvisor. Ce service peut déposer des cookies pour mesurer l'audience ou personnaliser l'affichage. Ces cookies sont soumis à votre consentement préalable.",
+    "manageChoices": "Comment gérer vos choix ?",
+    "manageChoicesDescription": "Lors de votre première visite, un bandeau vous permet d'accepter ou de refuser le dépôt de ces cookies. Vous pouvez modifier votre choix à tout moment en vidant les cookies de votre navigateur ou en utilisant les paramètres de confidentialité de celui-ci.",
+    "contact": "Contact",
+    "contactDescription": "Pour toute question concernant notre utilisation des cookies, vous pouvez nous contacter à l'adresse : "
+  },
+  "quotePage": {
+    "title": "Votre devis {reference}",
+    "invalidLink": "Lien invalide : le jeton de confirmation est absent ou incorrect.",
+    "notWritten": "Le devis n'a pas encore été rédigé.",
+    "alreadyConfirmed": "Ce devis a déjà été confirmé. Merci !",
+    "requestNotFound": "La demande de devis est introuvable.",
+    "confirmationError": "Une erreur est survenue lors de la confirmation du devis.",
+    "confirm": "Confirmer ce devis",
+    "confirming": "Confirmation...",
+    "notReady": "Ce devis n'est pas encore disponible pour confirmation.",
+    "questions": "Une question ? Contactez-nous à "
   },
   "contactForm": {
     "openContact": "Nous contacter",

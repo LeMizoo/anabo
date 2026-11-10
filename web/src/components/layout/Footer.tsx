@@ -118,7 +118,7 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
         </div>
 
         {footer?.showSocialLinks !== false && settings?.socialLinks?.length ? (
-          <nav aria-label="Réseaux sociaux" className="mt-8 flex flex-wrap gap-3">
+          <nav aria-label={t('socialLinks')} className="mt-8 flex flex-wrap gap-3">
             {settings.socialLinks.map((social, index) => {
               if (!social.platform || !social.url) return null
               const Icon = socialIcons[social.platform as keyof typeof socialIcons]

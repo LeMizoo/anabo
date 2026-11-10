@@ -6,6 +6,7 @@ import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { TextMediaBlock } from '@/lib/types'
 import type { ReactNode } from 'react'
@@ -17,63 +18,68 @@ type Props = {
   locale: Locale
 }
 
-const portableTextComponents: PortableTextComponents = {
-  list: {
-    bullet: ({ children }: { children?: ReactNode }) => (
-      <ul className="list-disc pl-6 my-4 space-y-2 text-gray-700">{children}</ul>
-    ),
-    number: ({ children }: { children?: ReactNode }) => (
-      <ol className="list-decimal pl-6 my-4 space-y-2 text-gray-700">{children}</ol>
-    ),
-    checkmarks: ({ children }: { children?: ReactNode }) => (
-      <ul className="list-none pl-0 my-4 space-y-2 text-gray-700">{children}</ul>
-    ),
-  },
-  listItem: {
-    bullet: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
-    number: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
-    checkmarks: ({ children }: { children?: ReactNode }) => (
-      <li className="flex items-start gap-3">
-        <span className="text-green-600 mt-1 flex-shrink-0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </span>
-        <span>{children}</span>
-      </li>
-    ),
-  },
-  block: {
-    h2: ({ children }: { children?: ReactNode }) => (
-      <h3 className="text-[clamp(1.25rem,3vw,1.875rem)] font-bold text-[#06245F] mt-8 mb-4 font-serif">{children}</h3>
-    ),
-    h3: ({ children }: { children?: ReactNode }) => (
-      <h4 className="text-[clamp(1.125rem,2.5vw,1.5rem)] font-bold text-[#06245F] mt-6 mb-3 font-serif">{children}</h4>
-    ),
-    blockquote: ({ children }: { children?: ReactNode }) => (
-      <blockquote className="border-l-4 border-[#E0A01C] pl-4 italic text-gray-600 my-6">
-        {children}
-      </blockquote>
-    ),
-  },
-  marks: {
-    link: ({ children, value }: { children?: ReactNode; value?: { href?: string; blank?: boolean } }) => {
-      const href = typeof value?.href === 'string' ? value.href : '#'
-      return (
-        <a
-          href={href}
-          target={value?.blank ? '_blank' : undefined}
-          rel={value?.blank ? 'noopener noreferrer' : undefined}
-          className="text-[#06245F] underline hover:text-[#E0A01C] transition-colors"
-        >
-          {children}
-        </a>
-      )
+function getPortableTextComponents(locale: Locale): PortableTextComponents {
+  return {
+    list: {
+      bullet: ({ children }: { children?: ReactNode }) => (
+        <ul className="list-disc pl-6 my-4 space-y-2 text-gray-700">{children}</ul>
+      ),
+      number: ({ children }: { children?: ReactNode }) => (
+        <ol className="list-decimal pl-6 my-4 space-y-2 text-gray-700">{children}</ol>
+      ),
+      checkmarks: ({ children }: { children?: ReactNode }) => (
+        <ul className="list-none pl-0 my-4 space-y-2 text-gray-700">{children}</ul>
+      ),
     },
-  },
+    listItem: {
+      bullet: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
+      number: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
+      checkmarks: ({ children }: { children?: ReactNode }) => (
+        <li className="flex items-start gap-3">
+          <span className="text-green-600 mt-1 flex-shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
+          <span>{children}</span>
+        </li>
+      ),
+    },
+    block: {
+      h2: ({ children }: { children?: ReactNode }) => (
+        <h3 className="text-[clamp(1.25rem,3vw,1.875rem)] font-bold text-[#06245F] mt-8 mb-4 font-serif">{children}</h3>
+      ),
+      h3: ({ children }: { children?: ReactNode }) => (
+        <h4 className="text-[clamp(1.125rem,2.5vw,1.5rem)] font-bold text-[#06245F] mt-6 mb-3 font-serif">{children}</h4>
+      ),
+      blockquote: ({ children }: { children?: ReactNode }) => (
+        <blockquote className="border-l-4 border-[#E0A01C] pl-4 italic text-gray-600 my-6">
+          {children}
+        </blockquote>
+      ),
+    },
+    marks: {
+      link: ({ children, value }: { children?: ReactNode; value?: { href?: string; blank?: boolean } }) => {
+        const href = typeof value?.href === 'string'
+          ? localizeInternalPath(value.href, locale)
+          : '#'
+        return (
+          <a
+            href={href}
+            target={value?.blank ? '_blank' : undefined}
+            rel={value?.blank ? 'noopener noreferrer' : undefined}
+            className="text-[#06245F] underline hover:text-[#E0A01C] transition-colors"
+          >
+            {children}
+          </a>
+        )
+      },
+    },
+  }
 }
 
 export function TextMediaSection({ block, locale }: Props) {
+  const portableTextComponents = getPortableTextComponents(locale)
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
   const titleFontClass = block.titleFont || 'font-euphoria'
   const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
@@ -126,7 +132,7 @@ export function TextMediaSection({ block, locale }: Props) {
                 className={`${titleSizeClass(block.titleSize)} ${block.titleWeight || 'font-normal'} text-[#06245F] ${titleFontClass}`}
                 style={{ color: brandTextColor(block.titleColor) }}
               >
-                {titleCase(block.title)}
+                {titleCase(block.title, locale)}
               </h2>
             )}
             {block.content && block.content.length > 0 && (
@@ -136,7 +142,7 @@ export function TextMediaSection({ block, locale }: Props) {
             )}
             {block.cta?.label && block.cta.link && (
               <Link
-                href={block.cta.link}
+                href={localizeInternalPath(block.cta.link, locale)}
                 className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
               >
                 {block.cta.label}
@@ -192,7 +198,7 @@ export function TextMediaSection({ block, locale }: Props) {
               className={`${titleSizeClass(block.titleSize)} ${block.titleWeight || 'font-normal'} text-[#06245F] ${titleFontClass}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {titleCase(block.title)}
+              {titleCase(block.title, locale)}
             </h2>
           )}
           {block.content && block.content.length > 0 && (
@@ -202,7 +208,7 @@ export function TextMediaSection({ block, locale }: Props) {
           )}
           {block.cta?.label && block.cta.link && (
             <Link
-              href={block.cta.link}
+              href={localizeInternalPath(block.cta.link, locale)}
               className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
             >
               {block.cta.label}

@@ -8,7 +8,7 @@ import { sanityClient } from '@/lib/sanity'
 import { homePageQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import type { HomePage, HeroBlock } from '@/lib/types'
-import { titleSizeClass } from '@/lib/typography'
+import { titleCase, titleSizeClass } from '@/lib/typography'
 import { SITE_NAME } from '@/lib/site'
 
 type Props = {
@@ -50,6 +50,7 @@ export default async function HomePage({ params }: Props) {
     homePageQuery,
     { locale },
   )
+  const t = await getTranslations('home')
 
   const hero = homePage?.modules?.find(
     (module): module is HeroBlock => module._type === 'heroBlock',
@@ -66,10 +67,10 @@ export default async function HomePage({ params }: Props) {
     return (
       <section className="container-custom py-20">
         <h1 className={`font-bold ${titleSizeClass('xl')}`}>
-          {SITE_NAME}
+          {titleCase(t('fallbackTitle'), locale)}
         </h1>
         <p className="mt-4 text-gray-600">
-          Le contenu de la page d&apos;accueil n&apos;est pas encore configuré.
+          {t('fallbackDescription')}
         </p>
       </section>
     )

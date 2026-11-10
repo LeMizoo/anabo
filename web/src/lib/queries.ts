@@ -145,13 +145,39 @@ const pageModulesProjection = `
     content,
     imagePosition,
     imageSize,
+    contentVerticalAlignment,
     backgroundColor,
     image{ ..., asset->, alt, presentation },
+    images[]{ ..., asset->, alt, presentation },
     floatingImages[]{
       _key,
       size,
       position,
       image{ ..., asset->, alt, presentation }
+    }
+  },
+  _type == "cardsBlock" => {
+    title,
+    titleFont,
+    titleWeight,
+    titleColor,
+    titleSize,
+    description,
+    columns,
+    imagePosition,
+    textAlignment,
+    cardStyle,
+    backgroundColor,
+    cards[]{
+      _key,
+      title,
+      titleFont,
+      titleWeight,
+      titleColor,
+      titleSize,
+      description,
+      image{ ..., asset->, alt, presentation },
+      cta{ label, link }
     }
   },
   _type == "puzzleGalleryBlock" => {

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { BrandTextColor, ImagePresentation } from '@/lib/types'
 import { imageContentStyle, imageFrameStyle } from './ImageFrame'
@@ -67,7 +68,7 @@ export function Slider3D({ block, locale }: Props) {
             className={`mb-8 text-center ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h2>
         )}
 
@@ -120,7 +121,7 @@ export function Slider3D({ block, locale }: Props) {
                         className={`${s.titleFont || 'font-euphoria'} ${s.titleWeight || 'font-normal'} ${titleSizeClass(s.titleSize)}`}
                         style={{ color: brandTextColor(s.titleColor) }}
                       >
-                        {s.title && titleCase(s.title)}
+                        {s.title && titleCase(s.title, locale)}
                       </h3>
                     )}
                     {s.subtitle && (
@@ -128,14 +129,14 @@ export function Slider3D({ block, locale }: Props) {
                         className={`mt-1 ${s.subtitleFont || 'font-sans'} ${subtitleSizeClass(s.subtitleSize)}`}
                         style={{ color: brandTextColor(s.subtitleColor) }}
                       >
-                        {s.subtitle && titleCase(s.subtitle)}
+                        {s.subtitle && titleCase(s.subtitle, locale)}
                       </p>
                     )}
                     
                     {/* 👇 Utilisation de la traduction ici 👇 */}
                     {s.linkUrl && i === active && (
                       <Link
-                        href={s.linkUrl}
+                        href={localizeInternalPath(s.linkUrl, locale)}
                         className="mt-3 inline-block text-sm underline"
                       >
                         {s.linkLabel || t('learnMore')}
@@ -153,7 +154,7 @@ export function Slider3D({ block, locale }: Props) {
             <button
               key={i}
               onClick={() => setActive(i)}
-              aria-label={`Slide ${i + 1}`}
+              aria-label={t('slide', { number: i + 1 })}
               className={`h-2.5 w-2.5 rounded-full transition-colors ${
                 i === active ? 'bg-gray-900' : 'bg-gray-300'
               }`}

@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
 import { subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { localizeInternalPath } from '@/lib/localized-path'
 import type { HeroBlock, BlockSettings } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
 import { SITE_NAME } from '@/lib/site'
@@ -73,13 +74,13 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
 
           {/* 👇 Application de la police du titre */}
           <h1 className={`max-w-4xl leading-tight text-white ${titleSizeClass(hero.titleSize)} ${titleFont} ${hero.titleWeight || 'font-normal'}`}>
-            {titleCase(hero.title || t('fallbackTitle'))}
+            {titleCase(hero.title || t('fallbackTitle'), locale)}
           </h1>
 
           {hero.subtitle && (
             /* 👇 Application de la police du sous-titre */
             <p className={`mt-6 max-w-2xl leading-8 text-white/90 ${subtitleSizeClass(hero.subtitleSize)} ${subtitleFont}`}>
-              {titleCase(hero.subtitle)}
+              {titleCase(hero.subtitle, locale)}
             </p>
           )}
 
@@ -87,7 +88,7 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
             <div className="mt-9 flex flex-wrap gap-4">
               {hero.ctaPrimary?.label && hero.ctaPrimary.link && (
                 <Link
-                  href={hero.ctaPrimary.link}
+                  href={localizeInternalPath(hero.ctaPrimary.link, locale)}
                   className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
                 >
                   {hero.ctaPrimary.label}
@@ -97,7 +98,7 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
 
               {hero.ctaSecondary?.label && hero.ctaSecondary.link && (
                 <Link
-                  href={hero.ctaSecondary.link}
+                  href={localizeInternalPath(hero.ctaSecondary.link, locale)}
                   className="inline-flex items-center rounded-full border border-white/80 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-gray-900"
                 >
                   {hero.ctaSecondary.label}

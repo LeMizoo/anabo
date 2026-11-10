@@ -21,7 +21,14 @@
   "footer": {
     "navigation": "Navigazione",
     "contact": "Contatti",
-    "country": "Madagascar"
+    "country": "Madagascar",
+    "socialLinks": "Social media"
+  },
+  "cookieBanner": {
+    "description": "Utilizziamo i cookie per migliorare la tua esperienza, analizzare il traffico e mostrare le nostre recensioni su Tripadvisor. In conformità con la normativa, chiediamo il tuo consenso.",
+    "learnMore": "Scopri di più",
+    "reject": "Rifiuta tutti",
+    "accept": "Accetta tutti"
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
@@ -65,7 +72,41 @@
     "suggestedRoute": "Itinerario indicativo, da confermare in base alla durata del viaggio, alla stagione e alle condizioni stradali."
   },
   "slider": {
-    "learnMore": "Scopri di più"
+    "learnMore": "Scopri di più",
+    "slide": "Diapositiva {number}"
+  },
+  "testimonials": {
+    "title": "Cosa dicono i nostri viaggiatori",
+    "photoAlt": "Foto del viaggio di {authorName}",
+    "previous": "Precedente",
+    "next": "Successivo",
+    "goToTestimonial": "Vai alla testimonianza {number}"
+  },
+  "cookiePolicy": {
+    "title": "Informativa sui cookie",
+    "whatIsCookie": "Che cos'è un cookie?",
+    "cookieDescription": "Un cookie è un piccolo file di testo salvato sul tuo dispositivo (computer, tablet o smartphone) quando visiti un sito web. Aiuta a ricordare le preferenze dell'utente, semplifica la navigazione e consente alcune funzionalità.",
+    "cookiesWeUse": "Quali cookie utilizziamo?",
+    "necessaryLabel": "Cookie strettamente necessari:",
+    "necessaryDescription": "Sono indispensabili per il funzionamento del sito (ad esempio, per ricordare la lingua scelta o la sessione se sei un amministratore). Non richiedono il tuo consenso.",
+    "thirdPartyLabel": "Cookie di terze parti (Tripadvisor / Trustindex):",
+    "thirdPartyDescription": "Se acconsenti, carichiamo un widget Trustindex per mostrare le recensioni della nostra pagina Tripadvisor. Questo servizio può utilizzare cookie per misurare il pubblico o personalizzare la visualizzazione. Questi cookie richiedono il tuo consenso preventivo.",
+    "manageChoices": "Come posso gestire le mie preferenze?",
+    "manageChoicesDescription": "Alla prima visita, un banner ti consente di accettare o rifiutare questi cookie. Puoi modificare la scelta in qualsiasi momento cancellando i cookie del browser o utilizzando le sue impostazioni sulla privacy.",
+    "contact": "Contatti",
+    "contactDescription": "Per domande sull'utilizzo dei cookie, puoi contattarci all'indirizzo: "
+  },
+  "quotePage": {
+    "title": "Il tuo preventivo {reference}",
+    "invalidLink": "Link non valido: il token di conferma è assente o errato.",
+    "notWritten": "Il preventivo non è ancora stato preparato.",
+    "alreadyConfirmed": "Questo preventivo è già stato confermato. Grazie!",
+    "requestNotFound": "La richiesta di preventivo non è stata trovata.",
+    "confirmationError": "Si è verificato un errore durante la conferma del preventivo.",
+    "confirm": "Conferma questo preventivo",
+    "confirming": "Conferma in corso...",
+    "notReady": "Questo preventivo non è ancora disponibile per la conferma.",
+    "questions": "Hai domande? Contattaci all'indirizzo "
   },
   "contactForm": {
     "openContact": "Contattaci",

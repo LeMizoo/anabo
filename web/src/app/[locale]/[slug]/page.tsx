@@ -113,21 +113,32 @@ export default async function PageBySlug({ params }: Props) {
     ? getTourRouteStops(page)
     : undefined
   const t = await getTranslations('tourIdeas')
-  const hasHeroModule = page.modules?.some((module) => module._type === 'heroBlock')
+  const heroModule = page.modules?.find(
+    (module) => module._type === 'heroBlock' && !module.settings?.hidden,
+  )
+  const remainingModules = heroModule
+    ? page.modules?.filter(
+        (module) =>
+          module !== heroModule &&
+          !(
+            module._type === 'headingBlock' &&
+            module.title?.trim().toLowerCase() === page.title.trim().toLowerCase()
+          ),
+      )
+    : page.modules
   const hasGalleryBlock = page.modules?.some(
     (module) => module._type === 'galleryBlock',
   ) ?? false
 
   return (
     <>
+      {heroModule && (
+        <PageRenderer modules={[heroModule]} circuits={circuits} locale={locale} />
+      )}
       {itineraryStops && (
         <section className="container-custom py-10 md:py-14">
           <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8">
-            {hasHeroModule ? (
-              <h2 className={`font-euphoria font-normal text-[#06245F] ${titleSizeClass('lg')}`}>
-                {titleCase(page.title, locale)}
-              </h2>
-            ) : (
+            {!heroModule && (
               <h1 className={`font-euphoria font-normal text-[#06245F] ${titleSizeClass('lg')}`}>
                 {titleCase(page.title, locale)}
               </h1>
@@ -149,7 +160,7 @@ export default async function PageBySlug({ params }: Props) {
           </div>
         </section>
       )}
-      <PageRenderer modules={page.modules} circuits={circuits} locale={locale} />
+      <PageRenderer modules={remainingModules} circuits={circuits} locale={locale} />
       {slug === 'gallery' && !hasGalleryBlock && (
         <ImagePlaceholderGallery locale={locale} />
       )}

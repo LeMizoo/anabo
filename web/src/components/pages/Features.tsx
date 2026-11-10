@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { Locale } from '@/lib/i18n'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 
 type Props = {
@@ -13,11 +14,12 @@ type Props = {
     content?: string
     features?: { _key: string; title: string; description: string; icon?: string }[]
   }
+  locale: Locale
   globalHeadingFont?: string
   globalHeadingWeight?: string
 }
 
-export function Features({ block, globalHeadingFont, globalHeadingWeight }: Props) {
+export function Features({ block, locale, globalHeadingFont, globalHeadingWeight }: Props) {
   const features = block.features ?? []
   if (features.length === 0 && !block.title) return null
 
@@ -33,7 +35,7 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
             className={`text-center text-[#06245F] dark:text-white ${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h2>
         )}
         {block.content && (
@@ -55,7 +57,7 @@ export function Features({ block, globalHeadingFont, globalHeadingWeight }: Prop
                 {i + 1}
               </span>
               <h3 className={`text-[clamp(1rem,2vw,1.25rem)] text-[#06245F] dark:text-white ${titleFont} ${titleWeight}`}>
-                {titleCase(f.title)}
+                {titleCase(f.title, locale)}
               </h3>
               <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
                 {f.description}

@@ -95,7 +95,7 @@ export function TrustindexWidget({ title, titleFont, titleWeight, titleColor, ti
           className={`mb-12 text-center text-[#06245F] ${titleFont || 'font-euphoria'} ${titleWeight || 'font-normal'} ${titleSizeClass(titleSize)}`}
           style={{ color: brandTextColor(titleColor) }}
         >
-          {titleCase(title || t.title)}
+          {titleCase(title || t.title, locale)}
         </h2>
         <div ref={containerRef} className="min-h-[200px]">
           {!loaded && !failed && (

@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { Locale } from '@/lib/i18n'
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 
 type Props = {
@@ -24,11 +25,12 @@ type Props = {
       }[]
     }[]
   }
+  locale: Locale
   globalHeadingFont?: string
   globalHeadingWeight?: string
 }
 
-export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeight }: Props) {
+export function CommitmentsSection({ block, locale, globalHeadingFont, globalHeadingWeight }: Props) {
   // 👇 Logique de priorité : local > global > défaut 👇
   const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
@@ -42,7 +44,7 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
             className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} text-[#E0A01C] block mb-2`}
             style={{ color: brandTextColor(block.subtitleColor) }}
           >
-            {titleCase(block.subtitle)}
+            {titleCase(block.subtitle, locale)}
           </span>
         )}
         {block.title && (
@@ -50,7 +52,7 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
             className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} text-[#06245F] dark:text-white mb-10 border-b-2 border-[#06245F] dark:border-gray-600 pb-2 inline-block`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h2>
         )}
 
@@ -69,7 +71,7 @@ export function CommitmentsSection({ block, globalHeadingFont, globalHeadingWeig
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                 </span>
-                {titleCase(section.title)}
+                {titleCase(section.title, locale)}
               </h3>
               <ul className="space-y-2 pl-8">
                 {section.items?.map((item) => (

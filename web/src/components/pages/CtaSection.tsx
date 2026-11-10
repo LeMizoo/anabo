@@ -1,12 +1,15 @@
 import Link from 'next/link'
 import type { CtaBlock } from '@/lib/types'
+import type { Locale } from '@/lib/i18n'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { localizeInternalPath } from '@/lib/localized-path'
 
 type Props = {
   block: CtaBlock
+  locale: Locale
 }
 
-export function CtaSection({ block }: Props) {
+export function CtaSection({ block, locale }: Props) {
   const secondary = block.variant === 'secondary'
 
   return (
@@ -25,7 +28,7 @@ export function CtaSection({ block }: Props) {
             }`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h2>
         )}
 
@@ -41,7 +44,7 @@ export function CtaSection({ block }: Props) {
 
         {block.buttonLabel && block.buttonLink && (
           <Link
-            href={block.buttonLink}
+            href={localizeInternalPath(block.buttonLink, locale)}
             className={`mt-7 inline-flex rounded-lg px-6 py-3 font-semibold transition ${
               secondary
                 ? 'bg-[#06245F] text-white hover:opacity-90'

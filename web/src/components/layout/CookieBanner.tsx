@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 
 export function CookieBanner() {
+  const locale = useLocale()
+  const t = useTranslations('cookieBanner')
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -33,28 +36,25 @@ export function CookieBanner() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="text-sm text-gray-600 flex-1">
           <p>
-            Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et afficher nos avis Tripadvisor. 
-            Conformément à la réglementation, nous vous demandons votre autorisation.{' '}
-            <Link href="/politique-cookies" className="text-blue-600 underline">
-              En savoir plus
+            {t('description')}{' '}
+            <Link href={`/${locale}/politique-cookies`} className="text-blue-600 underline">
+              {t('learnMore')}
             </Link>
           </p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          {/* Bouton Refuser (aussi visible que Accepter) */}
           <button
             onClick={handleDecline}
             className="flex-1 md:flex-none px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            Tout refuser
+            {t('reject')}
           </button>
           
-          {/* Bouton Accepter */}
           <button
             onClick={handleAccept}
             className="flex-1 md:flex-none px-6 py-2.5 text-sm font-medium text-white bg-[#06245F] rounded-lg hover:bg-blue-900 transition-colors"
           >
-            Tout accepter
+            {t('accept')}
           </button>
         </div>
       </div>

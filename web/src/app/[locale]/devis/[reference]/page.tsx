@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 
@@ -34,6 +35,15 @@ async function confirm(formData: FormData) {
 export default async function DevisPage({ params, searchParams }: Props) {
   const { locale, reference } = await params
   const { token, error } = await searchParams
+  const t = await getTranslations({ locale, namespace: 'quotePage' })
+  const errorMessage = error ? decodeURIComponent(error) : ''
+  const errorTranslations: Record<string, string> = {
+    'Lien invalide.': t('invalidLink'),
+    'Demande introuvable.': t('requestNotFound'),
+    "Ce devis n'est pas disponible à la confirmation.": t('notReady'),
+    'Une erreur est survenue lors de la confirmation.': t('confirmationError'),
+  }
+  const localizedError = errorTranslations[errorMessage] || errorMessage
 
   const { prisma } = await import('@/lib/prisma')
   const quote = await prisma.quoteRequest.findUnique({
@@ -47,7 +57,7 @@ export default async function DevisPage({ params, searchParams }: Props) {
     <main className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="mx-auto max-w-2xl rounded-xl bg-white p-8 shadow-sm border border-gray-200">
         <h1 className={`font-bold text-gray-900 mb-2 ${titleSizeClass('md')}`}>
-          {titleCase(`Votre devis ${quote.reference}`, locale)}
+          {titleCase(t('title', { reference: quote.reference }), locale)}
         </h1>
         <p className="text-sm text-gray-600 mb-6">
           {quote.firstName} {quote.lastName} — {quote.email}
@@ -55,19 +65,19 @@ export default async function DevisPage({ params, searchParams }: Props) {
 
         {error && (
           <p className="mb-6 rounded-lg bg-yellow-50 text-yellow-800 p-4 text-sm">
-            {decodeURIComponent(error) === 'invalid'
-              ? 'Lien invalide : le jeton de confirmation est absent ou incorrect.'
-              : decodeURIComponent(error)}
+            {errorMessage === 'invalid'
+              ? t('invalidLink')
+              : localizedError}
           </p>
         )}
 
         <section className="mb-8 whitespace-pre-wrap text-sm text-gray-800">
-          {quote.quoteDetails || 'Le devis n\'a pas encore été rédigé.'}
+          {quote.quoteDetails || t('notWritten')}
         </section>
 
         {quote.status === 'CONFIRME' && (
           <p className="rounded-lg bg-green-50 text-green-800 p-4 text-sm font-medium">
-            Ce devis a déjà été confirmé. Merci !
+            {t('alreadyConfirmed')}
           </p>
         )}
 
@@ -78,8 +88,8 @@ export default async function DevisPage({ params, searchParams }: Props) {
             <input type="hidden" name="reference" value={quote.reference} />
             <input type="hidden" name="locale" value={locale} />
             <FormSubmitButton
-              label="Confirmer ce devis"
-              pendingLabel="Confirmation..."
+              label={t('confirm')}
+              pendingLabel={t('confirming')}
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 font-medium text-white transition hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
             />
           </form>
@@ -88,13 +98,13 @@ export default async function DevisPage({ params, searchParams }: Props) {
         {quote.status !== 'CONFIRME' && !canConfirm && !error && (
           <p className="rounded-lg bg-yellow-50 text-yellow-800 p-4 text-sm">
             {quote.status === 'DEVIS_ENVOYE'
-              ? 'Lien invalide : le jeton de confirmation est absent ou incorrect.'
-              : 'Ce devis n\'est pas encore disponible pour confirmation.'}
+              ? t('invalidLink')
+              : t('notReady')}
           </p>
         )}
 
         <p className="mt-8 text-xs text-gray-500">
-          Une question ? Contactez-nous à contact@anabo.mg
+          {t('questions')} contact@anabo.mg
         </p>
       </div>
     </main>

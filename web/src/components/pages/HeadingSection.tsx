@@ -1,8 +1,10 @@
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import type { HeadingBlock } from '@/lib/types'
+import type { Locale } from '@/lib/i18n'
 
 type Props = {
   block: HeadingBlock
+  locale: Locale
 }
 
 const ALIGNMENT_CLASSES = {
@@ -11,7 +13,7 @@ const ALIGNMENT_CLASSES = {
   right: 'text-right items-end',
 } as const
 
-export function HeadingSection({ block }: Props) {
+export function HeadingSection({ block, locale }: Props) {
   if (!block.title && !block.subtitle) return null
 
   const alignment = ALIGNMENT_CLASSES[block.alignment || 'center']
@@ -24,7 +26,7 @@ export function HeadingSection({ block }: Props) {
             className={`${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h2>
         )}
         {block.subtitle && (
@@ -32,7 +34,7 @@ export function HeadingSection({ block }: Props) {
             className={`mt-3 whitespace-pre-line ${block.subtitleFont || 'font-sans'} ${block.subtitleWeight || 'font-normal'} ${subtitleSizeClass(block.subtitleSize)}`}
             style={{ color: brandTextColor(block.subtitleColor) }}
           >
-            {titleCase(block.subtitle)}
+            {titleCase(block.subtitle, locale)}
           </p>
         )}
       </div>

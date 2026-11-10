@@ -136,6 +136,7 @@ export default {
         { type: 'commitmentsBlock' },
         { type: 'imageBlock' },
         { type: 'headingBlock' },
+        { type: 'cardsBlock' },
       ],
       group: 'content',
     },

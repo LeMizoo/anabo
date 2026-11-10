@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { HeroBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -101,7 +102,7 @@ export function HeroSection({ block, locale }: Props) {
             className={`${titleSizeClass(block.titleSize)} ${titleFont} ${block.titleWeight || 'font-normal'} text-white`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h1>
 
           {block.subtitle && (
@@ -109,7 +110,7 @@ export function HeroSection({ block, locale }: Props) {
               className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize)} ${subtitleFont}`}
               style={{ color: brandTextColor(block.subtitleColor) }}
             >
-              {titleCase(block.subtitle)}
+              {titleCase(block.subtitle, locale)}
             </p>
           )}
 
@@ -117,7 +118,7 @@ export function HeroSection({ block, locale }: Props) {
             <div className="mt-8 flex flex-wrap gap-4">
               {block.ctaPrimary?.label && block.ctaPrimary.link && (
                 <Link
-                  href={block.ctaPrimary.link}
+                  href={localizeInternalPath(block.ctaPrimary.link, locale)}
                   className="rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
                 >
                   {block.ctaPrimary.label}
@@ -126,7 +127,7 @@ export function HeroSection({ block, locale }: Props) {
 
               {block.ctaSecondary?.label && block.ctaSecondary.link && (
                 <Link
-                  href={block.ctaSecondary.link}
+                  href={localizeInternalPath(block.ctaSecondary.link, locale)}
                   className="rounded-lg border border-white px-6 py-3 font-semibold text-white transition hover:bg-white hover:text-[#06245F]"
                 >
                   {block.ctaSecondary.label}

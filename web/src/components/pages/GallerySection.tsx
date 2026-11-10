@@ -22,7 +22,7 @@ export function GallerySection({ block, locale }: Props) {
             className={`mb-6 text-center text-[#06245F] ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title)}
+            {titleCase(block.title, locale)}
           </h2>
         )}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

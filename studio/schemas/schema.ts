@@ -21,6 +21,7 @@ import featuresBlock from './objects/blocks/featuresBlock'
 import commitmentsBlock from './objects/blocks/commitmentsBlock'
 import imageBlock from './objects/blocks/imageBlock'
 import headingBlock from './objects/blocks/headingBlock'
+import cardsBlock from './objects/blocks/cardsBlock'
 
 export const schemaTypes = [
   page,
@@ -43,4 +44,5 @@ export const schemaTypes = [
   commitmentsBlock,
   imageBlock,
   headingBlock,
+  cardsBlock,
 ]

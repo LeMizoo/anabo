@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslations } from 'next-intl'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
@@ -34,6 +35,7 @@ type Props = {
 }
 
 export function TestimonialsSection({ block, locale }: Props) {
+  const translate = useTranslations('testimonials')
   const testimonials = block.testimonials || []
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -93,7 +95,7 @@ export function TestimonialsSection({ block, locale }: Props) {
         {imageUrl ? (
           <Image
             src={imageUrl}
-            alt={t.testimonialImage.alt || `Photo du voyage de ${t.authorName}`}
+            alt={t.testimonialImage.alt || translate('photoAlt', { authorName: t.authorName })}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
@@ -114,7 +116,7 @@ export function TestimonialsSection({ block, locale }: Props) {
             className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
-            {titleCase(block.title || 'Ce que nos voyageurs disent')}
+            {titleCase(block.title || translate('title'), locale)}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {testimonials.map((t) => (
@@ -139,7 +141,7 @@ export function TestimonialsSection({ block, locale }: Props) {
           className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
-          {titleCase(block.title || 'Ce que nos voyageurs disent')}
+          {titleCase(block.title || translate('title'), locale)}
         </h2>
 
         <div className="relative max-w-4xl mx-auto">
@@ -171,14 +173,14 @@ export function TestimonialsSection({ block, locale }: Props) {
               <button
                 onClick={prev}
                 className="absolute top-1/2 -left-4 md:-left-12 -translate-y-1/2 bg-white p-3 rounded-full shadow-md text-gray-600 hover:text-[#06245F] transition-colors"
-                aria-label="Précédent"
+                aria-label={translate('previous')}
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={next}
                 className="absolute top-1/2 -right-4 md:-right-12 -translate-y-1/2 bg-white p-3 rounded-full shadow-md text-gray-600 hover:text-[#06245F] transition-colors"
-                aria-label="Suivant"
+                aria-label={translate('next')}
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -196,7 +198,7 @@ export function TestimonialsSection({ block, locale }: Props) {
                 className={`w-2.5 h-2.5 rounded-full transition-colors ${
                   i === currentIndex ? 'bg-[#06245F]' : 'bg-gray-300 hover:bg-gray-400'
                 }`}
-                aria-label={`Aller au témoignage ${i + 1}`}
+                aria-label={translate('goToTestimonial', { number: i + 1 })}
               />
             ))}
           </div>

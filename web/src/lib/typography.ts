@@ -41,7 +41,7 @@ export function subtitleSizeClass(size?: string) {
   return SUBTITLE_SIZE_CLASSES[size || 'md'] || SUBTITLE_SIZE_CLASSES.md
 }
 
-export function titleCase(value: string, locale = 'fr') {
+export function titleCase(value: string, locale: string) {
   return value
     .split(/(\s+)/u)
     .map((word) => {

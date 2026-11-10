@@ -1,9 +1,12 @@
 import Link from 'next/link'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { MapPin, ArrowLeft, Compass } from 'lucide-react'
 
 export default async function NotFound() {
-  const t = await getTranslations('NotFound')
+  const [locale, t] = await Promise.all([
+    getLocale(),
+    getTranslations('NotFound'),
+  ])
 
   return (
     <div className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-[#06245F] px-4 py-20 text-center">
@@ -30,7 +33,7 @@ export default async function NotFound() {
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
-            href="/"
+            href={`/${locale}`}
             className="inline-flex items-center gap-2 rounded-full bg-[#E0A01C] px-8 py-4 font-semibold text-white transition hover:bg-[#c98b13] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <ArrowLeft size={18} />
@@ -38,7 +41,7 @@ export default async function NotFound() {
           </Link>
           
           <Link
-            href="/tour-ideas"
+            href={`/${locale}/tour-ideas`}
             className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-8 py-4 font-semibold text-white transition hover:bg-white hover:text-[#06245F] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <Compass size={18} />

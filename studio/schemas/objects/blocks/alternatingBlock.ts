@@ -36,6 +36,23 @@ export default {
         imagePresentationField(),
       ],
     },
+    {
+      name: 'images',
+      type: 'array',
+      title: 'Images côte à côte',
+      description:
+        'Ajoutez plusieurs images pour remplacer l’image principale. Elles s’affichent ensemble à côté du texte.',
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            { name: 'alt', type: 'string', title: 'Texte alternatif' },
+            imagePresentationField(),
+          ],
+        },
+      ],
+    },
 
     // IMAGES FLOTTANTES MULTIPLES
     {
@@ -146,6 +163,21 @@ export default {
         layout: 'radio',
       },
       initialValue: 'md',
+    },
+    {
+      name: 'contentVerticalAlignment',
+      type: 'string',
+      title: 'Position verticale du texte',
+      description: 'Aligne le texte en haut, au centre ou en bas du groupe d’images.',
+      options: {
+        list: [
+          { title: 'En haut', value: 'top' },
+          { title: 'Au centre', value: 'center' },
+          { title: 'En bas', value: 'bottom' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'center',
     },
 
     // COULEUR DE FOND

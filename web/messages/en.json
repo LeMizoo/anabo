@@ -21,7 +21,14 @@
   "footer": {
     "navigation": "Navigation",
     "contact": "Contact",
-    "country": "Madagascar"
+    "country": "Madagascar",
+    "socialLinks": "Social media"
+  },
+  "cookieBanner": {
+    "description": "We use cookies to improve your experience, analyse traffic and display our Tripadvisor reviews. In accordance with regulations, we ask for your consent.",
+    "learnMore": "Learn more",
+    "reject": "Reject all",
+    "accept": "Accept all"
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
@@ -65,7 +72,41 @@
     "suggestedRoute": "Suggested route, to be confirmed according to trip length, season, and road conditions."
   },
   "slider": {
-    "learnMore": "Learn more"
+    "learnMore": "Learn more",
+    "slide": "Slide {number}"
+  },
+  "testimonials": {
+    "title": "What our travellers say",
+    "photoAlt": "Photo from {authorName}'s trip",
+    "previous": "Previous",
+    "next": "Next",
+    "goToTestimonial": "Go to testimonial {number}"
+  },
+  "cookiePolicy": {
+    "title": "Cookie Policy",
+    "whatIsCookie": "What is a cookie?",
+    "cookieDescription": "A cookie is a small text file stored on your device (computer, tablet or smartphone) when you visit a website. It helps remember user settings, make browsing easier and enable certain features.",
+    "cookiesWeUse": "Which cookies do we use?",
+    "necessaryLabel": "Strictly necessary cookies:",
+    "necessaryDescription": "These are essential for the website to work (for example, to remember your language choice or your session if you are an administrator). They do not require your consent.",
+    "thirdPartyLabel": "Third-party cookies (Tripadvisor / Trustindex):",
+    "thirdPartyDescription": "If you consent, we load a Trustindex widget to display reviews from our Tripadvisor page. This service may use cookies to measure audience activity or personalise its display. These cookies require your prior consent.",
+    "manageChoices": "How can I manage my choices?",
+    "manageChoicesDescription": "On your first visit, a banner lets you accept or reject these cookies. You can change your choice at any time by clearing your browser cookies or using its privacy settings.",
+    "contact": "Contact",
+    "contactDescription": "If you have questions about our use of cookies, contact us at: "
+  },
+  "quotePage": {
+    "title": "Your quote {reference}",
+    "invalidLink": "Invalid link: the confirmation token is missing or incorrect.",
+    "notWritten": "The quote has not been prepared yet.",
+    "alreadyConfirmed": "This quote has already been confirmed. Thank you!",
+    "requestNotFound": "The quote request could not be found.",
+    "confirmationError": "An error occurred while confirming the quote.",
+    "confirm": "Confirm this quote",
+    "confirming": "Confirming...",
+    "notReady": "This quote is not yet available for confirmation.",
+    "questions": "Questions? Contact us at "
   },
   "contactForm": {
     "openContact": "Contact us",

@@ -167,7 +167,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
               className={`mb-3 text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {titleCase(block.title)}
+              {titleCase(block.title, locale)}
             </h2>
           )}
           {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
@@ -313,7 +313,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
               className={`mb-3 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {titleCase(block.title)}
+              {titleCase(block.title, locale)}
             </h2>
           )}
           {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}

@@ -16,6 +16,7 @@ import { ImageBlockSection } from './ImageBlockSection'
 import { HeadingSection } from './HeadingSection'
 import { FaqSection } from './FaqSection'
 import { TrustindexWidget } from './TrustindexWidget'
+import { CardsSection } from './CardsSection'
 
 type Props = {
   modules?: PageModule[] | null
@@ -42,29 +43,31 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
             case 'textMediaBlock':
               return <TextMediaSection block={module} locale={locale} />
             case 'ctaBlock':
-              return <CtaSection block={module} />
+              return <CtaSection block={module} locale={locale} />
             case 'contactFormBlock':
               return <ContactForm block={module} circuits={circuits} />
             case 'slider3dBlock':
               return <Slider3D block={module} locale={locale} />
             case 'puzzleGalleryBlock':
-              return <PuzzleGallery block={module as any} locale={locale} />
+              return <PuzzleGallery block={module} locale={locale} />
             case 'alternatingBlock':
-              return <AlternatingSection block={module as any} locale={locale} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+              return <AlternatingSection block={module} locale={locale} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+            case 'cardsBlock':
+              return <CardsSection block={module} locale={locale} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'featuresBlock':
-              return <Features block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+              return <Features block={module} locale={locale} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'commitmentsBlock':
-              return <CommitmentsSection block={module as any} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
+              return <CommitmentsSection block={module} locale={locale} globalHeadingFont={globalHeadingFont} globalHeadingWeight={globalHeadingWeight} />
             case 'testimonialBlock':
-              return <TestimonialsSection block={module as any} locale={locale} />
+              return <TestimonialsSection block={module} locale={locale} />
             case 'galleryBlock':
               return <GallerySection block={module} locale={locale} />
             case 'imageBlock':
               return <ImageBlockSection block={module} locale={locale} />
             case 'headingBlock':
-              return <HeadingSection block={module} />
+              return <HeadingSection block={module} locale={locale} />
             case 'faqBlock':
-              return <FaqSection block={module} />
+              return <FaqSection block={module} locale={locale} />
             case 'tripadvisorBlock':
               return (
                 <TrustindexWidget

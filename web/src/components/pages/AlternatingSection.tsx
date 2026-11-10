@@ -48,6 +48,11 @@ export function AlternatingSection({
 
   const imageFirst = block.imagePosition === 'left'
   const imageUrl = block.image ? getImageUrl(block.image, 800, 85) : null
+  const contentAlignment = {
+    top: 'md:items-start',
+    center: 'md:items-center',
+    bottom: 'md:items-end',
+  }[block.contentVerticalAlignment || 'center']
 
   const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
@@ -57,7 +62,7 @@ export function AlternatingSection({
     <section className={`overflow-hidden ${bgClass}`}>
       <div className="container-custom mx-auto max-w-6xl px-4">
         <div
-          className={`flex flex-col gap-8 md:flex-row md:items-center ${
+          className={`flex flex-col gap-8 md:flex-row ${contentAlignment} ${
             imageFirst ? 'md:flex-row-reverse' : ''
           }`}
         >
@@ -74,7 +79,7 @@ export function AlternatingSection({
                 className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} block text-[#E0A01C] dark:text-[#E0A01C]`}
                 style={{ color: brandTextColor(block.subtitleColor) }}
               >
-                {block.subtitle && titleCase(block.subtitle)}
+                {block.subtitle && titleCase(block.subtitle, locale)}
               </span>
             )}
 
@@ -82,7 +87,7 @@ export function AlternatingSection({
               className={`${titleFont} ${titleWeight} ${titleSizeClass(block.titleSize)} text-[#06245F] dark:text-white`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
-              {block.title && titleCase(block.title)}
+              {block.title && titleCase(block.title, locale)}
             </h2>
 
             {block.content && (
@@ -92,7 +97,7 @@ export function AlternatingSection({
             )}
           </motion.div>
 
-          {/* Bloc Image principale et images flottantes */}
+          {/* Bloc d’images */}
           <motion.div
             initial={{ opacity: 0, x: imageFirst ? -30 : 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -100,66 +105,107 @@ export function AlternatingSection({
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative flex flex-1 items-center justify-center py-8"
           >
-            <ImageFrame
-              className="relative z-0 aspect-[4/3]"
-              presentation={block.image?.presentation}
-              style={{ width: block.imageSize === 'sm' ? '65%' : block.imageSize === 'lg' ? '100%' : '85%' }}
-            >
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt={block.image?.alt || block.title || 'Illustration de la section'}
-                  fill
-                  className="transition-transform duration-700 hover:scale-105"
-                  style={imageContentStyle(block.image?.presentation)}
-                />
-              ) : (
-                <ImagePlaceholder locale={locale} />
-              )}
-            </ImageFrame>
+            {block.images?.length ? (
+              <div
+                className={`grid w-full gap-3 ${
+                  block.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'
+                }`}
+                style={{
+                  maxWidth:
+                    block.imageSize === 'sm'
+                      ? '65%'
+                      : block.imageSize === 'md'
+                        ? '85%'
+                        : '100%',
+                }}
+              >
+                {block.images.map((image, index) => {
+                  const src = getImageUrl(image, 800, 85)
 
-            {block.floatingImages?.map((floatImg, index) => {
-              const floatUrl = getImageUrl(floatImg.image, 400, 85)
-              const sizeClass =
-                SIZE_CLASSES[floatImg.size] || SIZE_CLASSES.md
-              const positionClass =
-                POSITION_CLASSES[floatImg.position] ||
-                POSITION_CLASSES['center-right']
-
-              return (
-                <motion.div
-                  key={floatImg._key || index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{
-                    duration: 0.5,
-                    delay: 0.4 + index * 0.1,
-                  }}
-                  className={`pointer-events-none absolute z-10 ${sizeClass} ${positionClass}`}
+                  return (
+                    <ImageFrame
+                      key={image._key || index}
+                      className="relative aspect-[4/3] w-full"
+                      presentation={image.presentation}
+                    >
+                      {src ? (
+                        <Image
+                          src={src}
+                          alt={image.alt || block.title || 'Illustration de la section'}
+                          fill
+                          className="transition-transform duration-700 hover:scale-105"
+                          style={imageContentStyle(image.presentation)}
+                        />
+                      ) : (
+                        <ImagePlaceholder locale={locale} />
+                      )}
+                    </ImageFrame>
+                  )
+                })}
+              </div>
+            ) : (
+              <>
+                <ImageFrame
+                  className="relative z-0 aspect-[4/3]"
+                  presentation={block.image?.presentation}
+                  style={{ width: block.imageSize === 'sm' ? '65%' : block.imageSize === 'lg' ? '100%' : '85%' }}
                 >
-                  <ImageFrame
-                    className="relative aspect-[1/2] w-full"
-                    presentation={floatImg.image.presentation}
-                  >
-                    {floatUrl ? (
-                      <Image
-                        src={floatUrl}
-                        alt={floatImg.image.alt || 'Image superposée'}
-                        fill
-                        className="h-auto w-full"
-                        style={imageContentStyle({
-                          ...floatImg.image.presentation,
-                          fit: floatImg.image.presentation?.fit || 'contain',
-                        })}
-                      />
-                    ) : (
-                      <ImagePlaceholder locale={locale} />
-                    )}
-                  </ImageFrame>
-                </motion.div>
-              )
-            })}
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={block.image?.alt || block.title || 'Illustration de la section'}
+                      fill
+                      className="transition-transform duration-700 hover:scale-105"
+                      style={imageContentStyle(block.image?.presentation)}
+                    />
+                  ) : (
+                    <ImagePlaceholder locale={locale} />
+                  )}
+                </ImageFrame>
+                {block.floatingImages?.map((floatImg, index) => {
+                  const floatUrl = getImageUrl(floatImg.image, 400, 85)
+                  const sizeClass =
+                    SIZE_CLASSES[floatImg.size] || SIZE_CLASSES.md
+                  const positionClass =
+                    POSITION_CLASSES[floatImg.position] ||
+                    POSITION_CLASSES['center-right']
+
+                  return (
+                    <motion.div
+                      key={floatImg._key || index}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{
+                        duration: 0.5,
+                        delay: 0.4 + index * 0.1,
+                      }}
+                      className={`pointer-events-none absolute z-10 ${sizeClass} ${positionClass}`}
+                    >
+                      <ImageFrame
+                        className="relative aspect-[1/2] w-full"
+                        presentation={floatImg.image.presentation}
+                      >
+                        {floatUrl ? (
+                          <Image
+                            src={floatUrl}
+                            alt={floatImg.image.alt || 'Image superposée'}
+                            fill
+                            className="h-auto w-full"
+                            style={imageContentStyle({
+                              ...floatImg.image.presentation,
+                              fit: floatImg.image.presentation?.fit || 'contain',
+                            })}
+                          />
+                        ) : (
+                          <ImagePlaceholder locale={locale} />
+                        )}
+                      </ImageFrame>
+                    </motion.div>
+                  )
+                })}
+              </>
+            )}
           </motion.div>
         </div>
       </div>

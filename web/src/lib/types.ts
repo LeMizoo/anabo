@@ -114,6 +114,7 @@ export interface AlternatingBlock {
   subtitleWeight?: string
   content?: unknown[]
   image?: SanityImage
+  images?: (SanityImage & { _key?: string })[]
   floatingImages?: {
     _key: string
     image: SanityImage
@@ -128,7 +129,35 @@ export interface AlternatingBlock {
   }[]
   imagePosition?: 'left' | 'right'
   imageSize?: 'sm' | 'md' | 'lg'
+  contentVerticalAlignment?: 'top' | 'center' | 'bottom'
   backgroundColor?: 'white' | 'cream'
+  settings?: BlockSettings
+}
+
+export interface CardsBlock {
+  _type: 'cardsBlock'
+  title?: string
+  titleFont?: string
+  titleWeight?: string
+  titleColor?: BrandTextColor
+  titleSize?: string
+  description?: string
+  cards?: {
+    _key: string
+    title?: string
+    titleFont?: string
+    titleWeight?: string
+    titleColor?: BrandTextColor
+    titleSize?: string
+    description?: string
+    image?: SanityImage
+    cta?: PageCta
+  }[]
+  columns?: '2' | '3' | '4'
+  imagePosition?: 'top' | 'bottom'
+  textAlignment?: 'left' | 'center' | 'right'
+  cardStyle?: 'simple' | 'bordered' | 'shadow'
+  backgroundColor?: 'white' | 'cream' | 'navy'
   settings?: BlockSettings
 }
 
@@ -363,6 +392,7 @@ export type PageModule =
   | Slider3DBlock
   | PuzzleGalleryBlock
   | AlternatingBlock
+  | CardsBlock
   | FeaturesBlock
   | CommitmentsBlock
   | TestimonialBlock
