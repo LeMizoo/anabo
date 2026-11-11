@@ -6,4 +6,7 @@ export default defineCliConfig({
     dataset: process.env.SANITY_STUDIO_DATASET,
   },
   studioHost: 'anabo-roadtrip',
+  deployment: {
+    appId: 'rkyxzkxrzhzvl3o2c83ehreo',
+  },
 })
