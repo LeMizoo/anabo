@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { HomeHero } from '@/components/home/HomeHero'
-import { TrustindexWidget } from '@/components/pages/TrustindexWidget'
+import { JotformWidget } from '@/components/pages/JotformWidget'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { sanityClient } from '@/lib/sanity'
 import { homePageQuery } from '@/lib/queries'
@@ -83,7 +83,7 @@ export default async function HomePage({ params }: Props) {
       <PageRenderer modules={otherModules} locale={locale} />
 
       {/* 👇 Intégration du widget Tripadvisor (Trustindex) */}
-      {!hasTripadvisorBlock && <TrustindexWidget />}
+      {!hasTripadvisorBlock && <JotformWidget />}
     </>
   )
 }

@@ -15,7 +15,7 @@ import { GallerySection } from './GallerySection'
 import { ImageBlockSection } from './ImageBlockSection'
 import { HeadingSection } from './HeadingSection'
 import { FaqSection } from './FaqSection'
-import { TrustindexWidget } from './TrustindexWidget'
+import { JotformWidget } from './JotformWidget'
 import { CardsSection } from './CardsSection'
 
 type Props = {
@@ -70,7 +70,7 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
               return <FaqSection block={module} locale={locale} />
             case 'tripadvisorBlock':
               return (
-                <TrustindexWidget
+                <JotformWidget
                   title={module.title}
                   titleFont={module.titleFont}
                   titleWeight={module.titleWeight}

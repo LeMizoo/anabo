@@ -44,7 +44,7 @@ type Props = {
   titleSize?: string
 }
 
-export function TrustindexWidget({
+export function JotformWidget({
   title,
   titleFont,
   titleWeight,
@@ -81,7 +81,7 @@ export function TrustindexWidget({
 
     const script = document.createElement('script')
     script.src = JOTFORM_SCRIPT_SRC
-    script.async = true
+    script.defer = true
 
     const timeout = window.setTimeout(() => {
       setFailed(true)
