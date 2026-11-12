@@ -91,6 +91,7 @@ export default {
           type: 'string',
           options: {
             list: [
+              { title: 'Caflisch Script', value: 'font-caflisch' },
               { title: 'Euphoria Script', value: 'font-euphoria' },
               { title: 'DM Sans', value: 'font-dm-sans' },
               { title: 'Playfair (Serif)', value: 'font-serif' },
@@ -99,7 +100,7 @@ export default {
               { title: 'Poppins', value: 'font-poppins' },
             ],
           },
-          initialValue: 'font-euphoria',
+          initialValue: 'font-caflisch',
         },
         {
           name: 'globalHeadingWeight',

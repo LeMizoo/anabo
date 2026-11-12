@@ -30,7 +30,7 @@ export function ImageMarquee({ block, locale }: Props) {
     <section className="overflow-hidden">
       {block.title && (
         <h2
-          className={`container-custom mb-6 text-center text-[#06245F] ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+          className={`container-custom mb-6 text-center text-[#06245F] ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
           {titleCase(block.title, locale)}

@@ -19,7 +19,7 @@ export function GallerySection({ block, locale }: Props) {
       <div className="mx-auto max-w-6xl">
         {block.title && (
           <h2
-            className={`mb-6 text-center text-[#06245F] ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`mb-6 text-center text-[#06245F] ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}

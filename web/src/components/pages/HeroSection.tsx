@@ -29,7 +29,7 @@ export function HeroSection({ block, locale }: Props) {
     radius: 'none' as const,
     shadow: 'none' as const,
   }
-  const titleFont = block.titleFont || 'font-euphoria'
+  const titleFont = block.titleFont || 'font-caflisch'
   const subtitleFont = block.subtitleFont || 'font-sans'
   const heightClasses = {
     compact: 'min-h-[420px]',

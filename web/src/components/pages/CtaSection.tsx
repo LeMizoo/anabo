@@ -23,7 +23,7 @@ export function CtaSection({ block, locale }: Props) {
       >
         {block.title && (
           <h2
-            className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${
+            className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${
               secondary ? 'text-[#06245F]' : 'text-white'
             }`}
             style={{ color: brandTextColor(block.titleColor) }}

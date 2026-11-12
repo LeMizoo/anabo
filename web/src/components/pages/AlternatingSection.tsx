@@ -54,7 +54,7 @@ export function AlternatingSection({
     bottom: 'md:items-end',
   }[block.contentVerticalAlignment || 'center']
 
-  const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
+  const titleFont = block.titleFont || globalHeadingFont || 'font-caflisch'
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
   const subtitleFont = block.subtitleFont || 'font-script'
 

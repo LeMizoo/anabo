@@ -24,7 +24,7 @@ export function Features({ block, locale, globalHeadingFont, globalHeadingWeight
   if (features.length === 0 && !block.title) return null
 
   // 👇 Logique de priorité : local > global > défaut 👇
-  const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
+  const titleFont = block.titleFont || globalHeadingFont || 'font-caflisch'
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
 
   return (

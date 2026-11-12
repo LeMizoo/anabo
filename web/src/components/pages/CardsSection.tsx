@@ -59,7 +59,7 @@ export function CardsSection({
       {block.title && (
         <h2
           className={`mb-4 text-center ${titleSizeClass(block.titleSize)} ${
-            block.titleFont || globalHeadingFont || 'font-euphoria'
+            block.titleFont || globalHeadingFont || 'font-caflisch'
           } ${block.titleWeight || globalHeadingWeight || 'font-normal'}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
@@ -116,7 +116,7 @@ export function CardsSection({
                   {card.title && (
                     <h3
                       className={`mb-3 w-full ${titleSizeClass(card.titleSize || 'h3')} ${
-                        card.titleFont || 'font-euphoria'
+                        card.titleFont || 'font-caflisch'
                       } ${card.titleWeight || 'font-normal'}`}
                       style={{ color: brandTextColor(cardTitleColor) }}
                     >

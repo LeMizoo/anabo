@@ -34,7 +34,7 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
         : 'items-center text-center'
 
   // 👇 Récupération des polices depuis Sanity
-  const titleFont = hero.titleFont || 'font-euphoria'
+  const titleFont = hero.titleFont || 'font-caflisch'
   const subtitleFont = hero.subtitleFont || 'font-sans'
 
   return (

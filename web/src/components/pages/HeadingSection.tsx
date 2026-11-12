@@ -23,7 +23,7 @@ export function HeadingSection({ block, locale }: Props) {
       <div className={`mx-auto flex max-w-6xl flex-col ${alignment}`}>
         {block.title && (
           <h2
-            className={`${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}

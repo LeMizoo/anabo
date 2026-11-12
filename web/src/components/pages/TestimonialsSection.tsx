@@ -113,7 +113,7 @@ export function TestimonialsSection({ block, locale }: Props) {
       <section className="bg-gray-50">
         <div className="container-custom">
           <h2
-            className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title || translate('title'), locale)}
@@ -138,7 +138,7 @@ export function TestimonialsSection({ block, locale }: Props) {
     <section className="bg-gray-50 overflow-hidden">
       <div className="container-custom">
         <h2
-          className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+          className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
           {titleCase(block.title || translate('title'), locale)}

@@ -113,7 +113,7 @@ export function JotformWidget({
       <div className="container-custom mx-auto max-w-6xl px-4">
         <h2
           className={`mb-12 text-center text-[#06245F] ${
-            titleFont || 'font-euphoria'
+            titleFont || 'font-caflisch'
           } ${titleWeight || 'font-normal'} ${titleSizeClass(titleSize)}`}
           style={{ color: brandTextColor(titleColor) }}
         >

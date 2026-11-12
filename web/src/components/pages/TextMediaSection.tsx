@@ -81,7 +81,7 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
 export function TextMediaSection({ block, locale }: Props) {
   const portableTextComponents = getPortableTextComponents(locale)
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
-  const titleFontClass = block.titleFont || 'font-euphoria'
+  const titleFontClass = block.titleFont || 'font-caflisch'
   const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
   
   // Nouvelles positions

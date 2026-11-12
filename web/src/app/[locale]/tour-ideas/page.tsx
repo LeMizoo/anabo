@@ -166,7 +166,7 @@ export default async function TourIdeasPage({ params }: Props) {
                   <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#06245F] shadow-sm">
                     {tour.pageType === 'custom-trip' ? t('createTrip') : t('details')}
                   </span>
-                  <h2 className={`absolute inset-x-5 bottom-5 font-euphoria font-normal leading-tight text-white drop-shadow ${titleSizeClass('md')}`}>
+                  <h2 className={`absolute inset-x-5 bottom-5 font-caflisch font-normal leading-tight text-white drop-shadow ${titleSizeClass('md')}`}>
                     {titleCase(tour.title, locale)}
                   </h2>
                 </div>
@@ -227,14 +227,14 @@ export default async function TourIdeasPage({ params }: Props) {
         >
           <h2
             id="tour-ideas-faq-title"
-            className={`mb-6 font-euphoria font-normal text-[#E0A01C] ${titleSizeClass('2xl')}`}
+            className={`mb-6 font-caflisch font-normal text-[#E0A01C] ${titleSizeClass('2xl')}`}
           >
             {titleCase(t('faqTitle'), locale)}
           </h2>
           <div className="divide-y divide-gray-200 border-y border-gray-200">
             {faqs.map(({ question, answer }) => (
               <details key={question} className="group py-4">
-                <summary className="cursor-pointer pr-8 font-euphoria font-normal text-gray-900">
+                <summary className="cursor-pointer pr-8 font-caflisch font-normal text-gray-900">
                   {titleCase(question, locale)}
                 </summary>
                 <p className="mt-3 leading-7 text-gray-700">{answer}</p>

@@ -32,7 +32,7 @@ type Props = {
 
 export function CommitmentsSection({ block, locale, globalHeadingFont, globalHeadingWeight }: Props) {
   // 👇 Logique de priorité : local > global > défaut 👇
-  const titleFont = block.titleFont || globalHeadingFont || 'font-euphoria'
+  const titleFont = block.titleFont || globalHeadingFont || 'font-caflisch'
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
   const subtitleFont = block.subtitleFont || 'font-script'
 

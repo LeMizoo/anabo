@@ -34,7 +34,7 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
   const description = localized?.description || settings?.description
 
   // 👇 Récupération des polices globales 👇
-  const headingFont = settings?.typography?.globalHeadingFont || 'font-serif'
+  const headingFont = settings?.typography?.globalHeadingFont || 'font-caflisch'
   const headingWeight = settings?.typography?.globalHeadingWeight || 'font-bold'
   const bodyFont = settings?.typography?.globalBodyFont || 'font-sans'
   const footer = settings?.footer

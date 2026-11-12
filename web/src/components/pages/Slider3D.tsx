@@ -65,7 +65,7 @@ export function Slider3D({ block, locale }: Props) {
       <div className="container-custom">
         {block.title && (
           <h2
-            className={`mb-8 text-center ${block.titleFont || 'font-euphoria'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`mb-8 text-center ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}
@@ -118,7 +118,7 @@ export function Slider3D({ block, locale }: Props) {
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
                     {s.title && (
                       <h3
-                        className={`${s.titleFont || 'font-euphoria'} ${s.titleWeight || 'font-normal'} ${titleSizeClass(s.titleSize)}`}
+                        className={`${s.titleFont || 'font-caflisch'} ${s.titleWeight || 'font-normal'} ${titleSizeClass(s.titleSize)}`}
                         style={{ color: brandTextColor(s.titleColor) }}
                       >
                         {s.title && titleCase(s.title, locale)}
