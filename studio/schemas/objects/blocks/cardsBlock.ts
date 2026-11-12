@@ -1,3 +1,4 @@
+import type { ElementType, ReactNode } from 'react'
 import { headingTypographyFields } from '../headingTypographyFields'
 import { imagePresentationField } from '../imagePresentationField'
 
@@ -54,7 +55,16 @@ export default {
           ],
           preview: {
             select: { title: 'title', media: 'image' },
-            prepare({ title, media }: { title?: string; media?: unknown }) {
+            prepare({
+              title,
+              media,
+            }: {
+              title?: string
+              media?: ReactNode | ElementType
+            }): {
+              title: string
+              media?: ReactNode | ElementType
+            } {
               return { title: title || 'Carte', media }
             },
           },

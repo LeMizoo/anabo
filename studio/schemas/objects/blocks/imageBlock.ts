@@ -1,3 +1,4 @@
+import type { ElementType, ReactNode } from 'react'
 import { imagePresentationField } from '../imagePresentationField'
 
 export default {
@@ -56,7 +57,17 @@ export default {
   ],
   preview: {
     select: { media: 'image', alt: 'image.alt' },
-    prepare({ media, alt }: { media?: unknown; alt?: string }) {
+    prepare({
+      media,
+      alt,
+    }: {
+      media?: ReactNode | ElementType
+      alt?: string
+    }): {
+      title: string
+      subtitle: string
+      media?: ReactNode | ElementType
+    } {
       return {
         title: alt || 'Image seule',
         subtitle: 'Bloc image',

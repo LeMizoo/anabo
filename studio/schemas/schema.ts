@@ -22,13 +22,9 @@ import commitmentsBlock from './objects/blocks/commitmentsBlock'
 import imageBlock from './objects/blocks/imageBlock'
 import headingBlock from './objects/blocks/headingBlock'
 import cardsBlock from './objects/blocks/cardsBlock'
+import { PageBlockInput } from '../components/PageBlockInput'
 
-export const schemaTypes = [
-  page,
-  siteSettings,
-  testimonial,
-  seoFields,
-  blockSettings,
+const pageBlockTypes = [
   heroBlock,
   textMediaBlock,
   galleryBlock,
@@ -45,4 +41,18 @@ export const schemaTypes = [
   imageBlock,
   headingBlock,
   cardsBlock,
+]
+
+const withPageBlockInput = <T extends { name: string }>(schemaType: T) => ({
+  ...schemaType,
+  components: { input: PageBlockInput },
+})
+
+export const schemaTypes = [
+  page,
+  siteSettings,
+  testimonial,
+  seoFields,
+  blockSettings,
+  ...pageBlockTypes.map(withPageBlockInput),
 ]
