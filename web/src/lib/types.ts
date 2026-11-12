@@ -339,6 +339,18 @@ export interface ImageBlock {
   settings?: BlockSettings
 }
 
+export interface ImageMarqueeBlock {
+  _type: 'imageMarqueeBlock'
+  title?: string
+  titleFont?: string
+  titleWeight?: string
+  titleColor?: BrandTextColor
+  titleSize?: string
+  images?: (SanityImage & { _key?: string })[]
+  duration?: number
+  settings?: BlockSettings
+}
+
 export interface HeadingBlock {
   _type: 'headingBlock'
   title?: string
@@ -398,6 +410,7 @@ export type PageModule =
   | TestimonialBlock
   | GalleryBlock
   | ImageBlock
+  | ImageMarqueeBlock
   | HeadingBlock
   | FaqBlock
   | TripadvisorBlock

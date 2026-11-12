@@ -13,6 +13,7 @@ import { CommitmentsSection } from './CommitmentsSection'
 import { TestimonialsSection } from './TestimonialsSection'
 import { GallerySection } from './GallerySection'
 import { ImageBlockSection } from './ImageBlockSection'
+import { ImageMarquee } from './ImageMarquee'
 import { HeadingSection } from './HeadingSection'
 import { FaqSection } from './FaqSection'
 import { JotformWidget } from './JotformWidget'
@@ -64,6 +65,8 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
               return <GallerySection block={module} locale={locale} />
             case 'imageBlock':
               return <ImageBlockSection block={module} locale={locale} />
+            case 'imageMarqueeBlock':
+              return <ImageMarquee block={module} locale={locale} />
             case 'headingBlock':
               return <HeadingSection block={module} locale={locale} />
             case 'faqBlock':

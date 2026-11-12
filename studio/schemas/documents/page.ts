@@ -135,6 +135,7 @@ export default {
         // 👇 AJOUT IMPORTANT ICI 👇
         { type: 'commitmentsBlock' },
         { type: 'imageBlock' },
+        { type: 'imageMarqueeBlock' },
         { type: 'headingBlock' },
         { type: 'cardsBlock' },
       ],

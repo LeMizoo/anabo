@@ -20,6 +20,7 @@ import alternatingBlock from './objects/blocks/alternatingBlock'
 import featuresBlock from './objects/blocks/featuresBlock'
 import commitmentsBlock from './objects/blocks/commitmentsBlock'
 import imageBlock from './objects/blocks/imageBlock'
+import imageMarqueeBlock from './objects/blocks/imageMarqueeBlock'
 import headingBlock from './objects/blocks/headingBlock'
 import cardsBlock from './objects/blocks/cardsBlock'
 import { PageBlockInput } from '../components/PageBlockInput'
@@ -39,6 +40,7 @@ const pageBlockTypes = [
   featuresBlock,
   commitmentsBlock,
   imageBlock,
+  imageMarqueeBlock,
   headingBlock,
   cardsBlock,
 ]

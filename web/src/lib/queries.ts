@@ -235,6 +235,15 @@ const pageModulesProjection = `
     scale,
     crop
   },
+  _type == "imageMarqueeBlock" => {
+    title,
+    titleFont,
+    titleWeight,
+    titleColor,
+    titleSize,
+    duration,
+    images[]{ ..., asset->, alt, presentation }
+  },
   _type == "headingBlock" => {
     title,
     subtitle,
