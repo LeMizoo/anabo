@@ -4,6 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 const FROM_EMAIL = 'ANABO Roadtrip <contact@anabo.mg>'
 const ADMIN_EMAIL = process.env.CONTACT_EMAIL || 'contact@anabo.mg'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://roadtrip.anabo.mg'
 
 type QuoteData = {
   reference: string
@@ -34,7 +35,23 @@ function escapeHtml(unsafe: string | null | undefined): string {
 
 function formatDate(date?: Date | null): string {
   if (!date) return '—'
-  return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date)
+}
+
+// Resend ne lève pas d'exception : il renvoie { data, error }
+async function sendMail(payload: {
+  from: string
+  to: string
+  subject: string
+  html: string
+  replyTo?: string
+}) {
+  const { error } = await resend.emails.send(payload)
+  if (error) throw new Error(`Resend: ${error.message}`)
 }
 
 function buildAdminEmail(data: QuoteData) {
@@ -101,11 +118,11 @@ export async function sendQuoteEmails(data: QuoteData) {
   const errors: string[] = []
 
   try {
-    await resend.emails.send({
+    await sendMail({
       from: FROM_EMAIL,
       to: ADMIN_EMAIL,
       replyTo: data.email,
-      subject: `[ANABO] Nouvelle demande de devis — ${escapeHtml(data.reference)}`,
+      subject: `[ANABO] Nouvelle demande de devis — ${data.reference}`,
       html: buildAdminEmail(data),
     })
   } catch (err) {
@@ -114,7 +131,7 @@ export async function sendQuoteEmails(data: QuoteData) {
 
   try {
     const clientEmail = buildClientEmail(data)
-    await resend.emails.send({
+    await sendMail({
       from: FROM_EMAIL,
       to: data.email,
       replyTo: ADMIN_EMAIL,
@@ -129,59 +146,113 @@ export async function sendQuoteEmails(data: QuoteData) {
   return { ok: errors.length === 0, errors }
 }
 
+type StatusLocale = 'fr' | 'en' | 'it'
+
+const STATUS_TEXTS: Record<
+  StatusLocale,
+  {
+    quoteSubject: (ref: string) => string
+    quoteIntro: string
+    quoteButton: string
+    quoteOutro: string
+    confirmSubject: (ref: string) => string
+    confirmBody1: string
+    confirmBody2: string
+    hello: string
+    bye: string
+    team: string
+  }
+> = {
+  fr: {
+    quoteSubject: (r) => `Votre devis ANABO Roadtrip est prêt (Réf: ${r})`,
+    quoteIntro:
+      'Nous avons le plaisir de vous informer que votre devis personnalisé pour votre voyage à Madagascar est prêt.',
+    quoteButton: 'Consulter mon devis',
+    quoteOutro: 'Vous pourrez le consulter et le confirmer directement depuis ce lien.',
+    confirmSubject: (r) => `Votre voyage à Madagascar est confirmé ! (Réf: ${r})`,
+    confirmBody1: 'Nous sommes ravis de confirmer votre réservation pour votre voyage à Madagascar.',
+    confirmBody2: 'Nous avons hâte de vous accueillir et de vous faire découvrir notre belle île.',
+    hello: 'Bonjour',
+    bye: 'À très bientôt,',
+    team: "L'équipe ANABO Roadtrip",
+  },
+  en: {
+    quoteSubject: (r) => `Your ANABO Roadtrip quote is ready (Ref: ${r})`,
+    quoteIntro:
+      'We are pleased to let you know that your personalised quote for your trip to Madagascar is ready.',
+    quoteButton: 'View my quote',
+    quoteOutro: 'You can review and confirm it directly from this link.',
+    confirmSubject: (r) => `Your trip to Madagascar is confirmed! (Ref: ${r})`,
+    confirmBody1: 'We are delighted to confirm your booking for your trip to Madagascar.',
+    confirmBody2: 'We look forward to welcoming you and showing you our beautiful island.',
+    hello: 'Hello',
+    bye: 'See you soon,',
+    team: 'The ANABO Roadtrip team',
+  },
+  it: {
+    quoteSubject: (r) => `Il tuo preventivo ANABO Roadtrip è pronto (Rif: ${r})`,
+    quoteIntro:
+      'Siamo lieti di informarti che il tuo preventivo personalizzato per il viaggio in Madagascar è pronto.',
+    quoteButton: 'Consulta il preventivo',
+    quoteOutro: 'Potrai consultarlo e confermarlo direttamente da questo link.',
+    confirmSubject: (r) => `Il tuo viaggio in Madagascar è confermato! (Rif: ${r})`,
+    confirmBody1: 'Siamo felici di confermare la tua prenotazione per il viaggio in Madagascar.',
+    confirmBody2: 'Non vediamo l’ora di accoglierti e di farti scoprire la nostra bellissima isola.',
+    hello: 'Ciao',
+    bye: 'A presto,',
+    team: 'Il team ANABO Roadtrip',
+  },
+}
+
 export async function sendQuoteStatusEmail(
   to: string,
   firstName: string,
   status: string,
   reference: string,
   token?: string,
+  locale: string = 'fr',
 ) {
+  const lang: StatusLocale = locale === 'en' || locale === 'it' ? locale : 'fr'
+  const t = STATUS_TEXTS[lang]
+
   let subject = ''
   let html = ''
-  
-  const quoteUrl = token
-  ? `https://roadtrip.anabo.mg/fr/devis/${encodeURIComponent(reference)}?token=${encodeURIComponent(token)}`
-  : `https://roadtrip.anabo.mg/fr/devis/${encodeURIComponent(reference)}` 
 
   if (status === 'DEVIS_ENVOYE') {
-    subject = `Votre devis ANABO Roadtrip est prêt (Réf: ${reference})`
+    if (!token) throw new Error('Jeton manquant pour le lien du devis')
+    const quoteUrl = `${SITE_URL}/${lang}/devis/${encodeURIComponent(reference)}?token=${encodeURIComponent(token)}`
+    subject = t.quoteSubject(reference)
     html = `
-      <p>Bonjour ${escapeHtml(firstName)},</p>
-      <p>Nous avons le plaisir de vous informer que votre devis personnalisé pour votre voyage à Madagascar est prêt.</p>
+      <p>${t.hello} ${escapeHtml(firstName)},</p>
+      <p>${t.quoteIntro}</p>
       <p style="margin: 30px 0;">
         <a href="${quoteUrl}" style="background-color: #E0A01C; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-          Consulter mon devis
+          ${t.quoteButton}
         </a>
       </p>
-      <p>Vous pourrez le consulter, le confirmer ou nous demander des modifications directement depuis ce lien.</p>
-      <p>À très bientôt,<br/>L'équipe ANABO Roadtrip</p>
+      <p>${t.quoteOutro}</p>
+      <p>${t.bye}<br/>${t.team}</p>
     `
   } else if (status === 'CONFIRME') {
-    subject = `Votre voyage à Madagascar est confirmé ! (Réf: ${reference})`
+    subject = t.confirmSubject(reference)
     html = `
-      <p>Bonjour ${escapeHtml(firstName)},</p>
-      <p>Nous sommes ravis de confirmer votre réservation pour votre voyage à Madagascar.</p>
-      <p>Nous avons hâte de vous accueillir et de vous faire découvrir notre belle île.</p>
-      <p>À très bientôt,<br/>L'équipe ANABO Roadtrip</p>
+      <p>${t.hello} ${escapeHtml(firstName)},</p>
+      <p>${t.confirmBody1}</p>
+      <p>${t.confirmBody2}</p>
+      <p>${t.bye}<br/>${t.team}</p>
     `
   }
 
-  if (subject) {
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to,
-      subject,
-      html,
-    })
-  }
+  if (!subject) return
+
+  await sendMail({ from: FROM_EMAIL, to, subject, html })
 }
 
-// 👇 NOUVELLE FONCTION AJOUTÉE ICI
 export async function sendNewUserEmail(
   to: string,
   name: string,
   password: string,
-  role: string
+  role: string,
 ) {
   const subject = `Vos accès à l'administration ANABO Roadtrip`
   const html = `
@@ -195,17 +266,12 @@ export async function sendNewUserEmail(
     </ul>
     <p>Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe dès votre première connexion.</p>
     <p style="margin: 30px 0;">
-      <a href="https://roadtrip.anabo.mg/admin/login" style="background-color: #06245F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+      <a href="${SITE_URL}/admin/login" style="background-color: #06245F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
         Se connecter à l'administration
       </a>
     </p>
     <p>À très bientôt,<br/>L'équipe ANABO Roadtrip</p>
   `
 
-  await resend.emails.send({
-    from: FROM_EMAIL,
-    to,
-    subject,
-    html,
-  })
+  await sendMail({ from: FROM_EMAIL, to, subject, html })
 }
