@@ -72,6 +72,35 @@
   .hero-content-slide-right {
     animation: hero-content-slide-right 900ms ease-out both;
   }
+
+  .image-marquee {
+    overflow: hidden;
+  }
+
+  .image-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: image-marquee-scroll var(--marquee-duration, 30s) linear infinite;
+    will-change: transform;
+  }
+
+  .image-marquee__group {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 1rem;
+    padding-right: 1rem;
+  }
+
+  .image-marquee__item {
+    position: relative;
+    flex: 0 0 clamp(16rem, 32vw, 28rem);
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@keyframes image-marquee-scroll {
+  to { transform: translateX(-10%); }
 }
 
 @keyframes hero-pan-left {
@@ -129,6 +158,10 @@
   .hero-content-fade-up,
   .hero-content-slide-left,
   .hero-content-slide-right {
+    animation: none;
+  }
+
+  .image-marquee__track {
     animation: none;
   }
 }

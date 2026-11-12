@@ -17,6 +17,7 @@ const BLOCK_TYPES = [
   { value: 'featuresBlock', title: 'Fonctionnalités' },
   { value: 'commitmentsBlock', title: 'Engagements' },
   { value: 'imageBlock', title: 'Image' },
+  { value: 'imageMarqueeBlock', title: 'Défilement d’images' },
   { value: 'headingBlock', title: 'Titre' },
   { value: 'cardsBlock', title: 'Cartes image + texte' },
 ]

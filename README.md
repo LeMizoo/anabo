@@ -1,46 +1,63 @@
-# ANABO ROADTRIP MADAGASCAR — Application Web
+# ANABO Roadtrip Madagascar
 
-Application web moderne pour ANABO ROADTRIP MADAGASCAR.
+Site web multilingue (FR/EN/IT) consacré aux circuits et roadtrips à Madagascar. Il met en avant l'expertise d'un chauffeur-guide local, présente des itinéraires et permet aux visiteurs de demander des devis personnalisés.
 
-## Architecture
+## État du projet
 
-- Frontend : Next.js 15 + React 18 + TypeScript + Tailwind CSS
-- CMS : Sanity Studio 3
-- Multilingue : next-intl (FR / EN)
-- Formulaires : React Hook Form + Zod + Resend
-- Hébergement : SIMAFRI (cPanel Apache)
+La migration vers Sanity v4 et `next-sanity` 11 est terminée. Le site est stable, sécurisé et à jour ; cette migration n'a entraîné aucune régression visuelle. Le build de production ainsi que les vérifications strictes de lint et de TypeScript passent. Les contrôles lint et TypeScript sont exécutés séparément du build.
 
-## Structure
+## Stack technique
 
-anabo-roadtrip/
-├── web/       # Application Next.js
-├── studio/    # Sanity Studio (CMS)
-└── docs/      # Documentation
+- **Application web** : Next.js 15 (App Router), React 18, TypeScript et Tailwind CSS.
+- **CMS** : Sanity Studio v4 avec `next-sanity` 11.
+- **Base de données** : MySQL/MariaDB avec Prisma, notamment pour les demandes de devis et l'administration.
+- **Hébergement** : Simafri (cPanel / Passenger).
+- **Gestion du dépôt** : monorepo npm avec workspaces `web` et `studio`.
 
-## Démarrage rapide
+## Structure du projet
 
-### Installation
+- `web/` : application Next.js.
+- `studio/` : Sanity Studio, ses schémas et sa configuration.
+- `docs/` : documentation et décisions techniques.
 
+## Prérequis
+
+- Node.js 20 ou plus récent.
+- npm 10 ou plus récent.
+
+## Installation et démarrage
+
+Cloner le dépôt et installer les dépendances :
+
+```bash
+git clone https://github.com/LeMizoo/anabo.git
+cd anabo
 npm run install:all
+```
 
-### Développement
+Lancer l'application web et le Studio dans deux terminaux distincts :
 
-Terminal 1 - Frontend :
+```bash
 npm run dev:web
-Ouvrir http://localhost:3000
+```
 
-Terminal 2 - CMS :
+```bash
 npm run dev:studio
-Ouvrir http://localhost:3333
+```
 
-### Build
+## Build et vérifications
 
+Construire l'application web pour la production et le Studio :
+
+```bash
 npm run build:web
-npm run deploy:studio
+npm run build:studio
+```
 
-## Contacts
+Les contrôles lint et TypeScript de l'application web sont disponibles séparément :
 
-- Client : Vonjy Harilanto — drivergiide.mada@gmail.com
-- Développeur : Tovoniaina RAHENDRISON — tovoniaina.rahendrison@gmail.com
-
-© 2026 ANABO ROADTRIP MADAGASCAR
+```bash
+cd web
+npm run lint
+npm run type-check
+```
