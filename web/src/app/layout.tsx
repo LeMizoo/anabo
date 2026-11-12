@@ -4,6 +4,7 @@ import './globals.css'
 // 👇 Ajout des imports
 import {
   dmSans,
+  caflischScript,
   euphoriaScript,
   haigrastScript,
   inter,
@@ -46,6 +47,7 @@ export default function RootLayout({
         ${perfectGirlScript.variable} 
         ${perfectGirlSans.variable}
         ${playfairDisplaySc.variable}
+        ${caflischScript.variable}
         ${euphoriaScript.variable}
         ${haigrastScript.variable}
         ${scriptAlt.variable}

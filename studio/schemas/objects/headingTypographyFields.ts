@@ -6,6 +6,7 @@ const fontOptions = [
   { title: 'Playfair Display SC', value: 'font-playfair-sc' },
   { title: 'Perfect Girl Sans Serif', value: 'font-perfect-sans' },
   { title: 'Perfect Girl Script', value: 'font-script' },
+  { title: 'Caflisch Script', value: 'font-caflisch' },
   { title: 'Euphoria Script', value: 'font-euphoria' },
   { title: 'Haigrast Script', value: 'font-haigrast' },
   { title: 'Script Alt', value: 'font-script-alt' },
@@ -37,7 +38,7 @@ type Options = {
 }
 
 export function headingTypographyFields({
-  titleFont = 'font-euphoria',
+  titleFont = 'font-caflisch',
   subtitleFont = 'font-sans',
   subtitle = false,
 }: Options = {}) {

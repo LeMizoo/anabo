@@ -145,6 +145,12 @@ export const euphoriaScript = localFont({
   display: 'swap',
 })
 
+export const caflischScript = localFont({
+  src: '../../public/fonts/CaflischScriptWebPro.woff2',
+  variable: '--font-caflisch',
+  display: 'swap',
+})
+
 export const haigrastScript = localFont({
   src: '../../public/fonts/HaigrastScript_PERSONAL_USE_ONLY.otf',
   variable: '--font-haigrast',
