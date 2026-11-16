@@ -161,7 +161,7 @@ export default async function PageBySlug({ params }: Props) {
           </div>
         </section>
       )}
-      <PageRenderer modules={remainingModules} circuits={circuits} locale={locale} />
+      <PageRenderer modules={remainingModules} circuits={circuits} locale={locale} sectionLinks={slug !== 'home'} />
       {slug === 'gallery' && !hasGalleryBlock && (
         <ImagePlaceholderGallery locale={locale} />
       )}

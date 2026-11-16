@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
@@ -90,16 +91,26 @@ export function HeroSection({ block, locale }: Props) {
       )}
 
       {block.overlay !== false && (
-        <div
-          className="absolute inset-0 bg-black"
-          style={{ opacity: (block.overlayOpacity ?? 45) / 100 }}
-        />
+        <>
+          <div
+            className="absolute inset-0 bg-black"
+            style={{ opacity: (block.overlayOpacity ?? 45) / 100 }}
+          />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#06172e]/70 via-[#06172e]/25 to-transparent" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#06172e]/35 to-transparent" />
+        </>
       )}
 
       <div className={`container-custom relative z-10 flex ${heightClass} flex-col justify-center py-20`}>
         <div className={`flex max-w-4xl flex-col ${alignment} ${contentAnimationClass}`}>
+          {block.eyebrow && (
+            <p className="mb-4 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.24em] text-[#F4C566] md:text-sm">
+              <span className="h-px w-9 bg-[#E0A01C]" aria-hidden="true" />
+              {block.eyebrow}
+            </p>
+          )}
           <h1
-            className={`${titleSizeClass(block.titleSize)} ${titleFont} ${block.titleWeight || 'font-normal'} text-white`}
+            className={`${titleSizeClass(block.titleSize || 'xl')} ${titleFont} ${block.titleWeight || 'font-normal'} text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.32)]`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}
@@ -107,7 +118,7 @@ export function HeroSection({ block, locale }: Props) {
 
           {block.subtitle && (
             <p
-              className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize)} ${subtitleFont}`}
+              className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize || 'lg')} ${subtitleFont} leading-relaxed [text-shadow:0_1px_12px_rgba(0,0,0,0.45)]`}
               style={{ color: brandTextColor(block.subtitleColor) }}
             >
               {titleCase(block.subtitle, locale)}
@@ -115,20 +126,21 @@ export function HeroSection({ block, locale }: Props) {
           )}
 
           {(block.ctaPrimary?.label || block.ctaSecondary?.label) && (
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-3">
               {block.ctaPrimary?.label && block.ctaPrimary.link && (
                 <Link
                   href={localizeInternalPath(block.ctaPrimary.link, locale)}
-                  className="rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#E0A01C] px-7 py-3.5 font-semibold text-white shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-[#c9870a] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#06245F]"
                 >
                   {block.ctaPrimary.label}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               )}
 
               {block.ctaSecondary?.label && block.ctaSecondary.link && (
                 <Link
                   href={localizeInternalPath(block.ctaSecondary.link, locale)}
-                  className="rounded-lg border border-white px-6 py-3 font-semibold text-white transition hover:bg-white hover:text-[#06245F]"
+                  className="inline-flex items-center rounded-full border border-white/80 bg-white/10 px-7 py-3.5 font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-[#06245F] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#06245F]"
                 >
                   {block.ctaSecondary.label}
                 </Link>

@@ -49,6 +49,7 @@ const pageModulesProjection = `
   _type,
   settings,
   _type == "heroBlock" => {
+    eyebrow,
     title,
     subtitle,
     titleFont,
@@ -103,6 +104,21 @@ const pageModulesProjection = `
     description,
     formType,
     showWhatsapp
+  },
+  _type == "customQuoteBlock" => {
+    title,
+    titleFont,
+    titleWeight,
+    titleColor,
+    titleSize,
+    description,
+    regionHeading,
+    regions[]{ _key, value, title, description, image{ ..., asset->, alt } },
+    experienceHeading,
+    experiences[]{ _key, value, title, description, image{ ..., asset->, alt } },
+    vehicleHeading,
+    vehicles[]{ _key, value, title, description, image{ ..., asset->, alt } },
+    submitLabel
   },
   _type == "slider3dBlock" => {
     title,

@@ -204,6 +204,7 @@ export interface CommitmentsBlock {
 export interface HeroBlock {
   _type: 'heroBlock'
   title: string
+  eyebrow?: string
   subtitle?: string
   titleFont?: string
   titleWeight?: string
@@ -266,6 +267,32 @@ export interface ContactFormBlock {
   description?: string
   formType?: 'contact' | 'quote' | 'both'
   showWhatsapp?: boolean
+  settings?: BlockSettings
+}
+
+export interface CustomQuoteOption {
+  _key: string
+  value: string
+  title: string
+  description?: string
+  image?: SanityImage
+}
+
+export interface CustomQuoteBlock {
+  _type: 'customQuoteBlock'
+  title: string
+  titleFont?: string
+  titleWeight?: string
+  titleColor?: BrandTextColor
+  titleSize?: string
+  description?: string
+  regionHeading?: string
+  regions?: CustomQuoteOption[]
+  experienceHeading?: string
+  experiences?: CustomQuoteOption[]
+  vehicleHeading?: string
+  vehicles?: CustomQuoteOption[]
+  submitLabel?: string
   settings?: BlockSettings
 }
 
@@ -402,6 +429,7 @@ export type PageModule =
   | TextMediaBlock
   | CtaBlock
   | ContactFormBlock
+  | CustomQuoteBlock
   | Slider3DBlock
   | PuzzleGalleryBlock
   | AlternatingBlock

@@ -128,6 +128,7 @@ export default {
         { type: 'ctaBlock' },
         { type: 'faqBlock' },
         { type: 'contactFormBlock' },
+        { type: 'customQuoteBlock' },
         { type: 'slider3dBlock' },
         { type: 'puzzleGalleryBlock' },
         { type: 'alternatingBlock' },

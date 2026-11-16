@@ -30,7 +30,7 @@ export function BlockWrapper({ settings, children, className = '' }: Props) {
     <section
       id={settings?.anchorId}
       data-block-width={contentWidth}
-      className={`${bgClass} ${spacingClass} ${className}`}
+      className={`${bgClass} ${spacingClass} scroll-mt-24 ${className}`}
     >
       {children}
     </section>

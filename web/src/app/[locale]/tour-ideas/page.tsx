@@ -134,7 +134,7 @@ export default async function TourIdeasPage({ params }: Props) {
           {page.excerpt}
         </p>
       )}
-      {remainingModules?.length ? <PageRenderer modules={remainingModules} locale={locale} /> : null}
+      {remainingModules?.length ? <PageRenderer modules={remainingModules} locale={locale} sectionLinks /> : null}
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {

@@ -14,6 +14,7 @@ import tripadvisorBlock from './objects/blocks/tripadvisorBlock'
 import ctaBlock from './objects/blocks/ctaBlock'
 import faqBlock from './objects/blocks/faqBlock'
 import contactFormBlock from './objects/blocks/contactFormBlock'
+import customQuoteBlock from './objects/blocks/customQuoteBlock'
 import slider3dBlock from './objects/blocks/slider3dBlock'
 import puzzleGalleryBlock from './objects/blocks/puzzleGalleryBlock'
 import alternatingBlock from './objects/blocks/alternatingBlock'
@@ -34,6 +35,7 @@ const pageBlockTypes = [
   ctaBlock,
   faqBlock,
   contactFormBlock,
+  customQuoteBlock,
   slider3dBlock,
   puzzleGalleryBlock,
   alternatingBlock,

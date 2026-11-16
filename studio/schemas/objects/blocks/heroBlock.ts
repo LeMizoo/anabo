@@ -7,6 +7,7 @@ export default {
   title: 'Hero Section',
   type: 'object',
   fields: [
+    { name: 'eyebrow', type: 'string', title: 'Texte de repère (optionnel)' },
     {
       name: 'title',
       type: 'string',
