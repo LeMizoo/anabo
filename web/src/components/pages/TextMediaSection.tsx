@@ -100,7 +100,7 @@ export function TextMediaSection({ block, locale }: Props) {
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mx-auto w-full"
+              className="mx-auto flex w-full justify-center"
             >
               <ImageFrame
                 className="relative aspect-[16/9] w-full"
@@ -155,7 +155,7 @@ export function TextMediaSection({ block, locale }: Props) {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mx-auto w-full"
+              className="mx-auto flex w-full justify-center"
             >
               <ImageFrame
                 className="relative aspect-[16/9] w-full"

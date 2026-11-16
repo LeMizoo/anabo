@@ -182,6 +182,7 @@ const pageModulesProjection = `
   },
   _type == "puzzleGalleryBlock" => {
     title,
+    description,
     titleFont,
     titleWeight,
     titleColor,

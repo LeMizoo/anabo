@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
@@ -25,6 +26,9 @@ const automaticSizes: PuzzleItem['size'][] = [
   'tall',
 ]
 
+const initialVisibleCount = 12
+const visibleCountIncrement = 12
+
 const pixelWidths: Record<NonNullable<PuzzleItem['pixelation']>, number> = {
   none: 800,
   low: 48,
@@ -40,12 +44,19 @@ const overlayClasses: Record<NonNullable<PuzzleItem['overlay']>, string> = {
 }
 
 export function PuzzleGallery({ block, locale }: Props) {
+  const [visibleCount, setVisibleCount] = useState(initialVisibleCount)
   const items: PuzzleItem[] = block.items?.length
     ? block.items
     : automaticSizes.slice(0, 6).map((size, index) => ({
         _key: `placeholder-${index}`,
         size,
       }))
+  const visibleItems = items.slice(0, visibleCount)
+  const showMoreLabel = {
+    fr: 'Afficher plus de photos',
+    en: 'Show more photos',
+    it: 'Mostra altre foto',
+  }[locale]
 
   const getItemClasses = (size: NonNullable<PuzzleItem['size']>) => {
     switch (size) {
@@ -71,8 +82,14 @@ export function PuzzleGallery({ block, locale }: Props) {
           </motion.h2>
         )}
 
+        {block.description && (
+          <p className="mx-auto -mt-2 mb-8 max-w-3xl text-center text-base leading-7 text-slate-600 md:text-lg">
+            {block.description}
+          </p>
+        )}
+
         <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[150px] md:auto-rows-[200px]">
-          {items.map((item, index) => {
+          {visibleItems.map((item, index) => {
             const imageUrl = getImageUrl(
               item.image,
               pixelWidths[item.pixelation || 'none'],
@@ -90,7 +107,7 @@ export function PuzzleGallery({ block, locale }: Props) {
                   y: item.overlap?.startsWith('top') ? -16 : item.overlap?.startsWith('bottom') ? 16 : 0,
                   zIndex: item.overlap && item.overlap !== 'none' ? 1 : undefined,
                 }}
-                className={`relative group ${getItemClasses(
+                className={`relative group overflow-visible rounded-xl transition duration-300 hover:z-10 hover:scale-[1.03] hover:shadow-2xl hover:ring-4 hover:ring-[#E0A01C] focus-within:z-10 ${getItemClasses(
                   block.layout === 'manual'
                     ? item.size || 'small'
                     : automaticSizes[index % automaticSizes.length] || 'small',
@@ -135,6 +152,22 @@ export function PuzzleGallery({ block, locale }: Props) {
             )
           })}
         </div>
+
+        {visibleCount < items.length && (
+          <div className="mt-8 flex justify-center">
+            <button
+              type="button"
+              onClick={() =>
+                setVisibleCount((count) =>
+                  Math.min(count + visibleCountIncrement, items.length),
+                )
+              }
+              className="rounded-full bg-[#06245F] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#0a347f] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#06245F] focus-visible:ring-offset-2"
+            >
+              {showMoreLabel}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   )

@@ -11,6 +11,12 @@ export default {
       type: 'string',
       title: 'Titre de la section (optionnel)',
     },
+    {
+      name: 'description',
+      type: 'text',
+      rows: 2,
+      title: 'Texte d’introduction (optionnel)',
+    },
     ...headingTypographyFields(),
     {
       name: 'layout',

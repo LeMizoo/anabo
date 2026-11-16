@@ -91,6 +91,7 @@ export interface PuzzleItem {
 export interface PuzzleGalleryBlock {
   _type: 'puzzleGalleryBlock'
   title?: string
+  description?: string
   titleFont?: string
   titleWeight?: string
   titleColor?: BrandTextColor

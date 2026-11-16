@@ -127,7 +127,8 @@ export default async function PageBySlug({ params }: Props) {
       )
     : page.modules
   const hasGalleryBlock = page.modules?.some(
-    (module) => module._type === 'galleryBlock',
+    (module) =>
+      module._type === 'galleryBlock' || module._type === 'puzzleGalleryBlock',
   ) ?? false
 
   return (
