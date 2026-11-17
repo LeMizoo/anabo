@@ -463,6 +463,7 @@ export interface Page {
   translationGroup?: string
   pageType?: string
   excerpt?: string
+  cardTagline?: string
   featuredImage?: SanityImage
   routeStops?: string[]
   seo?: PageSeo

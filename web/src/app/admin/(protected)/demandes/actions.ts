@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
-import { QuoteStatus } from '@prisma/client'
+import { QuoteStatus } from '@/generated/prisma/enums'
 
 const MAX_TEXT = 20000
 

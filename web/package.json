@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit",
+    "type-check": "prisma generate && tsc --noEmit",
     "import:tour-ideas": "node scripts/import-tour-ideas.mjs",
     "localize:static-pages": "node scripts/localize-static-pages.mjs",
     "populate:text-utile": "node scripts/populate-text-utile.mjs",
@@ -44,7 +45,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@prisma/nextjs-monorepo-workaround-plugin": "^7.10.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",

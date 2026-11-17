@@ -19,7 +19,7 @@ export default {
       type: 'string',
       title: 'Sous-titre',
     },
-    ...headingTypographyFields({ subtitle: true }),
+    ...headingTypographyFields({ subtitle: true, textColors: ['gold', 'white'] }),
     {
       name: 'backgroundImage',
       type: 'image',

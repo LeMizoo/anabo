@@ -1,6 +1,7 @@
 generator client {
-  provider   = "prisma-client-js"
+  provider   = "prisma-client"
   engineType = "client"
+  output     = "../src/generated/prisma"
 }
 
 datasource db {
@@ -19,6 +20,24 @@ enum QuoteStatus {
 enum AdminRole {
   ADMIN
   SUPER_ADMIN
+}
+
+enum PricingMode {
+  DAILY_CAR
+  TOUR_INCLUDED
+}
+
+enum PricingUnit {
+  PER_PERSON
+  PER_DAY
+  PER_VEHICLE
+  FIXED
+}
+
+enum PackagePricingScope {
+  DAILY_CAR
+  TOUR_INCLUDED
+  BOTH
 }
 
 model QuoteRequest {
@@ -44,6 +63,14 @@ model QuoteRequest {
   
   // Champs pour le devis
   quoteDetails String?   @db.Text
+  estimateDetails String? @db.Text
+  vehicleCode String?    @db.VarChar(120)
+  vehicleLabel String?   @db.VarChar(120)
+  pricingMode PricingMode?
+  pricingPackageId String? @db.VarChar(30)
+  pricingPackageName String? @db.VarChar(120)
+  vehicleCount Int       @default(1)
+  consecutiveCircuits Int @default(1)
 
   contactedAt DateTime?
   quoteSentAt DateTime?
@@ -68,4 +95,72 @@ model AdminUser {
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model PricingConfig {
+  id         String          @id @default(cuid()) @db.VarChar(30)
+  circuitSlug String         @unique @db.VarChar(191)
+  dailyCarEnabled Boolean    @default(false)
+  tourPriceEnabled Boolean  @default(false)
+  tourPrice  Int?
+  basePrice  Int             @default(0) // Legacy field retained during migration; not used in calculations.
+  currency   String          @default("EUR") @db.VarChar(3)
+  vehicles   PricingVehicle[]
+  packages   PricingPackage[]
+  updatedAt  DateTime        @updatedAt
+  createdAt  DateTime        @default(now())
+}
+
+model PricingVehicle {
+  id              String        @id @default(cuid()) @db.VarChar(30)
+  configId        String        @db.VarChar(30)
+  code            String        @default("") @db.VarChar(120)
+  aliases         String?       @db.Text
+  name            String        @db.VarChar(120)
+  capacity        Int
+  pricePerDay     Int           @default(0)
+  indicativeOnly  Boolean       @default(false)
+  config          PricingConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@unique([configId, name])
+  @@unique([configId, code])
+}
+
+model PricingPackage {
+  id        String               @id @default(cuid()) @db.VarChar(30)
+  configId  String               @db.VarChar(30)
+  name      String               @db.VarChar(120)
+  active    Boolean              @default(true)
+  scope     PackagePricingScope  @default(BOTH)
+  config    PricingConfig        @relation(fields: [configId], references: [id], onDelete: Cascade)
+  items     PricingPackageItem[]
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@unique([configId, name])
+  @@index([configId])
+}
+
+model PricingPackageItem {
+  id        String        @id @default(cuid()) @db.VarChar(30)
+  packageId String        @db.VarChar(30)
+  code      String        @db.VarChar(40)
+  name      String        @db.VarChar(120)
+  unit      PricingUnit   @default(FIXED)
+  price     Int           @default(0)
+  package   PricingPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, code])
+  @@index([packageId])
+}
+
+model PricingRule {
+  id                String   @id @default(cuid()) @db.VarChar(30)
+  kind              String   @db.VarChar(20)
+  threshold         Int
+  percentage        Int
+  active            Boolean  @default(true)
+  updatedAt         DateTime @updatedAt
+
+  @@unique([kind, threshold])
 }

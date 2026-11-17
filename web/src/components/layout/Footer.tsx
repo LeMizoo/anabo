@@ -77,6 +77,7 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
                   {nav(item.key)}
                 </Link>
               ))}
+              <Link href={`/${locale}/annulation`} className="text-sm text-gray-400 transition-colors hover:text-white">Annulation et remboursement</Link>
             </nav>
           </div>}
 

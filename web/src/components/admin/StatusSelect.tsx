@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { updateQuoteStatus } from '@/app/admin/actions'
-import { QuoteStatus } from '@prisma/client'
+import { QuoteStatus } from '@/generated/prisma/enums'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
 const statuses: { value: QuoteStatus; label: string; color: string }[] = [

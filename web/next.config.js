@@ -1,5 +1,4 @@
 const createNextIntlPlugin = require('next-intl/plugin')
-const { PrismaPlugin } = require('@prisma/nextjs-monorepo-workaround-plugin')
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
@@ -38,13 +37,6 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
-
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.plugins = [...config.plugins, new PrismaPlugin()]
-    }
-    return config
-  },
 
   async headers() {
     return [

@@ -3,21 +3,42 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle } from 'lucide-react'
+import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, type LucideIcon } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  const menuItems = [
+  const primaryItems = [
     { label: 'Tableau de bord', href: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Demandes de devis', href: '/admin/demandes', icon: FileText },
-    { label: 'Mon compte', href: '/admin/mon-compte', icon: UserCircle }, // 👈 Lien ajouté
   ]
 
-  if (userRole === 'SUPER_ADMIN') {
-    menuItems.push({ label: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users })
+  const adminItems = userRole === 'SUPER_ADMIN' ? [
+    { label: 'Prix et véhicules', href: '/admin/prix', icon: CircleDollarSign },
+    { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users },
+  ] : []
+  const accountItems = [{ label: 'Mon compte', href: '/admin/mon-compte', icon: UserCircle }]
+
+  function renderItems(items: { label: string; href: string; icon: LucideIcon }[]) {
+    return items.map((item) => {
+      const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+      const Icon = item.icon
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          onClick={closeMenu}
+          className={`flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+            isActive ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+          }`}
+        >
+          <Icon className="h-5 w-5" />
+          <span className="font-medium">{item.label}</span>
+        </Link>
+      )
+    })
   }
 
   const closeMenu = () => setIsOpen(false)
@@ -58,28 +79,23 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2 mt-6 overflow-y-auto">
-          {menuItems.map((item) => {
-            const isActive = pathname.startsWith(item.href)
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={closeMenu}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
-              </Link>
-            )
-          })}
+        <nav className="mt-6 flex-1 space-y-5 overflow-y-auto px-4">
+          <section className="space-y-1">
+            <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Espace de travail</p>
+            {renderItems(primaryItems)}
+          </section>
 
-          <div className="pt-6 pb-2">
+          {adminItems.length > 0 && <section className="space-y-1 border-t border-gray-800 pt-4">
+            <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Administration</p>
+            {renderItems(adminItems)}
+          </section>}
+
+          <section className="space-y-1 border-t border-gray-800 pt-4">
+            <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Compte</p>
+            {renderItems(accountItems)}
+          </section>
+
+          <div className="border-t border-gray-800 pt-4 pb-2">
             <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Outils externes</p>
           </div>
 

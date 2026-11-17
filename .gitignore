@@ -5,6 +5,8 @@ node_modules/
 
 # Builds
 .next/
+web/src/generated/
+web/.prisma-client-js-old/
 out/
 dist/
 build/

@@ -1,13 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 import type { CustomQuoteBlock, CustomQuoteOption } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
+import { calculateIndicativeQuote, getPublicPricingModes, getPublicPricingPackages } from '@/app/admin/(protected)/prix/actions'
 
 type Props = { block: CustomQuoteBlock; locale: Locale }
 
@@ -16,9 +17,46 @@ export function CustomQuoteForm({ block, locale }: Props) {
   const [regions, setRegions] = useState<string[]>([])
   const [experiences, setExperiences] = useState<string[]>([])
   const [vehicle, setVehicle] = useState('')
+  const [packageId, setPackageId] = useState('')
+  const [packages, setPackages] = useState<{ id: string; name: string }[]>([])
+  const [pricingModes, setPricingModes] = useState<('DAILY_CAR' | 'TOUR_INCLUDED')[]>([])
+  const [pricingMode, setPricingMode] = useState<'DAILY_CAR' | 'TOUR_INCLUDED' | ''>('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
+  const [estimate, setEstimate] = useState<{ finalPrice: number; currency: string; discounts: { multiplex: number; fleet: number }; indicativeVehicle: boolean } | null>(null)
+  const [estimating, setEstimating] = useState(false)
+  const [consecutiveCircuits, setConsecutiveCircuits] = useState(1)
+  const [vehicleCount, setVehicleCount] = useState(1)
+
+  useEffect(() => {
+    let active = true
+    getPublicPricingModes('sur-mesure').then((availableModes) => {
+      if (!active) return
+      setPricingModes(availableModes)
+      if (availableModes.length === 1) setPricingMode(availableModes[0])
+    }).catch(() => {
+      if (active) setPricingModes([])
+    })
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    if (!pricingMode) {
+      setPackages([])
+      setPackageId('')
+      return () => { active = false }
+    }
+    getPublicPricingPackages('sur-mesure', pricingMode).then((availablePackages) => {
+      if (!active) return
+      setPackages(availablePackages)
+      setPackageId((current) => availablePackages.some((item) => item.id === current) ? current : '')
+    }).catch(() => {
+      if (active) setPackages([])
+    })
+    return () => { active = false }
+  }, [pricingMode])
 
   const regionNames = block.regions || []
   const experienceNames = block.experiences || []
@@ -30,6 +68,23 @@ export function CustomQuoteForm({ block, locale }: Props) {
   }[locale]
 
   const inputClass = 'mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100'
+
+  async function updateEstimate(form?: HTMLFormElement) {
+    if (!form) return
+    setError('')
+    const values = new FormData(form)
+    const start = String(values.get('startDate') || '')
+    const end = String(values.get('endDate') || '')
+    const days = start && end ? Math.max(1, Math.ceil((Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86400000)) : 0
+    setEstimating(true)
+    try {
+      const result = pricingMode ? await calculateIndicativeQuote({ circuitSlug: 'sur-mesure', pricingMode, vehicleCode: vehicle || undefined, packageId: packageId || undefined, people: Number(values.get('adults') || 0) + Number(values.get('children') || 0), days, consecutiveCircuits, vehicleCount }) : null
+      setEstimate(result)
+      if (!result) setError('Choisissez un mode tarifaire configuré, indiquez les dates et, pour Daily price car, sélectionnez un véhicule tarifé. Contactez-nous si aucun mode n’est disponible.')
+    } finally {
+      setEstimating(false)
+    }
+  }
 
   function toggleValue(value: string, selected: string[], update: (value: string[]) => void) {
     update(selected.includes(value) ? selected.filter((item) => item !== value) : [...selected, value])
@@ -99,6 +154,12 @@ export function CustomQuoteForm({ block, locale }: Props) {
           endDate: String(form.get('endDate') || ''),
           adults: Number(form.get('adults') || 2),
           children: Number(form.get('children') || 0),
+          vehicleCode: vehicle || '',
+          vehicleLabel: vehicleTitle,
+          pricingMode,
+          packageId,
+          consecutiveCircuits,
+          vehicleCount,
           message: details,
         }),
       })
@@ -107,11 +168,13 @@ export function CustomQuoteForm({ block, locale }: Props) {
         const fieldErrors = result.fields ? Object.values(result.fields).flat().filter(Boolean).join(' ') : ''
         throw new Error(fieldErrors || result.error || t('error'))
       }
+      setEstimate(result.estimate || null)
       setReference(result.reference || '')
       formElement.reset()
       setRegions([])
       setExperiences([])
       setVehicle('')
+      setPackageId('')
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t('error'))
     } finally {
@@ -147,7 +210,12 @@ export function CustomQuoteForm({ block, locale }: Props) {
             {vehicles.length > 0 && <fieldset>
               <legend className="mb-3 text-lg font-semibold text-[#06245F]">{block.vehicleHeading || labels.vehicle}</legend>
               <div className="grid gap-3 sm:grid-cols-2">{vehicles.map((option) => optionCard(option, vehicle === option.value, () => setVehicle(vehicle === option.value ? '' : option.value), 'single'))}</div>
+              {vehicle && estimate?.indicativeVehicle && <p className="mt-3 text-sm text-slate-600">Tarifs des véhicules à titre indicatif. Le prix final dépend de la disponibilité et de la saison ; il sera confirmé après votre demande.</p>}
             </fieldset>}
+
+            {pricingModes.length > 0 && <label className="block text-sm font-medium text-slate-700">Mode de tarification<select className={inputClass} value={pricingMode} onChange={(event) => { setPricingMode(event.target.value as 'DAILY_CAR' | 'TOUR_INCLUDED' | ''); setEstimate(null) }} disabled={sending}><option value="">Choisir</option>{pricingModes.map((mode) => <option key={mode} value={mode}>{mode === 'DAILY_CAR' ? 'Daily price car' : 'Tour price (included vehicle)'}</option>)}</select></label>}
+
+            {packages.length > 0 && <label className="block text-sm font-medium text-slate-700">Package facultatif<select className={inputClass} value={packageId} onChange={(event) => { setPackageId(event.target.value); setEstimate(null) }} disabled={sending}><option value="">Sans package</option>{packages.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}
 
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="text-sm font-medium text-slate-700">{t('startDate')}<input className={inputClass} name="startDate" type="date" disabled={sending} /></label>
@@ -159,6 +227,21 @@ export function CustomQuoteForm({ block, locale }: Props) {
               <label className="text-sm font-medium text-slate-700">{t('email')} *<input className={inputClass} name="email" type="email" autoComplete="email" maxLength={191} required disabled={sending} /></label>
               <label className="text-sm font-medium text-slate-700">{t('phone')} *<input className={inputClass} name="phone" type="tel" autoComplete="tel" maxLength={40} required disabled={sending} /></label>
               <label className="text-sm font-medium text-slate-700 sm:col-span-2">{t('country')}<input className={inputClass} name="country" autoComplete="country-name" maxLength={100} disabled={sending} /></label>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <label className="text-sm font-medium text-slate-700">Circuits consécutifs<input className={inputClass} type="number" min={1} max={20} value={consecutiveCircuits} onChange={(event) => setConsecutiveCircuits(Number(event.target.value))} disabled={sending} /></label>
+              <label className="text-sm font-medium text-slate-700">Véhicules demandés<input className={inputClass} type="number" min={1} max={20} value={vehicleCount} onChange={(event) => setVehicleCount(Number(event.target.value))} disabled={sending} /></label>
+            </div>
+            <div className="rounded-xl border border-blue-100 bg-white p-4">
+              <button type="button" onClick={(event) => updateEstimate(event.currentTarget.form || undefined)} disabled={estimating || sending} className="rounded-lg border border-[#06245F] px-4 py-2 font-semibold text-[#06245F] disabled:opacity-60">{estimating ? 'Calcul en cours…' : 'Calculer le prix indicatif'}</button>
+              {estimate && <div className="mt-4 space-y-2" aria-live="polite">
+                <p className="text-2xl font-bold text-slate-900">{new Intl.NumberFormat(locale, { style: 'currency', currency: estimate.currency, maximumFractionDigits: 0 }).format(estimate.finalPrice)}</p>
+                {estimate.discounts.multiplex > 0 && <p className="text-sm font-medium text-green-700">Offre Multiplex : -{estimate.discounts.multiplex}%</p>}
+                {estimate.discounts.fleet > 0 && <p className="text-sm font-medium text-green-700">Réduction flotte : -{estimate.discounts.fleet}%</p>}
+                {estimate.indicativeVehicle && <p className="text-sm text-amber-800">Le tarif du véhicule est indicatif, sous réserve de disponibilité et de saison. Confirmation après étude de la demande.</p>}
+                <p className="text-sm text-slate-600">Prix indicatif estimé. Toute négociation est possible sur place à Madagascar, selon la durée de votre séjour.</p>
+              </div>}
             </div>
 
             <label className="block text-sm font-medium text-slate-700">{t('message')}<textarea className={inputClass} name="message" rows={4} maxLength={4000} disabled={sending} /></label>

@@ -25,6 +25,7 @@ type TourIdea = {
   slug: string
   pageType: string
   excerpt?: string
+  cardTagline?: string
   featuredImage?: SanityImage
   routeStops?: string[]
 }
@@ -166,6 +167,11 @@ export default async function TourIdeasPage({ params }: Props) {
                   <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#06245F] shadow-sm">
                     {tour.pageType === 'custom-trip' ? t('createTrip') : t('details')}
                   </span>
+                  {tour.cardTagline && (
+                    <span className="absolute right-4 top-4 max-w-[60%] rounded-full bg-[#F4C566] px-3 py-1.5 text-right text-xs font-bold tracking-wide text-[#06245F] shadow-sm">
+                      {titleCase(tour.cardTagline, locale)}
+                    </span>
+                  )}
                   <h2 className={`absolute inset-x-5 bottom-5 font-caflisch font-normal leading-tight text-white drop-shadow ${titleSizeClass('md')}`}>
                     {titleCase(tour.title, locale)}
                   </h2>

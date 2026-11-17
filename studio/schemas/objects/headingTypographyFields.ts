@@ -35,13 +35,25 @@ type Options = {
   titleFont?: string
   subtitleFont?: string
   subtitle?: boolean
+  textColors?: string[]
 }
 
 export function headingTypographyFields({
   titleFont = 'font-caflisch',
   subtitleFont = 'font-sans',
   subtitle = false,
+  textColors,
 }: Options = {}) {
+  const availableColorOptions = textColors
+    ? colorOptions.filter((option) => textColors.includes(option.value))
+    : colorOptions
+  const initialTitleColor = availableColorOptions.some((option) => option.value === 'gold')
+    ? 'gold'
+    : availableColorOptions[0]?.value
+  const initialSubtitleColor = availableColorOptions.some((option) => option.value === 'white')
+    ? 'white'
+    : availableColorOptions[0]?.value
+
   return [
     {
       name: 'titleFont',
@@ -61,8 +73,8 @@ export function headingTypographyFields({
       name: 'titleColor',
       type: 'string',
       title: 'Couleur du titre',
-      options: { list: colorOptions, layout: 'radio' },
-      initialValue: 'gold',
+      options: { list: availableColorOptions, layout: 'radio' },
+      initialValue: initialTitleColor,
     },
     {
       name: 'titleSize',
@@ -85,8 +97,8 @@ export function headingTypographyFields({
             name: 'subtitleColor',
             type: 'string',
             title: 'Couleur du sous-titre',
-            options: { list: colorOptions, layout: 'radio' },
-            initialValue: 'navy',
+            options: { list: availableColorOptions, layout: 'radio' },
+            initialValue: initialSubtitleColor,
           },
           {
             name: 'subtitleSize',

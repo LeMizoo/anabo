@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 import { titleCase, titleSizeClass } from '@/lib/typography'
@@ -105,6 +106,9 @@ export default async function DevisPage({ params, searchParams }: Props) {
 
         <p className="mt-8 text-xs text-gray-500">
           {t('questions')} contact@anabo.mg
+        </p>
+        <p className="mt-3 text-xs text-gray-500">
+          <Link href={`/${locale}/annulation`} className="underline">Annulation et remboursement</Link>
         </p>
       </div>
     </main>

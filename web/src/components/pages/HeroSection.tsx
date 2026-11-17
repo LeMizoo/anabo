@@ -111,7 +111,7 @@ export function HeroSection({ block, locale }: Props) {
           )}
           <h1
             className={`${titleSizeClass(block.titleSize || 'xl')} ${titleFont} ${block.titleWeight || 'font-normal'} text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.32)]`}
-            style={{ color: brandTextColor(block.titleColor) }}
+            style={{ color: brandTextColor(block.titleColor === 'gold' ? 'gold' : 'white') }}
           >
             {titleCase(block.title, locale)}
           </h1>
@@ -119,7 +119,7 @@ export function HeroSection({ block, locale }: Props) {
           {block.subtitle && (
             <p
               className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize || 'lg')} ${subtitleFont} leading-relaxed [text-shadow:0_1px_12px_rgba(0,0,0,0.45)]`}
-              style={{ color: brandTextColor(block.subtitleColor) }}
+              style={{ color: brandTextColor(block.subtitleColor === 'gold' ? 'gold' : 'white') }}
             >
               {titleCase(block.subtitle, locale)}
             </p>

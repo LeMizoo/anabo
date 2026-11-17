@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateQuoteStatus } from '@/app/admin/actions'
-import { QuoteStatus } from '@prisma/client'
+import { QuoteStatus } from '@/generated/prisma/enums'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 
 export function StatusUpdateForm({ 

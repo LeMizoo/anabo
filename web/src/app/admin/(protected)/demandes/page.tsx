@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { StatusSelect } from '@/components/admin/StatusSelect'
 import { QuoteFilters } from '@/components/admin/QuoteFilters'
-import { Prisma, QuoteStatus } from '@prisma/client'
+import { Prisma } from '@/generated/prisma/client'
+import { QuoteStatus } from '@/generated/prisma/enums'
 
 export const dynamic = 'force-dynamic'
 

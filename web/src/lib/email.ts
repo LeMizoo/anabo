@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import type { QuoteEstimateSnapshot } from '@/lib/pricing'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -7,6 +8,7 @@ const ADMIN_EMAIL = process.env.CONTACT_EMAIL || 'contact@anabo.mg'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://roadtrip.anabo.mg'
 
 type QuoteData = {
+  id: string
   reference: string
   locale: string
   firstName: string
@@ -21,6 +23,13 @@ type QuoteData = {
   adults: number
   children: number
   message?: string | null
+  estimateDetails?: QuoteEstimateSnapshot | null
+  vehicleCode?: string | null
+  vehicleLabel?: string | null
+  pricingMode?: string | null
+  pricingPackageName?: string | null
+  vehicleCount?: number
+  consecutiveCircuits?: number
 }
 
 function escapeHtml(unsafe: string | null | undefined): string {
@@ -42,6 +51,14 @@ function formatDate(date?: Date | null): string {
   }).format(date)
 }
 
+function formatMoney(value: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 0 }).format(value)
+  } catch {
+    return `${value.toLocaleString('fr-FR')} ${escapeHtml(currency)}`
+  }
+}
+
 // Resend ne lève pas d'exception : il renvoie { data, error }
 async function sendMail(payload: {
   from: string
@@ -55,6 +72,25 @@ async function sendMail(payload: {
 }
 
 function buildAdminEmail(data: QuoteData) {
+  const estimate = data.estimateDetails
+  const estimateSection = estimate ? `
+    <hr />
+    <h3>Estimation indicative recalculée</h3>
+    <p><strong>Total estimé :</strong> ${formatMoney(estimate.finalPrice, estimate.currency)}</p>
+    <ul>
+      <li>Voyageurs : ${estimate.adults} adulte(s), ${estimate.children} enfant(s), ${estimate.people} au total</li>
+      <li>Durée prise en compte : ${estimate.days} jour(s)</li>
+      <li>${estimate.pricingMode === 'TOUR_INCLUDED' ? 'Prix global du circuit, véhicule inclus' : 'Base historique'} : ${formatMoney(estimate.baseTotal, estimate.currency)}${estimate.pricingMode === 'TOUR_INCLUDED' ? '' : ` (${formatMoney(estimate.basePricePerPerson, estimate.currency)} par personne)`}</li>
+      ${estimate.vehicle ? `<li>Véhicule : ${escapeHtml(estimate.vehicle.label)} [clé ${escapeHtml(estimate.vehicle.code)}, option ${escapeHtml(estimate.vehicle.matchedOptionCode)}], capacité ${estimate.vehicle.capacity}, ${estimate.vehicle.vehiclesCharged} véhicule(s) facturé(s), location ${formatMoney(estimate.vehicle.total, estimate.currency)}</li>` : ''}
+      ${estimate.package ? `<li>Package ${escapeHtml(estimate.package.name)} : ${estimate.package.items.map((item) => `${escapeHtml(item.name)} (${formatMoney(item.unitPrice, estimate.currency)} × ${item.quantity} = ${formatMoney(item.total, estimate.currency)})`).join(', ')} — total ${formatMoney(estimate.package.total, estimate.currency)}</li>` : ''}
+      ${estimate.discounts.multiplex.percentage ? `<li>Réduction Multiplex : -${estimate.discounts.multiplex.percentage}% (−${formatMoney(estimate.discounts.multiplex.amount, estimate.currency)}) sur ${estimate.consecutiveCircuits} circuit(s) consécutif(s)</li>` : ''}
+      ${estimate.discounts.fleet.percentage ? `<li>Réduction flotte : -${estimate.discounts.fleet.percentage}% (−${formatMoney(estimate.discounts.fleet.amount, estimate.currency)}) pour ${estimate.vehicleCount} véhicule(s)</li>` : ''}
+      ${estimate.vehicle?.indicativeOnly ? '<li>Le tarif de location est indicatif : confirmer disponibilité et saison.</li>' : ''}
+    </ul>
+  ` : data.circuitSlug === 'sur-mesure' ? `
+    <hr /><h3>Estimation indicative</h3>
+    <p>Aucun tarif complet n’a pu être calculé. Véhicule sélectionné : ${data.vehicleCode ? `${escapeHtml(data.vehicleLabel)} [${escapeHtml(data.vehicleCode)}]` : 'aucun'}, ${data.vehicleCount || 1} véhicule(s), ${data.consecutiveCircuits || 1} circuit(s) consécutif(s). Vérifiez que le circuit et les clés techniques des véhicules disposent de tarifs configurés.</p>
+  ` : ''
   return `
     <h2>Nouvelle demande de devis — ${escapeHtml(data.reference)}</h2>
     <p><strong>Langue :</strong> ${escapeHtml(data.locale.toUpperCase())}</p>
@@ -66,10 +102,14 @@ function buildAdminEmail(data: QuoteData) {
     <p><strong>Itinéraire :</strong> ${escapeHtml(data.circuitTitle) || escapeHtml(data.circuitSlug) || '—'}</p>
     <p><strong>Dates :</strong> ${formatDate(data.startDate)} → ${formatDate(data.endDate)}</p>
     <p><strong>Voyageurs :</strong> ${data.adults} adulte(s), ${data.children} enfant(s)</p>
+    ${data.pricingMode ? `<p><strong>Mode tarifaire demandé :</strong> ${data.pricingMode === 'DAILY_CAR' ? 'Daily price car' : 'Tour price (included vehicle)'}</p>` : ''}
+    ${data.pricingPackageName ? `<p><strong>Package demandé :</strong> ${escapeHtml(data.pricingPackageName)}</p>` : ''}
     <hr />
     <p><strong>Message :</strong></p>
     <p>${data.message ? escapeHtml(data.message).replace(/\n/g, '<br />') : '—'}</p>
+    ${estimateSection}
     <hr />
+    <p><a href="${SITE_URL}/admin/demandes/${encodeURIComponent(data.id)}">Ouvrir la fiche administrative</a></p>
     <p style="color:#888;font-size:12px;">Référence : ${escapeHtml(data.reference)}</p>
   `
 }
@@ -86,6 +126,7 @@ function buildClientEmail(data: QuoteData) {
       <p>Bonjour ${escapeHtml(d.firstName)},</p>
       <p>Nous avons bien reçu votre demande de devis et vous remercions de votre confiance.</p>
       <p><strong>Référence :</strong> ${escapeHtml(d.reference)}</p>
+      <p><a href="${SITE_URL}/fr/devis/${encodeURIComponent(d.reference)}">Suivre votre demande</a> · <a href="${SITE_URL}/fr/annulation">Conditions d’annulation et de remboursement</a></p>
       ${d.circuitTitle ? `<p><strong>Itinéraire :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Notre équipe vous répondra sous 24 à 48 heures ouvrées.</p>
       <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>

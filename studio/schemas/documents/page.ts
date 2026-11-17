@@ -90,6 +90,14 @@ export default {
       rows: 3,
       group: 'content',
     },
+    {
+      name: 'cardTagline',
+      type: 'string',
+      title: 'Accroche de la carte circuit',
+      description: 'Courte accroche affichée sur la carte du circuit dans la liste des voyages.',
+      hidden: ({ document }) => document?.pageType !== 'circuit',
+      group: 'content',
+    },
     defineField({
       name: 'routeStops',
       type: 'array',

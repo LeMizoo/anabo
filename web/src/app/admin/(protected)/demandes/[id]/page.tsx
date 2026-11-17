@@ -5,11 +5,32 @@ import Link from 'next/link'
 import { StatusUpdateForm } from '@/components/admin/StatusUpdateForm'
 import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 import { saveQuoteDetails } from '@/app/admin/actions'
+import type { QuoteEstimateSnapshot } from '@/lib/pricing'
 
 export const dynamic = 'force-dynamic'
 
 type Props = {
   params: Promise<{ id: string }>
+}
+
+function parseEstimate(value: string | null): QuoteEstimateSnapshot | null {
+  if (!value) return null
+  try {
+    const parsed = JSON.parse(value) as QuoteEstimateSnapshot
+    return (parsed.version === 1 || parsed.version === 2) && typeof parsed.finalPrice === 'number' && typeof parsed.currency === 'string'
+      ? parsed
+      : null
+  } catch {
+    return null
+  }
+}
+
+function formatMoney(value: number, currency: string) {
+  try {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 0 }).format(value)
+  } catch {
+    return `${value.toLocaleString('fr-FR')} ${currency}`
+  }
 }
 
 async function save(formData: FormData) {
@@ -29,6 +50,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
   const { id } = await params
   const quote = await prisma.quoteRequest.findUnique({ where: { id } })
   if (!quote) notFound()
+  const estimate = parseEstimate(quote.estimateDetails)
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -90,6 +112,12 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   {quote.adults} ad. / {quote.children} enf.
                 </dd>
               </div>
+              {quote.vehicleCode && <div>
+                <dt className="text-gray-500">Véhicule demandé</dt>
+                <dd className="mt-1 text-gray-900">{quote.vehicleLabel || quote.vehicleCode} <span className="text-gray-500">[{quote.vehicleCode}]</span> · {quote.vehicleCount} véhicule(s) · {quote.consecutiveCircuits} circuit(s) consécutif(s)</dd>
+              </div>}
+              {quote.pricingMode && <div><dt className="text-gray-500">Mode demandé</dt><dd className="mt-1 text-gray-900">{quote.pricingMode === 'DAILY_CAR' ? 'Daily price car' : 'Tour price (included vehicle)'}</dd></div>}
+              {quote.pricingPackageName && <div><dt className="text-gray-500">Package demandé</dt><dd className="mt-1 text-gray-900">{quote.pricingPackageName}</dd></div>}
               <div className="sm:col-span-2">
                 <dt className="text-gray-500">Message</dt>
                 <dd className="mt-1 whitespace-pre-wrap text-gray-900">
@@ -98,6 +126,27 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               </div>
             </dl>
           </section>
+
+          {estimate && <section className="rounded-xl border border-green-200 bg-green-50 p-6 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div><h2 className="text-lg font-semibold text-green-950">Estimation indicative reçue</h2><p className="mt-1 text-sm text-green-800">Calculée côté serveur le {new Date(estimate.calculatedAt).toLocaleString('fr-FR')}</p></div>
+              <p className="text-2xl font-bold text-green-950">{formatMoney(estimate.finalPrice, estimate.currency)}</p>
+            </div>
+            <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+              <div><dt className="text-green-800">Voyageurs</dt><dd className="mt-1 font-medium text-gray-900">{estimate.adults} adulte(s), {estimate.children} enfant(s) — {estimate.people} au total</dd></div>
+              <div><dt className="text-green-800">Durée et demandes</dt><dd className="mt-1 font-medium text-gray-900">{estimate.days} jour(s), {estimate.consecutiveCircuits} circuit(s) consécutif(s), {estimate.vehicleCount} véhicule(s) demandé(s)</dd></div>
+              <div><dt className="text-green-800">{estimate.pricingMode === 'TOUR_INCLUDED' ? 'Prix global du circuit (véhicule inclus)' : 'Base historique'}</dt><dd className="mt-1 font-medium text-gray-900">{estimate.pricingMode === 'TOUR_INCLUDED' ? formatMoney(estimate.baseTotal, estimate.currency) : `${formatMoney(estimate.basePricePerPerson, estimate.currency)} × ${estimate.people} = ${formatMoney(estimate.baseTotal, estimate.currency)}`}</dd></div>
+              {estimate.vehicle && <div><dt className="text-green-800">Location véhicule</dt><dd className="mt-1 font-medium text-gray-900">{estimate.vehicle.label} [tarif {estimate.vehicle.code}{estimate.vehicle.matchedOptionCode !== estimate.vehicle.code ? ` · option locale ${estimate.vehicle.matchedOptionCode}` : ''}] — {estimate.vehicle.capacity} places, {estimate.vehicle.vehiclesCharged} facturé(s), {formatMoney(estimate.vehicle.total, estimate.currency)}{estimate.vehicle.indicativeOnly ? ' · tarif indicatif' : ''}</dd></div>}
+              {estimate.package && <div className="sm:col-span-2"><dt className="text-green-800">Package : {estimate.package.name}</dt><dd className="mt-1 space-y-1 font-medium text-gray-900">{estimate.package.items.map((item) => <p key={item.code}>{item.name} — {formatMoney(item.unitPrice, estimate.currency)} × {item.quantity} = {formatMoney(item.total, estimate.currency)}</p>)}<p>Total package : {formatMoney(estimate.package.total, estimate.currency)}</p></dd></div>}
+              <div><dt className="text-green-800">Sous-total</dt><dd className="mt-1 font-medium text-gray-900">{formatMoney(estimate.subtotal, estimate.currency)}</dd></div>
+              <div><dt className="text-green-800">Réductions appliquées</dt><dd className="mt-1 font-medium text-gray-900">{estimate.discounts.multiplex.percentage > 0 ? `Multiplex −${estimate.discounts.multiplex.percentage}% (${formatMoney(estimate.discounts.multiplex.amount, estimate.currency)})` : 'Multiplex : aucune'}<br />{estimate.discounts.fleet.percentage > 0 ? `Flotte −${estimate.discounts.fleet.percentage}% (${formatMoney(estimate.discounts.fleet.amount, estimate.currency)})` : 'Flotte : aucune'}</dd></div>
+            </dl>
+            <p className="mt-4 border-t border-green-200 pt-3 text-xs text-green-900">Le devis peut être ajusté selon les disponibilités, la saison et les échanges avec le client.</p>
+          </section>}
+          {!estimate && quote.circuitSlug === 'sur-mesure' && <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">
+            <h2 className="font-semibold">Aucune estimation automatique enregistrée</h2>
+            <p className="mt-1">Vérifiez que le circuit « sur-mesure » possède un tarif et que la clé du véhicule sélectionné correspond à une clé ou à un alias configuré dans Prix et véhicules.</p>
+          </section>}
 
           <form
             action={save}

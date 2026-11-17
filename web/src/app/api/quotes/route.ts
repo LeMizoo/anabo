@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { sendQuoteEmails } from '@/lib/email'
+import { calculateQuoteEstimate } from '@/lib/pricing'
+import type { PricingMode } from '@/generated/prisma/enums'
 
 export const runtime = 'nodejs'
 
@@ -26,6 +28,12 @@ const quoteSchema = z.object({
   endDate: optionalDate,
   adults: z.coerce.number().int().min(1).max(20).default(2),
   children: z.coerce.number().int().min(0).max(20).default(0),
+  vehicleCode: z.string().trim().max(120).optional().or(z.literal('')),
+  vehicleLabel: z.string().trim().max(120).optional().or(z.literal('')),
+  pricingMode: z.enum(['DAILY_CAR', 'TOUR_INCLUDED']).optional(),
+  packageId: z.string().trim().max(30).optional().or(z.literal('')),
+  consecutiveCircuits: z.coerce.number().int().min(1).max(20).default(1),
+  vehicleCount: z.coerce.number().int().min(1).max(20).default(1),
   message: z.string().trim().max(5000).optional().or(z.literal('')),
 })
 
@@ -90,6 +98,43 @@ export async function POST(request: Request) {
     )
   }
 
+  const rentalDays = startDate && endDate
+    ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000))
+    : 0
+  let estimateResult: Awaited<ReturnType<typeof calculateQuoteEstimate>> = null
+  let selectedPackage: { id: string; name: string } | null = null
+  try {
+    if (data.packageId) {
+      if (!data.pricingMode || !data.circuitSlug) return NextResponse.json({ error: 'Choisissez un mode de tarification valide pour ce package.' }, { status: 400 })
+      selectedPackage = await prisma.pricingPackage.findFirst({
+        where: {
+          id: data.packageId,
+          active: true,
+          config: { circuitSlug: data.circuitSlug },
+          OR: [{ scope: data.pricingMode }, { scope: 'BOTH' }],
+        },
+        select: { id: true, name: true },
+      })
+      if (!selectedPackage) return NextResponse.json({ error: 'Le package sélectionné n’est plus disponible.' }, { status: 400 })
+    }
+    if (data.pricingMode && data.circuitSlug) estimateResult = await calculateQuoteEstimate({
+        circuitSlug: data.circuitSlug,
+        pricingMode: data.pricingMode as PricingMode,
+        vehicleCode: data.vehicleCode || undefined,
+        vehicleLabel: data.vehicleLabel || undefined,
+        packageId: selectedPackage?.id,
+        adults: data.adults,
+        children: data.children,
+        days: rentalDays,
+        consecutiveCircuits: data.consecutiveCircuits,
+        vehicleCount: data.vehicleCount,
+      })
+  } catch (error) {
+    console.error('[api/quotes] Estimate calculation failed:', error)
+    return NextResponse.json({ error: 'Impossible de calculer le prix indicatif pour le moment.' }, { status: 503 })
+  }
+  const estimateDetails = estimateResult?.snapshot || null
+
   const reference =
     `AR-${Date.now().toString(36).toUpperCase()}-` +
     randomBytes(4).toString('hex').toUpperCase()
@@ -111,8 +156,17 @@ export async function POST(request: Request) {
         adults: data.adults,
         children: data.children,
         message: data.message || null,
+        estimateDetails: estimateDetails ? JSON.stringify(estimateDetails) : null,
+        vehicleCode: data.vehicleCode || null,
+        vehicleLabel: data.vehicleLabel || null,
+        pricingMode: data.pricingMode || null,
+        pricingPackageId: selectedPackage?.id || null,
+        pricingPackageName: selectedPackage?.name || null,
+        vehicleCount: data.vehicleCount,
+        consecutiveCircuits: data.consecutiveCircuits,
       },
       select: {
+        id: true,
         reference: true,
         createdAt: true,
       },
@@ -121,6 +175,7 @@ export async function POST(request: Request) {
     // Envoi des e-mails (ne bloque pas la réponse en cas d'échec Resend)
     try {
       await sendQuoteEmails({
+        id: quote.id,
         reference: quote.reference,
         locale: data.locale,
         firstName: data.firstName,
@@ -135,6 +190,13 @@ export async function POST(request: Request) {
         adults: data.adults,
         children: data.children,
         message: data.message || null,
+        estimateDetails,
+        vehicleCode: data.vehicleCode || null,
+        vehicleLabel: data.vehicleLabel || null,
+        pricingMode: data.pricingMode || null,
+        pricingPackageName: selectedPackage?.name || null,
+        vehicleCount: data.vehicleCount,
+        consecutiveCircuits: data.consecutiveCircuits,
       })
     } catch (emailErr) {
       console.error('[api/quotes] Email send failed:', emailErr)
@@ -145,6 +207,7 @@ export async function POST(request: Request) {
         success: true,
         message: 'Votre demande a bien été enregistrée.',
         reference: quote.reference,
+        estimate: estimateResult?.publicEstimate || null,
       },
       { status: 201 },
     )

@@ -374,6 +374,7 @@ export const tourIdeasQuery = `
     "slug": slug.current,
     pageType,
     excerpt,
+    cardTagline,
     routeStops,
     featuredImage{ ..., asset->, alt }
   }
