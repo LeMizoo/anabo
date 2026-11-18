@@ -465,6 +465,8 @@ export interface Page {
   excerpt?: string
   featuredImage?: SanityImage
   routeStops?: string[]
+  totalDays?: number
+  stopDays?: StopDay[]
   seo?: PageSeo
   modules?: PageModule[]
 }
@@ -494,7 +496,14 @@ export interface Testimonial {
   featured?: boolean
 }
 
+export interface StopDay {
+  _key?: string
+  place: string
+  days: number
+}
+
 export interface Circuit {
   slug: string
   title: string
+  totalDays?: number
 }

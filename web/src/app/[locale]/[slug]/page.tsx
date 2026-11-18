@@ -8,6 +8,8 @@ import type { Page, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { ImagePlaceholderGallery } from '@/components/pages/ImagePlaceholderGallery'
 import { getTourRouteStops } from '@/lib/tour-routes'
+import { getVehicleRates } from '@/lib/pricing'
+import { CircuitPricing } from '@/components/pages/CircuitPricing'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import { MapPinned } from 'lucide-react'
 
@@ -112,6 +114,8 @@ export default async function PageBySlug({ params }: Props) {
   const itineraryStops = page.pageType === 'circuit' || page.pageType === 'custom-trip'
     ? getTourRouteStops(page)
     : undefined
+  const isCircuit = page.pageType === 'circuit' || page.pageType === 'custom-trip'
+  const vehicleRates = isCircuit ? await getVehicleRates() : null
   const t = await getTranslations('tourIdeas')
   const heroModule = page.modules?.find(
     (module) => module._type === 'heroBlock' && !module.settings?.hidden,
@@ -160,6 +164,14 @@ export default async function PageBySlug({ params }: Props) {
             </div>
           </div>
         </section>
+      )}
+      {isCircuit && vehicleRates && (
+        <CircuitPricing
+          totalDays={page.totalDays}
+          stopDays={page.stopDays}
+          rates={vehicleRates}
+          locale={locale}
+        />
       )}
       <PageRenderer modules={remainingModules} circuits={circuits} locale={locale} sectionLinks={slug !== 'home'} />
       {slug === 'gallery' && !hasGalleryBlock && (

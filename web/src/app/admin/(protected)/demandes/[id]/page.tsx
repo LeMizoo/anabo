@@ -90,6 +90,24 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   {quote.adults} ad. / {quote.children} enf.
                 </dd>
               </div>
+              <div>
+                <dt className="text-gray-500">Véhicule souhaité</dt>
+                <dd className="mt-1 text-gray-900">
+                  {quote.vehicleType === '4x4'
+                    ? '4x4'
+                    : quote.vehicleType === 'minivan'
+                      ? 'Mini van'
+                      : '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-gray-500">Estimation (par véhicule)</dt>
+                <dd className="mt-1 text-gray-900">
+                  {quote.estimatedPrice != null && quote.totalDays != null && quote.dailyRate != null
+                    ? `${quote.totalDays} j × ${quote.dailyRate} € = ${quote.estimatedPrice} €`
+                    : '—'}
+                </dd>
+              </div>
               <div className="sm:col-span-2">
                 <dt className="text-gray-500">Message</dt>
                 <dd className="mt-1 whitespace-pre-wrap text-gray-900">

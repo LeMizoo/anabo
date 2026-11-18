@@ -45,6 +45,13 @@ model QuoteRequest {
   // Champs pour le devis
   quoteDetails String?   @db.Text
 
+  // Estimation tarifaire (instantané au moment de la demande).
+  // Prix par véhicule et par jour, jamais par personne.
+  vehicleType    String? @db.VarChar(20) // "4x4" | "minivan"
+  totalDays      Int?
+  dailyRate      Int?    // tarif/jour du véhicule en euros au moment de la demande
+  estimatedPrice Int?    // totalDays x dailyRate, en euros
+
   contactedAt DateTime?
   quoteSentAt DateTime?
   confirmedAt DateTime?

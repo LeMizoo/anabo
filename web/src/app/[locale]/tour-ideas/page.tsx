@@ -1,10 +1,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ArrowUpRight, MapPinned } from 'lucide-react'
+import { ArrowUpRight, MapPinned, CalendarDays } from 'lucide-react'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { sanityClient, getImageUrl } from '@/lib/sanity'
 import { pageBySlugQuery, tourIdeasQuery } from '@/lib/queries'
+import { computeCircuitPrice, formatEuro, getVehicleRates, isValidTotalDays } from '@/lib/pricing'
 import { getRouteMapUrls, getTourRouteStops } from '@/lib/tour-routes'
 import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
@@ -27,6 +28,7 @@ type TourIdea = {
   excerpt?: string
   featuredImage?: SanityImage
   routeStops?: string[]
+  totalDays?: number
 }
 
 type SearchFaq = {
@@ -86,8 +88,9 @@ export default async function TourIdeasPage({ params }: Props) {
   setRequestLocale(locale)
 
   const t = await getTranslations('tourIdeas')
+  const tp = await getTranslations('pricing')
   const faqs = getSearchFaqs(t.raw('faqs'))
-  const [page, tours] = await Promise.all([
+  const [page, tours, vehicleRates] = await Promise.all([
     sanityClient.fetch<Page | null>(
       pageBySlugQuery,
       { slug: 'tour-ideas', locale },
@@ -98,6 +101,7 @@ export default async function TourIdeasPage({ params }: Props) {
       { locale },
       { cache: 'no-store' },
     ),
+    getVehicleRates(),
   ])
   const heroModule = page?.modules?.find(
     (module) => module._type === 'heroBlock' && !module.settings?.hidden,
@@ -173,6 +177,18 @@ export default async function TourIdeasPage({ params }: Props) {
                 <div className="flex flex-1 flex-col p-5">
                   {tour.excerpt && (
                     <p className="line-clamp-3 text-sm leading-6 text-slate-600">{tour.excerpt}</p>
+                  )}
+                  {tour.pageType !== 'custom-trip' && isValidTotalDays(tour.totalDays) && (
+                    <p className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[#06245F]">
+                      <CalendarDays size={15} aria-hidden="true" className="text-[#E0A01C]" />
+                      {tp('cardFrom', {
+                        count: tour.totalDays,
+                        price: formatEuro(
+                          computeCircuitPrice(tour.totalDays, vehicleRates.fourByFourPerDay),
+                          locale,
+                        ),
+                      })}
+                    </p>
                   )}
                   <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#06245F]">
                     {tour.pageType === 'custom-trip' ? t('createTrip') : t('details')}

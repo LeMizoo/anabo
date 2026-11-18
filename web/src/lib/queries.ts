@@ -45,6 +45,20 @@ export const siteSettingsQuery = `
   }
 `
 
+export const vehicleRatesQuery = `
+  *[_type == "siteSettings"][0].vehicleRates{
+    fourByFourPerDay,
+    fourByFourModel,
+    miniVanPerDay,
+    miniVanModel
+  }
+`
+
+export const circuitTotalDaysQuery = `
+  *[_type == "page" && slug.current == $slug && pageType == "circuit" && defined(totalDays)]
+    | order(language == $locale desc)[0].totalDays
+`
+
 const pageModulesProjection = `
   _type,
   settings,
@@ -338,6 +352,8 @@ export const pageBySlugQuery = `
     pageType,
     excerpt,
     routeStops,
+    totalDays,
+    stopDays[]{ _key, place, days },
     featuredImage{ ..., asset->, alt },
     seo{
       metaTitle,
@@ -375,6 +391,7 @@ export const tourIdeasQuery = `
     pageType,
     excerpt,
     routeStops,
+    totalDays,
     featuredImage{ ..., asset->, alt }
   }
 `
@@ -382,6 +399,7 @@ export const tourIdeasQuery = `
 export const circuitsQuery = `
   *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
     "slug": slug.current,
-    title
+    title,
+    totalDays
   }
 `

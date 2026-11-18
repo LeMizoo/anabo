@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { sendQuoteEmails } from '@/lib/email'
+import { estimateQuote, type QuoteEstimate } from '@/lib/pricing'
 
 export const runtime = 'nodejs'
 
@@ -26,6 +27,7 @@ const quoteSchema = z.object({
   endDate: optionalDate,
   adults: z.coerce.number().int().min(1).max(20).default(2),
   children: z.coerce.number().int().min(0).max(20).default(0),
+  vehicleType: z.enum(['4x4', 'minivan']).optional().or(z.literal('')),
   message: z.string().trim().max(5000).optional().or(z.literal('')),
 })
 
@@ -90,6 +92,23 @@ export async function POST(request: Request) {
     )
   }
 
+  // Estimation indicative : jours du circuit × tarif journalier du véhicule.
+  // En cas d'échec de lecture Sanity, la demande est quand même enregistrée.
+  let estimate: QuoteEstimate | null = null
+  if (data.vehicleType) {
+    try {
+      estimate = await estimateQuote(
+        data.vehicleType,
+        data.circuitSlug && data.circuitSlug !== 'sur-mesure' && data.circuitSlug !== 'extensions'
+          ? data.circuitSlug
+          : null,
+        data.locale,
+      )
+    } catch (estimateError) {
+      console.error('[api/quotes] Estimate failed:', estimateError)
+    }
+  }
+
   const reference =
     `AR-${Date.now().toString(36).toUpperCase()}-` +
     randomBytes(4).toString('hex').toUpperCase()
@@ -111,6 +130,10 @@ export async function POST(request: Request) {
         adults: data.adults,
         children: data.children,
         message: data.message || null,
+        vehicleType: estimate?.vehicleType ?? null,
+        totalDays: estimate?.totalDays ?? null,
+        dailyRate: estimate?.dailyRate ?? null,
+        estimatedPrice: estimate?.estimatedPrice ?? null,
       },
       select: {
         reference: true,

@@ -141,5 +141,60 @@
     "description": "It seems the page you are looking for has been moved or no longer exists. Don't worry, your next adventure is waiting for you.",
     "backHome": "Back to home",
     "exploreTours": "Explore tours"
+  },
+  "pricing": {
+    "title": "Tour pricing",
+    "subtitle": "The price is calculated per vehicle and per day: it does not depend on the number of people.",
+    "totalDays": "{count, plural, one {# day} other {# days}} in total",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "perDay": "{price} / day",
+    "vehicle4x4": "4x4",
+    "vehicleMinivan": "Mini van",
+    "indicativeModel": "Indicative model: {model}",
+    "total": "Estimated total",
+    "stopsTitle": "Days per stop",
+    "note": "Models (Prado, Grand Starex) are indicative only. Depending on your request, several vehicles may be possible; the final quote is confirmed according to your dates and the number of travellers.",
+    "durationToDefine": "Duration to be defined: ask for a personalised quote.",
+    "cardFrom": "{count, plural, one {# day} other {# days}} · from {price} by 4x4",
+    "vehicleField": "Preferred vehicle",
+    "vehicleUndecided": "To be decided together"
+  },
+  "carRent": {
+    "eyebrow": "Car rental with driver-guide",
+    "title": "Rent your vehicle with Vonjy",
+    "intro": "A private vehicle and a Malagasy driver-guide who knows every road: travel at your own pace, safely, on the tour of your choice.",
+    "qualitiesTitle": "Why travel with Vonjy",
+    "qualities": [
+      {
+        "title": "Local driver-guide",
+        "text": "Vonjy knows the roads, the national parks and the villages: a guide who lives here, not just a driver."
+      },
+      {
+        "title": "Safe, experienced driving",
+        "text": "Madagascar's roads call for experience. You travel with peace of mind, even on the toughest tracks."
+      },
+      {
+        "title": "French, English and Italian",
+        "text": "Talk in your own language to ask questions, understand the culture and prepare each stage."
+      },
+      {
+        "title": "Private car, at your pace",
+        "text": "A vehicle just for you: photo stops, encounters, detours. The route adapts to what you want."
+      },
+      {
+        "title": "A clear price",
+        "text": "The price depends on the vehicle and the number of days of the tour, never on the number of people."
+      }
+    ],
+    "vehiclesTitle": "Our vehicles",
+    "vehicle4x4": "4x4",
+    "vehicle4x4Text": "For tracks and nature tours.",
+    "vehicleMinivan": "Mini van",
+    "vehicleMinivanText": "For comfortable travel as a group or family.",
+    "perDay": "{price} / day",
+    "indicativeModel": "Indicative model: {model}",
+    "rateNote": "Price per vehicle, no price per person. Prado and Grand Starex are indicative: several vehicles are possible depending on your request.",
+    "ctaCircuits": "See the tours",
+    "ctaQuote": "Request a quote"
   }
 }

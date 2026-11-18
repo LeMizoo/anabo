@@ -141,5 +141,60 @@
     "description": "Sembra che la pagina che stai cercando sia stata spostata o non esista più. Non preoccuparti, la tua prossima avventura ti aspetta.",
     "backHome": "Torna alla home",
     "exploreTours": "Esplora i tour"
+  },
+  "pricing": {
+    "title": "Tariffe del circuito",
+    "subtitle": "Il prezzo è calcolato per veicolo e per giorno: non dipende dal numero di persone.",
+    "totalDays": "{count, plural, one {# giorno} other {# giorni}} in totale",
+    "days": "{count, plural, one {# giorno} other {# giorni}}",
+    "perDay": "{price} / giorno",
+    "vehicle4x4": "4x4",
+    "vehicleMinivan": "Minivan",
+    "indicativeModel": "Modello indicativo: {model}",
+    "total": "Totale stimato",
+    "stopsTitle": "Giorni per tappa",
+    "note": "I modelli (Prado, Grand Starex) sono solo indicativi. In base alla richiesta, sono possibili più veicoli; il preventivo finale viene confermato in base alle date e al numero di viaggiatori.",
+    "durationToDefine": "Durata da definire: richiedete un preventivo personalizzato.",
+    "cardFrom": "{count, plural, one {# giorno} other {# giorni}} · da {price} in 4x4",
+    "vehicleField": "Veicolo preferito",
+    "vehicleUndecided": "Da definire insieme"
+  },
+  "carRent": {
+    "eyebrow": "Noleggio auto con autista-guida",
+    "title": "Noleggiate il vostro veicolo con Vonjy",
+    "intro": "Un veicolo privato e un autista-guida malgascio che conosce ogni strada: viaggiate con i vostri tempi, in sicurezza, sul circuito che preferite.",
+    "qualitiesTitle": "Perché viaggiare con Vonjy",
+    "qualities": [
+      {
+        "title": "Autista-guida locale",
+        "text": "Vonjy conosce le strade, i parchi nazionali e i villaggi: una guida che vive qui, non un semplice autista."
+      },
+      {
+        "title": "Guida sicura ed esperta",
+        "text": "Le strade del Madagascar richiedono esperienza. Viaggiate con serenità, anche sulle piste più difficili."
+      },
+      {
+        "title": "Francese, inglese e italiano",
+        "text": "Parlate nella vostra lingua per fare domande, capire la cultura e preparare ogni tappa."
+      },
+      {
+        "title": "Auto privata, con i vostri tempi",
+        "text": "Un veicolo solo per voi: soste fotografiche, incontri, deviazioni. L'itinerario si adatta ai vostri desideri."
+      },
+      {
+        "title": "Una tariffa chiara",
+        "text": "Il prezzo dipende dal veicolo e dal numero di giorni del circuito, mai dal numero di persone."
+      }
+    ],
+    "vehiclesTitle": "I nostri veicoli",
+    "vehicle4x4": "4x4",
+    "vehicle4x4Text": "Per piste e circuiti naturalistici.",
+    "vehicleMinivan": "Minivan",
+    "vehicleMinivanText": "Per viaggiare comodamente in gruppo o in famiglia.",
+    "perDay": "{price} / giorno",
+    "indicativeModel": "Modello indicativo: {model}",
+    "rateNote": "Tariffa per veicolo, senza prezzo a persona. Prado e Grand Starex sono indicativi: sono possibili più veicoli in base alla richiesta.",
+    "ctaCircuits": "Vedi i circuiti",
+    "ctaQuote": "Richiedi un preventivo"
   }
 }

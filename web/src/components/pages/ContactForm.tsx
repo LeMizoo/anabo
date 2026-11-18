@@ -24,6 +24,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
 
   // 👇 Récupération des traductions 👇
   const t = useTranslations('contactForm')
+  const tp = useTranslations('pricing')
 
   const isModalChoice = block.formType === 'both'
   const [activeModalForm, setActiveModalForm] = useState<'contact' | 'quote' | null>(null)
@@ -126,6 +127,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
       endDate: String(form.get('endDate') || ''),
       adults: Number(form.get('adults') || 2),
       children: Number(form.get('children') || 0),
+      vehicleType: isQuote ? String(form.get('vehicleType') || '') : '',
       message: String(form.get('message') || '').trim(),
     }
 
@@ -255,6 +257,15 @@ export function ContactForm({ block, circuits = [] }: Props) {
 
               {isQuote && (
                 <div className="grid gap-5 sm:grid-cols-2">
+                  <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
+                    {tp('vehicleField')}
+                    <select className={inputClass} name="vehicleType" defaultValue="" disabled={sending}>
+                      <option value="">{tp('vehicleUndecided')}</option>
+                      <option value="4x4">{tp('vehicle4x4')}</option>
+                      <option value="minivan">{tp('vehicleMinivan')}</option>
+                    </select>
+                  </label>
+
                   <label className="block text-sm font-medium text-gray-700">
                     {t('startDate')}
                     <input className={inputClass} name="startDate" type="date" disabled={sending} />

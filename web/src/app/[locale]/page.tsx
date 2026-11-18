@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { HomeHero } from '@/components/home/HomeHero'
+import { CarRentSection } from '@/components/home/CarRentSection'
 import { JotformWidget } from '@/components/pages/JotformWidget'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { sanityClient } from '@/lib/sanity'
@@ -65,14 +66,17 @@ export default async function HomePage({ params }: Props) {
 
   if (!hero) {
     return (
-      <section className="container-custom py-20">
-        <h1 className={`font-bold ${titleSizeClass('xl')}`}>
-          {titleCase(t('fallbackTitle'), locale)}
-        </h1>
-        <p className="mt-4 text-gray-600">
-          {t('fallbackDescription')}
-        </p>
-      </section>
+      <>
+        <section className="container-custom py-20">
+          <h1 className={`font-bold ${titleSizeClass('xl')}`}>
+            {titleCase(t('fallbackTitle'), locale)}
+          </h1>
+          <p className="mt-4 text-gray-600">
+            {t('fallbackDescription')}
+          </p>
+        </section>
+        <CarRentSection locale={locale} />
+      </>
     )
   }
 
@@ -80,6 +84,7 @@ export default async function HomePage({ params }: Props) {
     <>
       {/* 👇 On passe les settings (ancre, masquage) au Hero d'accueil */}
       <HomeHero hero={hero} settings={hero.settings} locale={locale} />
+      <CarRentSection locale={locale} />
       <PageRenderer modules={otherModules} locale={locale} />
 
       {/* 👇 Intégration du widget Tripadvisor (Trustindex) */}
