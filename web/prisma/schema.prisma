@@ -46,11 +46,15 @@ model QuoteRequest {
   quoteDetails String?   @db.Text
 
   // Estimation tarifaire (instantané au moment de la demande).
-  // Prix par véhicule et par jour, jamais par personne.
-  vehicleType    String? @db.VarChar(20) // "4x4" | "minivan"
-  totalDays      Int?
-  dailyRate      Int?    // tarif/jour du véhicule en euros au moment de la demande
-  estimatedPrice Int?    // totalDays x dailyRate, en euros
+  // Prix par véhicule et par jour, jamais par personne. Durée en fourchette (min-max).
+  vehicleId   String? @db.VarChar(30)
+  vehicleName String? @db.VarChar(100)
+  season      String? @db.VarChar(10) // "dry" | "rainy"
+  daysMin     Int?
+  daysMax     Int?
+  dailyRate   Int?    // tarif/jour du véhicule en euros au moment de la demande
+  priceMin    Int?    // daysMin x dailyRate, en euros
+  priceMax    Int?    // daysMax x dailyRate, en euros
 
   contactedAt DateTime?
   quoteSentAt DateTime?
@@ -77,11 +81,27 @@ model AdminUser {
   updatedAt    DateTime  @updatedAt
 }
 
-// Tarifs journaliers par véhicule (en euros), modifiables dans /admin/prix.
+// Véhicules et tarifs journaliers (en euros), modifiables dans /admin/prix.
 // Prix par véhicule et par jour, jamais par personne.
-model VehicleRate {
-  vehicleType String   @id @db.VarChar(20) // "4x4" | "minivan"
-  dailyRate   Int
-  modelName   String   @db.VarChar(100) // modèle indicatif (Prado, Grand Starex)
-  updatedAt   DateTime @updatedAt
+model Vehicle {
+  id        String   @id @default(cuid()) @db.VarChar(30)
+  name      String   @db.VarChar(100) // ex. "4x4", "Mini van"
+  modelName String   @default("") @db.VarChar(100) // modèle indicatif (Prado, Grand Starex)
+  seats     Int      // nombre de places passagers
+  dailyRate Int      // prix par jour, en euros
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Durée des circuits selon la saison, en fourchette de jours (qualité des routes).
+// circuitKey = translationGroup du circuit dans Sanity (commun à fr, en et it).
+model CircuitDuration {
+  circuitKey String   @id @db.VarChar(191)
+  dryMin     Int?
+  dryMax     Int?
+  rainyMin   Int?
+  rainyMax   Int?
+  updatedAt  DateTime @updatedAt
 }

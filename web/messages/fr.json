@@ -145,22 +145,26 @@
   "pricing": {
     "title": "Tarifs du circuit",
     "subtitle": "Le prix est calculé par véhicule et par jour : il ne dépend pas du nombre de personnes.",
-    "totalDays": "{count, plural, one {# jour} other {# jours}} au total",
+    "seasonLabel": "Saison de voyage",
+    "seasonDry": "Saison sèche",
+    "seasonRainy": "Saison des pluies",
     "days": "{count, plural, one {# jour} other {# jours}}",
+    "daysRange": "{min} à {max} jours",
     "perDay": "{price} / jour",
-    "vehicle4x4": "4x4",
-    "vehicleMinivan": "Mini van",
+    "seats": "{count, plural, one {# place} other {# places}}",
     "indicativeModel": "Modèle indicatif : {model}",
     "total": "Total estimé",
-    "stopsTitle": "Jours par escale",
-    "note": "Les modèles (Prado, Grand Starex) sont donnés à titre indicatif. Selon votre demande, plusieurs véhicules peuvent être possibles ; le devis final est confirmé selon vos dates et le nombre de voyageurs.",
+    "durationNote": "Durée approximative, en fourchette selon la saison et l'état des routes. Elle ne dépend pas des dates saisies.",
+    "note": "Les modèles de véhicule sont donnés à titre indicatif. Selon votre demande, plusieurs véhicules peuvent être possibles ; le devis final est confirmé selon vos dates et le nombre de voyageurs.",
     "durationToDefine": "Durée à définir : demandez un devis personnalisé.",
-    "cardFrom": "{count, plural, one {# jour} other {# jours}} · dès {price} en 4x4",
+    "cardSingle": "{count, plural, one {# jour} other {# jours}} · dès {price}",
+    "cardRange": "{min} à {max} jours · dès {price}",
     "vehicleField": "Véhicule souhaité",
     "vehicleUndecided": "À définir avec vous",
-    "totalDuration": "Durée totale du voyage : {count, plural, one {# jour} other {# jours}}",
-    "durationUnknown": "{count, plural, one {La durée d'un circuit reste à confirmer} other {La durée de # circuits reste à confirmer}}.",
-    "durationNote": "Calculée à partir des jours de chaque circuit choisi, indépendamment des dates ci-dessous."
+    "totalDuration": "Durée totale du voyage : {duration}",
+    "durationUnknown": "{count, plural, one {La durée d'un circuit reste à confirmer} other {La durée de # circuits reste à confirmer}} pour cette saison.",
+    "estimate": "Estimation indicative pour ce véhicule : {price}",
+    "estimateNote": "Prix par véhicule, pas par personne. Le devis final est confirmé par notre équipe."
   },
   "carRent": {
     "eyebrow": "Car Rent avec chauffeur-guide",
@@ -190,14 +194,11 @@
       }
     ],
     "vehiclesTitle": "Nos véhicules",
-    "vehicle4x4": "4x4",
-    "vehicle4x4Text": "Pour les pistes et les circuits nature.",
-    "vehicleMinivan": "Mini van",
-    "vehicleMinivanText": "Pour voyager confortablement en groupe ou en famille.",
     "perDay": "{price} / jour",
     "indicativeModel": "Modèle indicatif : {model}",
-    "rateNote": "Tarif par véhicule, sans prix par personne. Prado et Grand Starex sont indicatifs : plusieurs véhicules sont possibles selon votre demande.",
+    "rateNote": "Tarif par véhicule, sans prix par personne. Les modèles sont indicatifs : plusieurs véhicules sont possibles selon votre demande.",
     "ctaCircuits": "Voir les circuits",
-    "ctaQuote": "Demander un devis"
+    "ctaQuote": "Demander un devis",
+    "seats": "{count, plural, one {# place} other {# places}}"
   }
 }

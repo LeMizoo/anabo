@@ -290,52 +290,114 @@ export async function changePassword(currentPassword: string, newPassword: strin
   return { success: true }
 }
 
-// Tarifs journaliers des véhicules (page /admin/prix).
+// ─── /admin/prix : véhicules (prix/jour) et durée des circuits par saison ───────────────
 // Prix par véhicule et par jour, jamais par personne.
-const VEHICLE_RATE_FIELDS = [
-  { type: '4x4', label: '4x4', rateField: 'rate4x4', modelField: 'model4x4' },
-  { type: 'minivan', label: 'Mini van', rateField: 'rateMinivan', modelField: 'modelMinivan' },
-] as const
+type PriceResult = { success: true } | { success: false; error: string }
 
-export async function saveVehicleRates(
-  formData: FormData,
-): Promise<{ success: true } | { success: false; error: string }> {
+function parseInt0(value: FormDataEntryValue | null): number | null {
+  const raw = String(value ?? '').trim()
+  if (!raw) return null
+  const n = Number(raw.replace(',', '.'))
+  return Number.isInteger(n) ? n : Number.NaN
+}
+
+export async function saveVehicles(formData: FormData): Promise<PriceResult> {
   await requireSession()
 
-  const parsed: { type: string; dailyRate: number; modelName: string }[] = []
+  const ids = formData.getAll('vehicleId').map(String)
+  const names = formData.getAll('vehicleName').map((v) => String(v).trim())
+  const models = formData.getAll('vehicleModel').map((v) => String(v).trim())
+  const seats = formData.getAll('vehicleSeats')
+  const rates = formData.getAll('vehicleRate')
+  const removed = new Set(formData.getAll('vehicleRemove').map(String))
 
-  for (const field of VEHICLE_RATE_FIELDS) {
-    const rawRate = String(formData.get(field.rateField) ?? '').trim().replace(',', '.')
-    const dailyRate = Number(rawRate)
-    const modelName = String(formData.get(field.modelField) ?? '').trim().slice(0, 100)
+  const rows: { id: string; name: string; modelName: string; seats: number; dailyRate: number; sortOrder: number }[] = []
 
-    if (!rawRate || !Number.isInteger(dailyRate) || dailyRate < 0 || dailyRate > 100000) {
-      return {
-        success: false,
-        error: `Tarif ${field.label} invalide : saisissez un nombre entier d'euros par jour (0 à 100000).`,
-      }
+  for (let i = 0; i < names.length; i += 1) {
+    const id = ids[i] ?? ''
+    if (id && removed.has(id)) continue
+    if (!names[i] && !id && !String(rates[i] ?? '').trim()) continue // ligne vide
+
+    const seat = parseInt0(seats[i] ?? null)
+    const rate = parseInt0(rates[i] ?? null)
+    if (!names[i] || names[i].length > 100) {
+      return { success: false, error: `Véhicule ${i + 1} : le nom est requis (100 caractères max).` }
     }
-
-    if (!modelName) {
-      return { success: false, error: `Le modèle indicatif du ${field.label} est requis.` }
+    if (seat === null || !Number.isInteger(seat) || seat < 1 || seat > 100) {
+      return { success: false, error: `${names[i]} : le nombre de places doit être un entier entre 1 et 100.` }
     }
-
-    parsed.push({ type: field.type, dailyRate, modelName })
+    if (rate === null || !Number.isInteger(rate) || rate < 0 || rate > 100000) {
+      return { success: false, error: `${names[i]} : le prix par jour doit être un nombre entier d'euros (0 à 100000).` }
+    }
+    rows.push({ id, name: names[i], modelName: (models[i] ?? '').slice(0, 100), seats: seat, dailyRate: rate, sortOrder: rows.length })
   }
 
-  await prisma.$transaction(
-    parsed.map(({ type, dailyRate, modelName }) =>
-      prisma.vehicleRate.upsert({
-        where: { vehicleType: type },
-        update: { dailyRate, modelName },
-        create: { vehicleType: type, dailyRate, modelName },
-      }),
+  if (rows.length === 0) {
+    return { success: false, error: 'Il faut garder au moins un véhicule.' }
+  }
+
+  const keepIds = rows.map((row) => row.id).filter(Boolean)
+
+  await prisma.$transaction([
+    prisma.vehicle.deleteMany({ where: keepIds.length ? { id: { notIn: keepIds } } : {} }),
+    ...rows.map((row) =>
+      row.id
+        ? prisma.vehicle.upsert({
+            where: { id: row.id },
+            update: { name: row.name, modelName: row.modelName, seats: row.seats, dailyRate: row.dailyRate, sortOrder: row.sortOrder },
+            create: { id: row.id, name: row.name, modelName: row.modelName, seats: row.seats, dailyRate: row.dailyRate, sortOrder: row.sortOrder },
+          })
+        : prisma.vehicle.create({
+            data: { name: row.name, modelName: row.modelName, seats: row.seats, dailyRate: row.dailyRate, sortOrder: row.sortOrder },
+          }),
     ),
-  )
+  ])
 
   revalidatePath('/admin/prix')
-  // Les prix s'affichent sur l'accueil, les pages circuit et tour-ideas.
   revalidatePath('/', 'layout')
+  return { success: true }
+}
 
+export async function saveCircuitDurations(formData: FormData): Promise<PriceResult> {
+  await requireSession()
+
+  const keys = formData.getAll('circuitKey').map(String)
+  const fields = ['dryMin', 'dryMax', 'rainyMin', 'rainyMax'] as const
+  const values = Object.fromEntries(fields.map((field) => [field, formData.getAll(field)])) as Record<(typeof fields)[number], FormDataEntryValue[]>
+
+  const writes: ReturnType<typeof prisma.circuitDuration.upsert>[] = []
+
+  for (let i = 0; i < keys.length; i += 1) {
+    const key = keys[i]
+    if (!key || key.length > 191) continue
+
+    const parsed = Object.fromEntries(fields.map((field) => [field, parseInt0(values[field][i] ?? null)])) as Record<(typeof fields)[number], number | null>
+
+    for (const field of fields) {
+      const v = parsed[field]
+      if (v !== null && (!Number.isInteger(v) || v < 1 || v > 120)) {
+        return { success: false, error: `Circuit « ${key} » : les jours doivent être des entiers entre 1 et 120.` }
+      }
+    }
+    if ((parsed.dryMin === null) !== (parsed.dryMax === null) || (parsed.rainyMin === null) !== (parsed.rainyMax === null)) {
+      return { success: false, error: `Circuit « ${key} » : renseignez le minimum et le maximum pour chaque saison.` }
+    }
+    if ((parsed.dryMin !== null && parsed.dryMax! < parsed.dryMin) || (parsed.rainyMin !== null && parsed.rainyMax! < parsed.rainyMin)) {
+      return { success: false, error: `Circuit « ${key} » : le maximum ne peut pas être inférieur au minimum.` }
+    }
+
+    writes.push(
+      prisma.circuitDuration.upsert({
+        where: { circuitKey: key },
+        update: parsed,
+        create: { circuitKey: key, ...parsed },
+      }),
+    )
+  }
+
+  await prisma.$transaction(writes)
+
+  revalidatePath('/admin/prix')
+  revalidatePath('/', 'layout')
   return { success: true }
 }

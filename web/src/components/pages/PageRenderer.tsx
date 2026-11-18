@@ -17,12 +17,14 @@ import { ImageBlockSection } from './ImageBlockSection'
 import { ImageMarquee } from './ImageMarquee'
 import { HeadingSection } from './HeadingSection'
 import { FaqSection } from './FaqSection'
+import type { Vehicle } from '@/lib/trip-pricing'
 import { JotformWidget } from './JotformWidget'
 import { CardsSection } from './CardsSection'
 
 type Props = {
   modules?: PageModule[] | null
   circuits?: Circuit[]
+  vehicles?: Vehicle[]
   globalHeadingFont?: string
   globalHeadingWeight?: string
   locale: Locale
@@ -50,7 +52,7 @@ function isNavigableModule(module: PageModule): module is PageModule & { title: 
   )
 }
 
-export function PageRenderer({ modules, circuits = [], globalHeadingFont, globalHeadingWeight, locale, sectionLinks = false }: Props) {
+export function PageRenderer({ modules, circuits = [], vehicles = [], globalHeadingFont, globalHeadingWeight, locale, sectionLinks = false }: Props) {
   const sourceModules = Array.isArray(modules) ? modules : []
   const safeModules = sourceModules.map((module, index) => {
     if (!sectionLinks || !('title' in module) || !module.title || module._type === 'heroBlock') return module
@@ -98,7 +100,7 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
             case 'ctaBlock':
               return <CtaSection block={module} locale={locale} />
             case 'contactFormBlock':
-              return <ContactForm block={module} circuits={circuits} />
+              return <ContactForm block={module} circuits={circuits} vehicles={vehicles} />
             case 'customQuoteBlock':
               return <CustomQuoteForm block={module} locale={locale} />
             case 'slider3dBlock':

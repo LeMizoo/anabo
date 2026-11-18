@@ -6,21 +6,30 @@ import { useTranslations } from 'next-intl'
 import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
-import { circuitDurationDays, cumulateDurations } from '@/lib/duration'
+import {
+  SEASONS,
+  addRanges,
+  formatDays,
+  formatEuroRange,
+  priceRange,
+  type CircuitDurations,
+  type Season,
+  type Vehicle,
+} from '@/lib/trip-pricing'
 
 type Circuit = {
   slug: string
   title: string
-  totalDays?: number
-  stopDays?: { days: number }[]
+  durations?: CircuitDurations
 }
 
 type Props = {
   block: ContactFormBlock
   circuits?: Circuit[]
+  vehicles?: Vehicle[]
 }
 
-export function ContactForm({ block, circuits = [] }: Props) {
+export function ContactForm({ block, circuits = [], vehicles = [] }: Props) {
   const pathname = usePathname()
   const firstSegment = pathname.split('/').filter(Boolean)[0]
   const locale = ['fr', 'en', 'it'].includes(firstSegment) ? firstSegment : 'fr'
@@ -45,17 +54,26 @@ export function ContactForm({ block, circuits = [] }: Props) {
   const [selectedCircuit, setSelectedCircuit] = useState('')
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
 
-  // Durée du voyage : somme des jours (stopDays) de chaque circuit choisi.
-  // Elle ne dépend pas des dates saisies par le client.
+  const [season, setSeason] = useState<Season>('dry')
+  const [vehicleId, setVehicleId] = useState('')
+
+  // Durée du voyage : somme des fourchettes de jours (saisies dans /admin/prix) de chaque
+  // circuit choisi, pour la saison choisie. Elle ne dépend pas des dates saisies.
   const chosenSlugs = Array.from(
     new Set([selectedCircuit, ...extraCircuits].filter(Boolean)),
   )
   const chosenCircuits = chosenSlugs
     .map((slug) => circuits.find((circuit) => circuit.slug === slug))
     .filter((circuit): circuit is Circuit => Boolean(circuit))
-  const chosenDurations = chosenCircuits.map((circuit) => circuitDurationDays(circuit))
-  const cumulated = cumulateDurations(chosenDurations)
-  const daysOf = (circuit: Circuit) => circuitDurationDays(circuit)
+  const chosenRanges = chosenCircuits.map((circuit) => circuit.durations?.[season])
+  const cumulated = addRanges(chosenRanges)
+  const hasDuration = cumulated.total.max > 0
+  const selectedVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId)
+  const estimate =
+    hasDuration && cumulated.unknownCount === 0 && selectedVehicle
+      ? priceRange(cumulated.total, selectedVehicle.dailyRate)
+      : null
+  const seasonKey = { dry: 'seasonDry', rainy: 'seasonRainy' } as const
 
   useEffect(() => {
     if (!activeModalForm) return
@@ -143,7 +161,8 @@ export function ContactForm({ block, circuits = [] }: Props) {
       endDate: String(form.get('endDate') || ''),
       adults: Number(form.get('adults') || 2),
       children: Number(form.get('children') || 0),
-      vehicleType: isQuote ? String(form.get('vehicleType') || '') : '',
+      vehicleId: isQuote ? vehicleId : '',
+      season: isQuote ? season : '',
       message: String(form.get('message') || '').trim(),
     }
 
@@ -215,10 +234,10 @@ export function ContactForm({ block, circuits = [] }: Props) {
                     >
                       <option value="">{t('circuitDefault')}</option>
                       {circuits.map((c) => {
-                        const days = daysOf(c)
+                        const range = c.durations?.[season]
                         return (
                           <option key={c.slug} value={c.slug}>
-                            {days ? `${c.title} — ${tp('days', { count: days })}` : c.title}
+                            {range ? `${c.title} — ${formatDays(range, tp)}` : c.title}
                           </option>
                         )
                       })}
@@ -241,14 +260,33 @@ export function ContactForm({ block, circuits = [] }: Props) {
                               className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             />
                             {c.title}
-                            {daysOf(c) ? (
-                              <span className="text-gray-500"> ({tp('days', { count: daysOf(c) as number })})</span>
+                            {c.durations?.[season] ? (
+                              <span className="text-gray-500"> ({formatDays(c.durations[season]!, tp)})</span>
                             ) : null}
                           </label>
                         )
                       })}
                     </div>
                   </div>
+
+                  <fieldset className="rounded-lg border border-gray-200 p-3">
+                    <legend className="px-1 text-sm font-medium text-gray-700">{tp('seasonLabel')}</legend>
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+                      {SEASONS.map((value) => (
+                        <label key={value} className="inline-flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="season"
+                            value={value}
+                            checked={season === value}
+                            onChange={() => setSeason(value)}
+                            disabled={sending}
+                          />
+                          {tp(seasonKey[value])}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
 
                   {chosenCircuits.length > 0 && (
                     <div
@@ -258,20 +296,22 @@ export function ContactForm({ block, circuits = [] }: Props) {
                     >
                       <ul className="space-y-1">
                         {chosenCircuits.map((circuit, index) => {
-                          const days = chosenDurations[index]
+                          const range = chosenRanges[index]
                           return (
                             <li key={circuit.slug} className="flex justify-between gap-3">
                               <span>{index > 0 ? '+ ' : ''}{circuit.title}</span>
                               <span className="shrink-0 font-medium">
-                                {days ? tp('days', { count: days }) : '—'}
+                                {range ? formatDays(range, tp) : '—'}
                               </span>
                             </li>
                           )
                         })}
                       </ul>
-                      <p className="mt-3 border-t border-amber-200 pt-3 font-semibold text-[#06245F]">
-                        {tp('totalDuration', { count: cumulated.totalDays })}
-                      </p>
+                      {hasDuration && (
+                        <p className="mt-3 border-t border-amber-200 pt-3 font-semibold text-[#06245F]">
+                          {tp('totalDuration', { duration: formatDays(cumulated.total, tp) })}
+                        </p>
+                      )}
                       {cumulated.unknownCount > 0 && (
                         <p className="mt-1 text-xs text-gray-600">
                           {tp('durationUnknown', { count: cumulated.unknownCount })}
@@ -314,11 +354,27 @@ export function ContactForm({ block, circuits = [] }: Props) {
                 <div className="grid gap-5 sm:grid-cols-2">
                   <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
                     {tp('vehicleField')}
-                    <select className={inputClass} name="vehicleType" defaultValue="" disabled={sending}>
+                    <select
+                      className={inputClass}
+                      name="vehicleId"
+                      value={vehicleId}
+                      onChange={(event) => setVehicleId(event.target.value)}
+                      disabled={sending}
+                    >
                       <option value="">{tp('vehicleUndecided')}</option>
-                      <option value="4x4">{tp('vehicle4x4')}</option>
-                      <option value="minivan">{tp('vehicleMinivan')}</option>
+                      {vehicles.map((vehicle) => (
+                        <option key={vehicle.id} value={vehicle.id}>
+                          {vehicle.name} — {tp('seats', { count: vehicle.seats })}
+                        </option>
+                      ))}
                     </select>
+                    {estimate && (
+                      <span className="mt-2 block text-xs font-normal text-gray-600">
+                        {tp('estimate', { price: formatEuroRange(estimate, locale as 'fr' | 'en' | 'it') })}
+                        {' · '}
+                        {tp('estimateNote')}
+                      </span>
+                    )}
                   </label>
 
                   <label className="block text-sm font-medium text-gray-700">

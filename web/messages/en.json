@@ -145,22 +145,26 @@
   "pricing": {
     "title": "Tour pricing",
     "subtitle": "The price is calculated per vehicle and per day: it does not depend on the number of people.",
-    "totalDays": "{count, plural, one {# day} other {# days}} in total",
+    "seasonLabel": "Travel season",
+    "seasonDry": "Dry season",
+    "seasonRainy": "Rainy season",
     "days": "{count, plural, one {# day} other {# days}}",
+    "daysRange": "{min} to {max} days",
     "perDay": "{price} / day",
-    "vehicle4x4": "4x4",
-    "vehicleMinivan": "Mini van",
+    "seats": "{count, plural, one {# seat} other {# seats}}",
     "indicativeModel": "Indicative model: {model}",
     "total": "Estimated total",
-    "stopsTitle": "Days per stop",
-    "note": "Models (Prado, Grand Starex) are indicative only. Depending on your request, several vehicles may be possible; the final quote is confirmed according to your dates and the number of travellers.",
+    "durationNote": "Approximate duration, given as a range depending on the season and road conditions. It does not depend on the dates entered.",
+    "note": "Vehicle models are indicative only. Depending on your request, several vehicles may be possible; the final quote is confirmed according to your dates and the number of travellers.",
     "durationToDefine": "Duration to be defined: ask for a personalised quote.",
-    "cardFrom": "{count, plural, one {# day} other {# days}} · from {price} by 4x4",
+    "cardSingle": "{count, plural, one {# day} other {# days}} · from {price}",
+    "cardRange": "{min} to {max} days · from {price}",
     "vehicleField": "Preferred vehicle",
     "vehicleUndecided": "To be decided together",
-    "totalDuration": "Total trip duration: {count, plural, one {# day} other {# days}}",
-    "durationUnknown": "{count, plural, one {The duration of one tour is still to be confirmed} other {The duration of # tours is still to be confirmed}}.",
-    "durationNote": "Calculated from the days of each selected tour, regardless of the dates below."
+    "totalDuration": "Total trip duration: {duration}",
+    "durationUnknown": "{count, plural, one {The duration of one tour is still to be confirmed} other {The duration of # tours is still to be confirmed}} for this season.",
+    "estimate": "Indicative estimate for this vehicle: {price}",
+    "estimateNote": "Price per vehicle, not per person. The final quote is confirmed by our team."
   },
   "carRent": {
     "eyebrow": "Car rental with driver-guide",
@@ -190,14 +194,11 @@
       }
     ],
     "vehiclesTitle": "Our vehicles",
-    "vehicle4x4": "4x4",
-    "vehicle4x4Text": "For tracks and nature tours.",
-    "vehicleMinivan": "Mini van",
-    "vehicleMinivanText": "For comfortable travel as a group or family.",
     "perDay": "{price} / day",
     "indicativeModel": "Indicative model: {model}",
-    "rateNote": "Price per vehicle, no price per person. Prado and Grand Starex are indicative: several vehicles are possible depending on your request.",
+    "rateNote": "Price per vehicle, no price per person. Models are indicative: several vehicles are possible depending on your request.",
     "ctaCircuits": "See the tours",
-    "ctaQuote": "Request a quote"
+    "ctaQuote": "Request a quote",
+    "seats": "{count, plural, one {# seat} other {# seats}}"
   }
 }

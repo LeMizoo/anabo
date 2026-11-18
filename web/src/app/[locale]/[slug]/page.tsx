@@ -8,7 +8,7 @@ import type { Page, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { ImagePlaceholderGallery } from '@/components/pages/ImagePlaceholderGallery'
 import { getTourRouteStops } from '@/lib/tour-routes'
-import { getVehicleRates } from '@/lib/pricing'
+import { getCircuitDurations, getVehicles } from '@/lib/pricing'
 import { CircuitPricing } from '@/components/pages/CircuitPricing'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import { MapPinned } from 'lucide-react'
@@ -115,7 +115,15 @@ export default async function PageBySlug({ params }: Props) {
     ? getTourRouteStops(page)
     : undefined
   const isCircuit = page.pageType === 'circuit' || page.pageType === 'custom-trip'
-  const vehicleRates = isCircuit ? await getVehicleRates() : null
+  // Véhicules et durées saisis dans /admin/prix : alimentent le formulaire de devis
+  // et le bloc de prix du circuit.
+  const [vehicles, allDurations] = await Promise.all([getVehicles(), getCircuitDurations()])
+  circuits = (circuits ?? []).map((circuit) => ({
+    ...circuit,
+    durations: circuit.key ? allDurations[circuit.key] : undefined,
+  }))
+  const pageCircuitKey = page.translationGroup || page.slug || slug
+  const pageDurations = allDurations[pageCircuitKey]
   const t = await getTranslations('tourIdeas')
   const heroModule = page.modules?.find(
     (module) => module._type === 'heroBlock' && !module.settings?.hidden,
@@ -165,15 +173,16 @@ export default async function PageBySlug({ params }: Props) {
           </div>
         </section>
       )}
-      {isCircuit && vehicleRates && (
-        <CircuitPricing
-          totalDays={page.totalDays}
-          stopDays={page.stopDays}
-          rates={vehicleRates}
-          locale={locale}
-        />
+      {isCircuit && page.pageType === 'circuit' && (
+        <CircuitPricing durations={pageDurations} vehicles={vehicles} locale={locale} />
       )}
-      <PageRenderer modules={remainingModules} circuits={circuits} locale={locale} sectionLinks={slug !== 'home'} />
+      <PageRenderer
+        modules={remainingModules}
+        circuits={circuits}
+        vehicles={vehicles}
+        locale={locale}
+        sectionLinks={slug !== 'home'}
+      />
       {slug === 'gallery' && !hasGalleryBlock && (
         <ImagePlaceholderGallery locale={locale} />
       )}

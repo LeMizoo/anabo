@@ -1,3 +1,5 @@
+import type { CircuitDurations } from '@/lib/trip-pricing'
+
 export interface SiteTypography {
   globalHeadingFont?: string
   globalHeadingWeight?: string
@@ -465,8 +467,6 @@ export interface Page {
   excerpt?: string
   featuredImage?: SanityImage
   routeStops?: string[]
-  totalDays?: number
-  stopDays?: StopDay[]
   seo?: PageSeo
   modules?: PageModule[]
 }
@@ -496,15 +496,10 @@ export interface Testimonial {
   featured?: boolean
 }
 
-export interface StopDay {
-  _key?: string
-  place: string
-  days: number
-}
-
 export interface Circuit {
   slug: string
   title: string
-  totalDays?: number
-  stopDays?: Pick<StopDay, 'days'>[]
+  // translationGroup du circuit : clé des durées saisies dans /admin/prix
+  key?: string
+  durations?: CircuitDurations
 }

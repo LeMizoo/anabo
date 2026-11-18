@@ -29,7 +29,8 @@ const quoteSchema = z.object({
   endDate: optionalDate,
   adults: z.coerce.number().int().min(1).max(20).default(2),
   children: z.coerce.number().int().min(0).max(20).default(0),
-  vehicleType: z.enum(['4x4', 'minivan']).optional().or(z.literal('')),
+  vehicleId: z.string().trim().max(30).optional().or(z.literal('')),
+  season: z.enum(['dry', 'rainy']).optional().or(z.literal('')),
   message: z.string().trim().max(5000).optional().or(z.literal('')),
 })
 
@@ -97,15 +98,20 @@ export async function POST(request: Request) {
   // Estimation indicative : jours du circuit × tarif journalier du véhicule.
   // En cas d'échec de lecture Sanity, la demande est quand même enregistrée.
   let estimate: QuoteEstimate | null = null
-  if (data.vehicleType) {
-    // La durée vient des circuits choisis (somme des stopDays dans Sanity),
+  if (data.vehicleId) {
+    // Durée et prix viennent de /admin/prix (véhicule + durée des circuits pour la saison),
     // jamais des dates saisies ni d'un total envoyé par le navigateur.
     const requestedSlugs = (
       data.circuitSlugs ?? (data.circuitSlug ? [data.circuitSlug] : [])
     ).filter((slug) => slug !== 'sur-mesure' && slug !== 'extensions')
 
     try {
-      estimate = await estimateQuote(data.vehicleType, requestedSlugs, data.locale)
+      estimate = await estimateQuote({
+        vehicleId: data.vehicleId,
+        season: data.season || 'dry',
+        circuitSlugs: requestedSlugs,
+        locale: data.locale,
+      })
     } catch (estimateError) {
       console.error('[api/quotes] Estimate failed:', estimateError)
     }
@@ -132,10 +138,14 @@ export async function POST(request: Request) {
         adults: data.adults,
         children: data.children,
         message: data.message || null,
-        vehicleType: estimate?.vehicleType ?? null,
-        totalDays: estimate?.totalDays ?? null,
+        vehicleId: estimate?.vehicleId ?? null,
+        vehicleName: estimate?.vehicleName ?? null,
+        season: estimate?.season ?? null,
+        daysMin: estimate?.daysMin ?? null,
+        daysMax: estimate?.daysMax ?? null,
         dailyRate: estimate?.dailyRate ?? null,
-        estimatedPrice: estimate?.estimatedPrice ?? null,
+        priceMin: estimate?.priceMin ?? null,
+        priceMax: estimate?.priceMax ?? null,
       },
       select: {
         reference: true,

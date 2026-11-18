@@ -116,69 +116,6 @@ export default {
       group: 'content',
     }),
     {
-      name: 'totalDays',
-      type: 'number',
-      title: 'Nombre total de jours du circuit',
-      description:
-        'Sert au calcul du prix : nombre de jours × tarif journalier du véhicule. Les tarifs (4x4, Mini van) se modifient dans l’administration du site : /admin/prix. Pas de prix par personne.',
-      hidden: ({ document }: any) =>
-        document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
-      validation: (Rule: any) => Rule.integer().min(1).max(60),
-      group: 'content',
-    },
-    defineField({
-      name: 'stopDays',
-      type: 'array',
-      title: 'Jours par escale',
-      description:
-        'Facultatif. Une ligne par escale, dans l’ordre du trajet, avec le nombre de jours passés sur place. La somme devrait correspondre au nombre total de jours du circuit.',
-      hidden: ({ document }) =>
-        document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
-      of: [
-        {
-          type: 'object',
-          name: 'stopDay',
-          fields: [
-            {
-              name: 'place',
-              type: 'string',
-              title: 'Escale',
-              validation: (Rule) => Rule.required().min(2),
-            },
-            {
-              name: 'days',
-              type: 'number',
-              title: 'Nombre de jours',
-              initialValue: 1,
-              validation: (Rule) => Rule.required().integer().min(1).max(30),
-            },
-          ],
-          preview: {
-            select: { title: 'place', days: 'days' },
-            prepare({ title, days }: { title?: string; days?: number }) {
-              return {
-                title: title || 'Escale',
-                subtitle: days ? `${days} jour${days > 1 ? 's' : ''}` : '',
-              }
-            },
-          },
-        },
-      ],
-      validation: (Rule) =>
-        Rule.custom((stops, context) => {
-          const total = (context.document as { totalDays?: number } | undefined)?.totalDays
-          if (!Array.isArray(stops) || stops.length === 0 || !total) return true
-          const sum = (stops as { days?: number }[]).reduce<number>(
-            (acc, stop) => acc + (Number(stop.days) || 0),
-            0,
-          )
-          return sum === total
-            ? true
-            : `La somme des jours par escale (${sum}) ne correspond pas au total du circuit (${total}).`
-        }).warning(),
-      group: 'content',
-    }),
-    {
       name: 'modules',
       type: 'array',
       title: 'Blocs de contenu',

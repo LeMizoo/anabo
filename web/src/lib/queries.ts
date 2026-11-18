@@ -45,12 +45,19 @@ export const siteSettingsQuery = `
   }
 `
 
-export const circuitDurationsQuery = `
+export const circuitKeysBySlugQuery = `
   *[_type == "page" && pageType == "circuit" && slug.current in $slugs]{
     "slug": slug.current,
-    language,
-    totalDays,
-    stopDays[]{ days }
+    "key": coalesce(translationGroup, slug.current)
+  }
+`
+
+// Circuits listés dans /admin/prix : une ligne par circuit (toutes langues confondues).
+export const adminCircuitsQuery = `
+  *[_type == "page" && pageType == "circuit"]{
+    "key": coalesce(translationGroup, slug.current),
+    title,
+    language
   }
 `
 
@@ -347,8 +354,6 @@ export const pageBySlugQuery = `
     pageType,
     excerpt,
     routeStops,
-    totalDays,
-    stopDays[]{ _key, place, days },
     featuredImage{ ..., asset->, alt },
     seo{
       metaTitle,
@@ -386,7 +391,7 @@ export const tourIdeasQuery = `
     pageType,
     excerpt,
     routeStops,
-    totalDays,
+    "key": coalesce(translationGroup, slug.current),
     featuredImage{ ..., asset->, alt }
   }
 `
@@ -394,8 +399,7 @@ export const tourIdeasQuery = `
 export const circuitsQuery = `
   *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
     "slug": slug.current,
-    title,
-    totalDays,
-    stopDays[]{ days }
+    "key": coalesce(translationGroup, slug.current),
+    title
   }
 `

@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { ArrowRight, Bus, Car, Languages, MapPinned, ShieldCheck, Tag, Users } from 'lucide-react'
+import { ArrowRight, Car, Languages, MapPinned, ShieldCheck, Tag, Users } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
-import { getVehicleRates, formatEuro } from '@/lib/pricing'
+import { getVehicles } from '@/lib/pricing'
+import { formatEuro } from '@/lib/trip-pricing'
 import { localizeInternalPath } from '@/lib/localized-path'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
@@ -22,30 +23,11 @@ function getQualities(value: unknown): Quality[] {
 }
 
 export async function CarRentSection({ locale }: { locale: Locale }) {
-  const [t, rates] = await Promise.all([
+  const [t, vehicles] = await Promise.all([
     getTranslations({ locale, namespace: 'carRent' }),
-    getVehicleRates(),
+    getVehicles(),
   ])
   const qualities = getQualities(t.raw('qualities'))
-
-  const vehicles = [
-    {
-      key: '4x4',
-      icon: Car,
-      label: t('vehicle4x4'),
-      text: t('vehicle4x4Text'),
-      price: formatEuro(rates.fourByFourPerDay, locale),
-      model: rates.fourByFourModel,
-    },
-    {
-      key: 'minivan',
-      icon: Bus,
-      label: t('vehicleMinivan'),
-      text: t('vehicleMinivanText'),
-      price: formatEuro(rates.miniVanPerDay, locale),
-      model: rates.miniVanModel,
-    },
-  ]
 
   return (
     <section
@@ -96,26 +78,28 @@ export async function CarRentSection({ locale }: { locale: Locale }) {
               {t('vehiclesTitle')}
             </h3>
             <div className="mt-5 space-y-4">
-              {vehicles.map(({ key, icon: Icon, label, text, price, model }) => (
+              {vehicles.map((vehicle) => (
                 <div
-                  key={key}
+                  key={vehicle.id}
                   className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E0A01C]/15 text-[#8a5f00]">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
+                      <Car className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-900">{label}</p>
-                      <p className="text-sm text-slate-600">{text}</p>
+                      <p className="font-semibold text-slate-900">{vehicle.name}</p>
+                      <p className="text-sm text-slate-600">{t('seats', { count: vehicle.seats })}</p>
                     </div>
                   </div>
                   <p className="mt-4 text-2xl font-bold text-[#06245F]">
-                    {t('perDay', { price })}
+                    {t('perDay', { price: formatEuro(vehicle.dailyRate, locale) })}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {t('indicativeModel', { model })}
-                  </p>
+                  {vehicle.modelName && (
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t('indicativeModel', { model: vehicle.modelName })}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
