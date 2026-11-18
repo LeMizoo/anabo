@@ -157,7 +157,10 @@
     "durationToDefine": "Durée à définir : demandez un devis personnalisé.",
     "cardFrom": "{count, plural, one {# jour} other {# jours}} · dès {price} en 4x4",
     "vehicleField": "Véhicule souhaité",
-    "vehicleUndecided": "À définir avec vous"
+    "vehicleUndecided": "À définir avec vous",
+    "totalDuration": "Durée totale du voyage : {count, plural, one {# jour} other {# jours}}",
+    "durationUnknown": "{count, plural, one {La durée d'un circuit reste à confirmer} other {La durée de # circuits reste à confirmer}}.",
+    "durationNote": "Calculée à partir des jours de chaque circuit choisi, indépendamment des dates ci-dessous."
   },
   "carRent": {
     "eyebrow": "Car Rent avec chauffeur-guide",

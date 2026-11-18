@@ -1,7 +1,8 @@
 import type { Locale } from '@/lib/i18n'
 import { sanityClient } from '@/lib/sanity'
 import { unstable_noStore as noStore } from 'next/cache'
-import { circuitTotalDaysQuery } from '@/lib/queries'
+import { circuitDurationsQuery } from '@/lib/queries'
+import { circuitDurationDays, type CircuitDurationSource } from '@/lib/duration'
 
 export type VehicleType = '4x4' | 'minivan'
 
@@ -96,16 +97,41 @@ export function formatEuro(amount: number, locale: Locale): string {
   }).format(amount)
 }
 
-export async function getCircuitTotalDays(slug: string, locale: Locale): Promise<number | null> {
+type CircuitDurationRow = CircuitDurationSource & { slug: string; language?: string }
+
+// Durée cumulée de plusieurs circuits : somme des stopDays de chacun.
+// Renvoie null si un circuit est introuvable ou sans durée, pour ne jamais
+// afficher un prix partiel trompeur.
+export async function getCircuitsTotalDays(
+  slugs: string[],
+  locale: Locale,
+): Promise<number | null> {
+  const uniqueSlugs = Array.from(new Set(slugs.filter(Boolean)))
+  if (uniqueSlugs.length === 0) return null
+
   try {
-    const totalDays = await sanityClient.fetch<number | null>(
-      circuitTotalDaysQuery,
-      { slug, locale },
+    const rows = await sanityClient.fetch<CircuitDurationRow[]>(
+      circuitDurationsQuery,
+      { slugs: uniqueSlugs },
       { cache: 'no-store' },
     )
-    return isValidTotalDays(totalDays) ? totalDays : null
+
+    let total = 0
+    for (const slug of uniqueSlugs) {
+      const candidates = rows
+        .filter((row) => row.slug === slug)
+        .sort((a, b) => Number(b.language === locale) - Number(a.language === locale))
+      const days = candidates
+        .map((row) => circuitDurationDays(row))
+        .find((value): value is number => value !== null)
+
+      if (!days) return null
+      total += days
+    }
+
+    return isValidTotalDays(total) ? total : null
   } catch (error) {
-    console.error('[pricing] Lecture du nombre de jours impossible :', error)
+    console.error('[pricing] Lecture des durées impossible :', error)
     return null
   }
 }
@@ -120,12 +146,12 @@ export type QuoteEstimate = {
 // Calcul côté serveur : le client n'envoie jamais de prix.
 export async function estimateQuote(
   vehicleType: VehicleType,
-  circuitSlug: string | null,
+  circuitSlugs: string[],
   locale: Locale,
 ): Promise<QuoteEstimate> {
   const [rates, totalDays] = await Promise.all([
     getVehicleRates(),
-    circuitSlug ? getCircuitTotalDays(circuitSlug, locale) : Promise.resolve(null),
+    getCircuitsTotalDays(circuitSlugs, locale),
   ])
   const dailyRate = dailyRateFor(rates, vehicleType)
 

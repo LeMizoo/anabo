@@ -6,10 +6,13 @@ import { useTranslations } from 'next-intl'
 import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
 import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { circuitDurationDays, cumulateDurations } from '@/lib/duration'
 
 type Circuit = {
   slug: string
   title: string
+  totalDays?: number
+  stopDays?: { days: number }[]
 }
 
 type Props = {
@@ -41,6 +44,18 @@ export function ContactForm({ block, circuits = [] }: Props) {
   
   const [selectedCircuit, setSelectedCircuit] = useState('')
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
+
+  // Durée du voyage : somme des jours (stopDays) de chaque circuit choisi.
+  // Elle ne dépend pas des dates saisies par le client.
+  const chosenSlugs = Array.from(
+    new Set([selectedCircuit, ...extraCircuits].filter(Boolean)),
+  )
+  const chosenCircuits = chosenSlugs
+    .map((slug) => circuits.find((circuit) => circuit.slug === slug))
+    .filter((circuit): circuit is Circuit => Boolean(circuit))
+  const chosenDurations = chosenCircuits.map((circuit) => circuitDurationDays(circuit))
+  const cumulated = cumulateDurations(chosenDurations)
+  const daysOf = (circuit: Circuit) => circuitDurationDays(circuit)
 
   useEffect(() => {
     if (!activeModalForm) return
@@ -117,6 +132,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
     const payload = {
       locale,
       circuitSlug: circuitSlug || (extraCircuits.length > 0 ? 'extensions' : ''),
+      circuitSlugs: chosenSlugs,
       circuitTitle,
       firstName: String(form.get('firstName') || '').trim(),
       lastName: String(form.get('lastName') || '').trim(),
@@ -198,9 +214,14 @@ export function ContactForm({ block, circuits = [] }: Props) {
                       disabled={sending}
                     >
                       <option value="">{t('circuitDefault')}</option>
-                      {circuits.map((c) => (
-                        <option key={c.slug} value={c.slug}>{c.title}</option>
-                      ))}
+                      {circuits.map((c) => {
+                        const days = daysOf(c)
+                        return (
+                          <option key={c.slug} value={c.slug}>
+                            {days ? `${c.title} — ${tp('days', { count: days })}` : c.title}
+                          </option>
+                        )
+                      })}
                     </select>
                   </label>
 
@@ -220,11 +241,45 @@ export function ContactForm({ block, circuits = [] }: Props) {
                               className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             />
                             {c.title}
+                            {daysOf(c) ? (
+                              <span className="text-gray-500"> ({tp('days', { count: daysOf(c) as number })})</span>
+                            ) : null}
                           </label>
                         )
                       })}
                     </div>
                   </div>
+
+                  {chosenCircuits.length > 0 && (
+                    <div
+                      className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-gray-800"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      <ul className="space-y-1">
+                        {chosenCircuits.map((circuit, index) => {
+                          const days = chosenDurations[index]
+                          return (
+                            <li key={circuit.slug} className="flex justify-between gap-3">
+                              <span>{index > 0 ? '+ ' : ''}{circuit.title}</span>
+                              <span className="shrink-0 font-medium">
+                                {days ? tp('days', { count: days }) : '—'}
+                              </span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                      <p className="mt-3 border-t border-amber-200 pt-3 font-semibold text-[#06245F]">
+                        {tp('totalDuration', { count: cumulated.totalDays })}
+                      </p>
+                      {cumulated.unknownCount > 0 && (
+                        <p className="mt-1 text-xs text-gray-600">
+                          {tp('durationUnknown', { count: cumulated.unknownCount })}
+                        </p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500">{tp('durationNote')}</p>
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -23,6 +23,8 @@ const quoteSchema = z.object({
   country: z.string().trim().max(100).optional().or(z.literal('')),
   circuitSlug: z.string().trim().max(191).optional().or(z.literal('')),
   circuitTitle: z.string().trim().max(191).optional().or(z.literal('')),
+  // Tous les circuits choisis (principal + extensions) : leurs jours s'additionnent.
+  circuitSlugs: z.array(z.string().trim().min(1).max(191)).max(20).optional(),
   startDate: optionalDate,
   endDate: optionalDate,
   adults: z.coerce.number().int().min(1).max(20).default(2),
@@ -96,14 +98,14 @@ export async function POST(request: Request) {
   // En cas d'échec de lecture Sanity, la demande est quand même enregistrée.
   let estimate: QuoteEstimate | null = null
   if (data.vehicleType) {
+    // La durée vient des circuits choisis (somme des stopDays dans Sanity),
+    // jamais des dates saisies ni d'un total envoyé par le navigateur.
+    const requestedSlugs = (
+      data.circuitSlugs ?? (data.circuitSlug ? [data.circuitSlug] : [])
+    ).filter((slug) => slug !== 'sur-mesure' && slug !== 'extensions')
+
     try {
-      estimate = await estimateQuote(
-        data.vehicleType,
-        data.circuitSlug && data.circuitSlug !== 'sur-mesure' && data.circuitSlug !== 'extensions'
-          ? data.circuitSlug
-          : null,
-        data.locale,
-      )
+      estimate = await estimateQuote(data.vehicleType, requestedSlugs, data.locale)
     } catch (estimateError) {
       console.error('[api/quotes] Estimate failed:', estimateError)
     }

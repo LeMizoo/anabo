@@ -157,7 +157,10 @@
     "durationToDefine": "Durata da definire: richiedete un preventivo personalizzato.",
     "cardFrom": "{count, plural, one {# giorno} other {# giorni}} · da {price} in 4x4",
     "vehicleField": "Veicolo preferito",
-    "vehicleUndecided": "Da definire insieme"
+    "vehicleUndecided": "Da definire insieme",
+    "totalDuration": "Durata totale del viaggio: {count, plural, one {# giorno} other {# giorni}}",
+    "durationUnknown": "{count, plural, one {La durata di un circuito è ancora da confermare} other {La durata di # circuiti è ancora da confermare}}.",
+    "durationNote": "Calcolata in base ai giorni di ogni circuito scelto, indipendentemente dalle date qui sotto."
   },
   "carRent": {
     "eyebrow": "Noleggio auto con autista-guida",

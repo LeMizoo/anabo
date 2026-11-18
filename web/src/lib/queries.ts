@@ -45,9 +45,13 @@ export const siteSettingsQuery = `
   }
 `
 
-export const circuitTotalDaysQuery = `
-  *[_type == "page" && slug.current == $slug && pageType == "circuit" && defined(totalDays)]
-    | order(language == $locale desc)[0].totalDays
+export const circuitDurationsQuery = `
+  *[_type == "page" && pageType == "circuit" && slug.current in $slugs]{
+    "slug": slug.current,
+    language,
+    totalDays,
+    stopDays[]{ days }
+  }
 `
 
 const pageModulesProjection = `
@@ -391,6 +395,7 @@ export const circuitsQuery = `
   *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
     "slug": slug.current,
     title,
-    totalDays
+    totalDays,
+    stopDays[]{ days }
   }
 `

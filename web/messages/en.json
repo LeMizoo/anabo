@@ -157,7 +157,10 @@
     "durationToDefine": "Duration to be defined: ask for a personalised quote.",
     "cardFrom": "{count, plural, one {# day} other {# days}} · from {price} by 4x4",
     "vehicleField": "Preferred vehicle",
-    "vehicleUndecided": "To be decided together"
+    "vehicleUndecided": "To be decided together",
+    "totalDuration": "Total trip duration: {count, plural, one {# day} other {# days}}",
+    "durationUnknown": "{count, plural, one {The duration of one tour is still to be confirmed} other {The duration of # tours is still to be confirmed}}.",
+    "durationNote": "Calculated from the days of each selected tour, regardless of the dates below."
   },
   "carRent": {
     "eyebrow": "Car rental with driver-guide",

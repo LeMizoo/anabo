@@ -506,4 +506,5 @@ export interface Circuit {
   slug: string
   title: string
   totalDays?: number
+  stopDays?: Pick<StopDay, 'days'>[]
 }
