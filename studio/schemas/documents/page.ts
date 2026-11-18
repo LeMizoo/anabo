@@ -120,7 +120,7 @@ export default {
       type: 'number',
       title: 'Nombre total de jours du circuit',
       description:
-        'Sert au calcul du prix : nombre de jours × tarif journalier du véhicule (voir Paramètres du site › Tarifs véhicules). Pas de prix par personne.',
+        'Sert au calcul du prix : nombre de jours × tarif journalier du véhicule. Les tarifs (4x4, Mini van) se modifient dans l’administration du site : /admin/prix. Pas de prix par personne.',
       hidden: ({ document }: any) =>
         document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
       validation: (Rule: any) => Rule.integer().min(1).max(60),

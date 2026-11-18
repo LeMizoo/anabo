@@ -8,7 +8,6 @@ export default {
     { name: 'headerFooter', title: 'En-tête et pied de page' },
     { name: 'contact', title: 'Contact' },
     { name: 'social', title: 'Réseaux sociaux' },
-    { name: 'pricing', title: 'Tarifs véhicules' },
   ],
   fields: [
     {
@@ -209,43 +208,6 @@ export default {
       title: 'Adresse',
       rows: 2,
       group: 'contact',
-    },
-    {
-      name: 'vehicleRates',
-      type: 'object',
-      title: 'Tarifs des véhicules (par jour)',
-      description:
-        'Prix par véhicule et par jour, jamais par personne. Le prix d’un circuit = nombre total de jours du circuit × tarif journalier du véhicule. Les modèles (Prado, Grand Starex) sont indicatifs : plusieurs véhicules restent possibles selon la demande.',
-      group: 'pricing',
-      options: { collapsible: false },
-      fields: [
-        {
-          name: 'fourByFourPerDay',
-          type: 'number',
-          title: '4x4 — prix par jour (€)',
-          initialValue: 80,
-          validation: (Rule: any) => Rule.required().min(0).precision(2),
-        },
-        {
-          name: 'fourByFourModel',
-          type: 'string',
-          title: '4x4 — modèle indicatif',
-          initialValue: 'Prado',
-        },
-        {
-          name: 'miniVanPerDay',
-          type: 'number',
-          title: 'Mini van — prix par jour (€)',
-          initialValue: 100,
-          validation: (Rule: any) => Rule.required().min(0).precision(2),
-        },
-        {
-          name: 'miniVanModel',
-          type: 'string',
-          title: 'Mini van — modèle indicatif',
-          initialValue: 'Grand Starex',
-        },
-      ],
     },
     {
       name: 'socialLinks',

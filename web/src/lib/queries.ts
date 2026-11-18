@@ -45,15 +45,6 @@ export const siteSettingsQuery = `
   }
 `
 
-export const vehicleRatesQuery = `
-  *[_type == "siteSettings"][0].vehicleRates{
-    fourByFourPerDay,
-    fourByFourModel,
-    miniVanPerDay,
-    miniVanModel
-  }
-`
-
 export const circuitTotalDaysQuery = `
   *[_type == "page" && slug.current == $slug && pageType == "circuit" && defined(totalDays)]
     | order(language == $locale desc)[0].totalDays

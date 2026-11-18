@@ -289,3 +289,53 @@ export async function changePassword(currentPassword: string, newPassword: strin
 
   return { success: true }
 }
+
+// Tarifs journaliers des véhicules (page /admin/prix).
+// Prix par véhicule et par jour, jamais par personne.
+const VEHICLE_RATE_FIELDS = [
+  { type: '4x4', label: '4x4', rateField: 'rate4x4', modelField: 'model4x4' },
+  { type: 'minivan', label: 'Mini van', rateField: 'rateMinivan', modelField: 'modelMinivan' },
+] as const
+
+export async function saveVehicleRates(
+  formData: FormData,
+): Promise<{ success: true } | { success: false; error: string }> {
+  await requireSession()
+
+  const parsed: { type: string; dailyRate: number; modelName: string }[] = []
+
+  for (const field of VEHICLE_RATE_FIELDS) {
+    const rawRate = String(formData.get(field.rateField) ?? '').trim().replace(',', '.')
+    const dailyRate = Number(rawRate)
+    const modelName = String(formData.get(field.modelField) ?? '').trim().slice(0, 100)
+
+    if (!rawRate || !Number.isInteger(dailyRate) || dailyRate < 0 || dailyRate > 100000) {
+      return {
+        success: false,
+        error: `Tarif ${field.label} invalide : saisissez un nombre entier d'euros par jour (0 à 100000).`,
+      }
+    }
+
+    if (!modelName) {
+      return { success: false, error: `Le modèle indicatif du ${field.label} est requis.` }
+    }
+
+    parsed.push({ type: field.type, dailyRate, modelName })
+  }
+
+  await prisma.$transaction(
+    parsed.map(({ type, dailyRate, modelName }) =>
+      prisma.vehicleRate.upsert({
+        where: { vehicleType: type },
+        update: { dailyRate, modelName },
+        create: { vehicleType: type, dailyRate, modelName },
+      }),
+    ),
+  )
+
+  revalidatePath('/admin/prix')
+  // Les prix s'affichent sur l'accueil, les pages circuit et tour-ideas.
+  revalidatePath('/', 'layout')
+
+  return { success: true }
+}

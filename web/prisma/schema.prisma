@@ -76,3 +76,12 @@ model AdminUser {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
+
+// Tarifs journaliers par véhicule (en euros), modifiables dans /admin/prix.
+// Prix par véhicule et par jour, jamais par personne.
+model VehicleRate {
+  vehicleType String   @id @db.VarChar(20) // "4x4" | "minivan"
+  dailyRate   Int
+  modelName   String   @db.VarChar(100) // modèle indicatif (Prado, Grand Starex)
+  updatedAt   DateTime @updatedAt
+}

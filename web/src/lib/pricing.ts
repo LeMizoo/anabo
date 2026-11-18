@@ -1,6 +1,7 @@
 import type { Locale } from '@/lib/i18n'
 import { sanityClient } from '@/lib/sanity'
-import { circuitTotalDaysQuery, vehicleRatesQuery } from '@/lib/queries'
+import { unstable_noStore as noStore } from 'next/cache'
+import { circuitTotalDaysQuery } from '@/lib/queries'
 
 export type VehicleType = '4x4' | 'minivan'
 
@@ -13,8 +14,7 @@ export type VehicleRates = {
   miniVanModel: string
 }
 
-// Valeurs par défaut, utilisées tant que les tarifs ne sont pas saisis dans
-// Sanity Studio (Paramètres du site › Tarifs véhicules).
+// Valeurs par défaut, utilisées si la table VehicleRate est vide ou illisible.
 export const DEFAULT_VEHICLE_RATES: VehicleRates = {
   fourByFourPerDay: 80,
   fourByFourModel: 'Prado',
@@ -41,14 +41,23 @@ export function resolveVehicleRates(raw?: Partial<VehicleRates> | null): Vehicle
   }
 }
 
+// Les tarifs sont modifiés dans /admin/prix et stockés dans Prisma (table VehicleRate).
 export async function getVehicleRates(): Promise<VehicleRates> {
+  // Les tarifs peuvent changer à tout moment : jamais de page figée au build.
+  noStore()
+
   try {
-    const raw = await sanityClient.fetch<Partial<VehicleRates> | null>(
-      vehicleRatesQuery,
-      {},
-      { cache: 'no-store' },
-    )
-    return resolveVehicleRates(raw)
+    const { prisma } = await import('@/lib/prisma')
+    const rows = await prisma.vehicleRate.findMany()
+    const fourByFour = rows.find((row) => row.vehicleType === '4x4')
+    const miniVan = rows.find((row) => row.vehicleType === 'minivan')
+
+    return resolveVehicleRates({
+      fourByFourPerDay: fourByFour?.dailyRate,
+      fourByFourModel: fourByFour?.modelName,
+      miniVanPerDay: miniVan?.dailyRate,
+      miniVanModel: miniVan?.modelName,
+    })
   } catch (error) {
     console.error('[pricing] Lecture des tarifs impossible, valeurs par défaut utilisées :', error)
     return DEFAULT_VEHICLE_RATES
