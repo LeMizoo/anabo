@@ -1,3 +1,4 @@
+
 {
   "nav": {
     "home": "Accueil",
@@ -117,6 +118,8 @@
     "circuit": "Circuit principal souhaité",
     "circuitDefault": "Sur-mesure / Je ne sais pas encore",
     "circuitExtras": "Souhaitez-vous ajouter une extension ?",
+    "totalDuration": "Durée totale du séjour : {days} jours",
+    "durationIncomplete": "La durée de certains circuits sélectionnés n'est pas encore renseignée.",
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Adresse e-mail",

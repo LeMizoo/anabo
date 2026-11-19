@@ -383,6 +383,10 @@ export const tourIdeasQuery = `
 export const circuitsQuery = `
   *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
     "slug": slug.current,
-    title
+    title,
+    stopDays[] {
+      place,
+      days
+    }
   }
 `

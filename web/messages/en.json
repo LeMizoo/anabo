@@ -1,3 +1,4 @@
+
 {
   "nav": {
     "home": "Home",
@@ -117,6 +118,8 @@
     "circuit": "Main desired tour",
     "circuitDefault": "Tailor-made / I don't know yet",
     "circuitExtras": "Would you like to add an extension?",
+    "totalDuration": "Total trip duration: {days} days",
+    "durationIncomplete": "The duration of some selected tours has not been entered yet.",
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email address",

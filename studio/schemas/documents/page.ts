@@ -95,7 +95,7 @@ export default {
       type: 'string',
       title: 'Accroche de la carte circuit',
       description: 'Courte accroche affichée sur la carte du circuit dans la liste des voyages.',
-      hidden: ({ document }) => document?.pageType !== 'circuit',
+      hidden: ({ document }: any) => document?.pageType !== 'circuit',
       group: 'content',
     },
     defineField({
@@ -103,8 +103,8 @@ export default {
       type: 'array',
       title: 'Étapes de l’itinéraire',
       description:
-        'Visible pour les circuits et voyages sur mesure. Ajoutez une étape par élément, dans l’ordre réel du trajet, du départ à l’arrivée. Saisissez des lieux précis (ex. « Antananarivo, Madagascar »), pas le titre du circuit. Au moins deux étapes sont nécessaires pour afficher la carte.',
-      hidden: ({ document }) =>
+        'Visible pour les circuits et voyages sur mesure. Ajoutez les lieux dans l’ordre réel du trajet. Au moins deux étapes sont nécessaires pour afficher la carte.',
+      hidden: ({ document }: any) =>
         document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
       of: [
         {
@@ -113,14 +113,82 @@ export default {
         },
       ],
       validation: (Rule) =>
-        Rule.custom((stops) => {
+        Rule.custom((stops: any) => {
           if (!Array.isArray(stops) || stops.length === 0) return true
           if (stops.length < 2) return 'Ajoutez au moins deux étapes pour définir un itinéraire.'
-          if (stops.some((stop) => typeof stop !== 'string' || stop.trim().length < 2)) {
+          if (stops.some((stop: any) => typeof stop !== 'string' || stop.trim().length < 2)) {
             return 'Chaque étape doit contenir un nom de lieu précis.'
           }
           return true
         }),
+      group: 'content',
+    }),
+    defineField({
+      name: 'totalDays',
+      type: 'number',
+      title: 'Nombre total de jours du circuit',
+      description:
+        'Durée totale de référence du circuit. Le calcul du tarif utilise la somme des jours renseignés dans « Jours par escale ». Ce total sert à vérifier la cohérence du programme.',
+      hidden: ({ document }: any) =>
+        document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
+      validation: (Rule) => Rule.integer().min(1).max(60),
+      group: 'content',
+    }),
+    defineField({
+      name: 'stopDays',
+      type: 'array',
+      title: 'Jours par escale',
+      description:
+        'Renseignez chaque escale du programme et le nombre de jours passés sur place. La somme de ces jours sera utilisée pour calculer le prix du véhicule.',
+      hidden: ({ document }: any) =>
+        document?.pageType !== 'circuit' && document?.pageType !== 'custom-trip',
+      of: [
+        {
+          type: 'object',
+          name: 'stopDay',
+          fields: [
+            {
+              name: 'place',
+              type: 'string',
+              title: 'Escale',
+              validation: (Rule) => Rule.required().min(2),
+            },
+            {
+              name: 'days',
+              type: 'number',
+              title: 'Nombre de jours',
+              initialValue: 1,
+              validation: (Rule) => Rule.required().integer().min(1).max(30),
+            },
+          ],
+          preview: {
+            select: { title: 'place', days: 'days' },
+            prepare({ title, days }: { title?: string; days?: number }) {
+              return {
+                title: title || 'Escale',
+                subtitle: days ? `${days} jour${days > 1 ? 's' : ''}` : '',
+              }
+            },
+          },
+        },
+      ],
+      validation: (Rule) =>
+        Rule.custom((stops: any, context: any) => {
+          if (!Array.isArray(stops) || stops.length === 0) return true
+
+          const sum = (stops as { days?: number }[]).reduce<number>(
+            (acc, stop) => acc + (Number(stop.days) || 0),
+            0,
+          )
+
+          const total = (context.document as { totalDays?: number } | undefined)?.totalDays
+
+          if (total && sum !== total) {
+            return `La somme des jours par escale (${sum}) ne correspond pas au total du circuit (${total}).`
+          }
+
+          return true
+        }).warning(),
       group: 'content',
     }),
     {
@@ -141,7 +209,6 @@ export default {
         { type: 'puzzleGalleryBlock' },
         { type: 'alternatingBlock' },
         { type: 'featuresBlock' },
-        // 👇 AJOUT IMPORTANT ICI 👇
         { type: 'commitmentsBlock' },
         { type: 'imageBlock' },
         { type: 'imageMarqueeBlock' },

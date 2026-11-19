@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
@@ -10,6 +11,10 @@ import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
 type Circuit = {
   slug: string
   title: string
+  stopDays?: {
+    place?: string
+    days: number
+  }[]
 }
 
 type Props = {
@@ -22,7 +27,6 @@ export function ContactForm({ block, circuits = [] }: Props) {
   const firstSegment = pathname.split('/').filter(Boolean)[0]
   const locale = ['fr', 'en', 'it'].includes(firstSegment) ? firstSegment : 'fr'
 
-  // 👇 Récupération des traductions 👇
   const t = useTranslations('contactForm')
 
   const isModalChoice = block.formType === 'both'
@@ -37,9 +41,24 @@ export function ContactForm({ block, circuits = [] }: Props) {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
-  
+
   const [selectedCircuit, setSelectedCircuit] = useState('')
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
+
+  const selectedCircuitSlugs = [
+    ...(selectedCircuit ? [selectedCircuit] : []),
+    ...extraCircuits,
+  ]
+
+  const totalDays = selectedCircuitSlugs.reduce((total, slug) => {
+    const circuit = circuits.find(item => item.slug === slug)
+    const circuitDays = circuit?.stopDays?.reduce(
+      (sum, stop) => sum + (Number.isFinite(stop.days) && stop.days > 0 ? stop.days : 0),
+      0,
+    ) ?? 0
+
+    return total + circuitDays
+  }, 0)
 
   useEffect(() => {
     if (!activeModalForm) return
@@ -85,9 +104,9 @@ export function ContactForm({ block, circuits = [] }: Props) {
   }, [activeModalForm])
 
   const toggleExtraCircuit = (slug: string) => {
-    setExtraCircuits(prev => 
-      prev.includes(slug) 
-        ? prev.filter(item => item !== slug) 
+    setExtraCircuits(prev =>
+      prev.includes(slug)
+        ? prev.filter(item => item !== slug)
         : [...prev, slug]
     )
   }
@@ -161,147 +180,170 @@ export function ContactForm({ block, circuits = [] }: Props) {
 
   const formCard = (
     <div className="mx-auto max-w-3xl px-4">
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-          {block.title && (
-            <h2
-              className={`mb-3 text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'}`}
-              style={{ color: brandTextColor(block.titleColor) }}
-            >
-              {titleCase(block.title, locale)}
-            </h2>
-          )}
-          {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+        {block.title && (
+          <h2
+            className={`mb-3 text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'}`}
+            style={{ color: brandTextColor(block.titleColor) }}
+          >
+            {titleCase(block.title, locale)}
+          </h2>
+        )}
+        {block.description && <p className="mb-6 text-gray-600">{block.description}</p>}
 
-          {reference ? (
-            <div className="flex gap-3 rounded-xl border border-green-200 bg-green-50 p-5 text-green-900" role="status" aria-live="polite">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-              <div>
-                <p className="font-semibold">{t('success')}</p>
-                <p className="mt-2">{t('reference')}: <strong>{reference}</strong></p>
-              </div>
+        {reference ? (
+          <div className="flex gap-3 rounded-xl border border-green-200 bg-green-50 p-5 text-green-900" role="status" aria-live="polite">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <div>
+              <p className="font-semibold">{t('success')}</p>
+              <p className="mt-2">{t('reference')}: <strong>{reference}</strong></p>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6" aria-busy={sending}>
-              
-              {isQuote && circuits.length > 0 && (
-                <div className="space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
-                  <label htmlFor="circuitSlug" className="block text-sm font-medium text-gray-700">
-                    {t('circuit')}
-                    <select
-                      id="circuitSlug"
-                      className={inputClass}
-                      name="circuitSlug"
-                      value={selectedCircuit}
-                      onChange={(e) => setSelectedCircuit(e.target.value)}
-                      disabled={sending}
-                    >
-                      <option value="">{t('circuitDefault')}</option>
-                      {circuits.map((c) => (
-                        <option key={c.slug} value={c.slug}>{c.title}</option>
-                      ))}
-                    </select>
-                  </label>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6" aria-busy={sending}>
 
-                  <div className="pt-2">
-                    <p className="mb-2 text-sm font-medium text-gray-700">{t('circuitExtras')}</p>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {circuits.map((c) => {
-                        if (c.slug === selectedCircuit) return null
-                        return (
-                          <label key={c.slug} className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-gray-900">
-                            <input
-                              type="checkbox"
-                              value={c.slug}
-                              checked={extraCircuits.includes(c.slug)}
-                              onChange={() => toggleExtraCircuit(c.slug)}
-                              disabled={sending}
-                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                            />
-                            {c.title}
-                          </label>
-                        )
-                      })}
-                    </div>
+            {isQuote && circuits.length > 0 && (
+              <div className="space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
+                <label htmlFor="circuitSlug" className="block text-sm font-medium text-gray-700">
+                  {t('circuit')}
+                  <select
+                    id="circuitSlug"
+                    className={inputClass}
+                    name="circuitSlug"
+                    value={selectedCircuit}
+                    onChange={(e) => {
+                      setSelectedCircuit(e.target.value)
+                      setExtraCircuits(prev => prev.filter(slug => slug !== e.target.value))
+                    }}
+                    disabled={sending}
+                  >
+                    <option value="">{t('circuitDefault')}</option>
+                    {circuits.map((c) => (
+                      <option key={c.slug} value={c.slug}>{c.title}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="pt-2">
+                  <p className="mb-2 text-sm font-medium text-gray-700">{t('circuitExtras')}</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {circuits.map((c) => {
+                      if (c.slug === selectedCircuit) return null
+                      return (
+                        <label key={c.slug} className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+                          <input
+                            type="checkbox"
+                            value={c.slug}
+                            checked={extraCircuits.includes(c.slug)}
+                            onChange={() => toggleExtraCircuit(c.slug)}
+                            disabled={sending}
+                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                          />
+                          {c.title}
+                        </label>
+                      )
+                    })}
                   </div>
                 </div>
-              )}
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('firstName')} *
-                  <input className={inputClass} name="firstName" autoComplete="given-name" maxLength={100} required disabled={sending} />
-                </label>
-
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('lastName')} *
-                  <input className={inputClass} name="lastName" autoComplete="family-name" maxLength={100} required disabled={sending} />
-                </label>
-
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('email')} *
-                  <input className={inputClass} name="email" type="email" autoComplete="email" maxLength={191} required disabled={sending} />
-                </label>
-
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('phone')} *
-                  <input className={inputClass} name="phone" type="tel" autoComplete="tel" maxLength={40} required disabled={sending} />
-                </label>
-
-                <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
-                  {t('country')}
-                  <input className={inputClass} name="country" autoComplete="country-name" maxLength={100} disabled={sending} />
-                </label>
               </div>
+            )}
 
-              {isQuote && (
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t('startDate')}
-                    <input className={inputClass} name="startDate" type="date" disabled={sending} />
-                  </label>
+            {isQuote && selectedCircuitSlugs.length > 0 && (
+              <div
+                className="rounded-xl border border-primary-200 bg-primary-50 px-5 py-4"
+                role="status"
+                aria-live="polite"
+              >
+                <p className="text-sm font-medium text-gray-700">
+                  {t('totalDuration', { days: totalDays })}
+                </p>
+                {selectedCircuitSlugs.some(slug => {
+                  const circuit = circuits.find(item => item.slug === slug)
+                  return !circuit?.stopDays?.some(stop => Number.isFinite(stop.days) && stop.days > 0)
+                }) && (
+                  <p className="mt-1 text-xs text-gray-600">
+                    {t('durationIncomplete')}
+                  </p>
+                )}
+              </div>
+            )}
 
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t('endDate')}
-                    <input className={inputClass} name="endDate" type="date" disabled={sending} />
-                  </label>
-
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t('adults')}
-                    <input className={inputClass} name="adults" type="number" min={1} max={20} defaultValue={2} required disabled={sending} />
-                  </label>
-
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t('children')}
-                    <input className={inputClass} name="children" type="number" min={0} max={20} defaultValue={0} required disabled={sending} />
-                  </label>
-                </div>
-              )}
-
+            <div className="grid gap-5 sm:grid-cols-2">
               <label className="block text-sm font-medium text-gray-700">
-                {t('message')}
-                <textarea className={inputClass} name="message" rows={5} maxLength={5000} disabled={sending} />
+                {t('firstName')} *
+                <input className={inputClass} name="firstName" autoComplete="given-name" maxLength={100} required disabled={sending} />
               </label>
 
-              {error && (
-                <p className="flex items-start gap-2 text-sm text-red-700" role="alert">
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                  {error || t('required')}
-                </p>
-              )}
+              <label className="block text-sm font-medium text-gray-700">
+                {t('lastName')} *
+                <input className={inputClass} name="lastName" autoComplete="family-name" maxLength={100} required disabled={sending} />
+              </label>
 
-              <button
-                type="submit"
-                disabled={sending}
-                aria-live="polite"
-                className="inline-flex min-w-48 items-center justify-center gap-2 rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {sending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-                {sending ? t('sending') : isQuote ? t('submitQuote') : t('submit')}
-              </button>
-            </form>
-          )}
-        </div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t('email')} *
+                <input className={inputClass} name="email" type="email" autoComplete="email" maxLength={191} required disabled={sending} />
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                {t('phone')} *
+                <input className={inputClass} name="phone" type="tel" autoComplete="tel" maxLength={40} required disabled={sending} />
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
+                {t('country')}
+                <input className={inputClass} name="country" autoComplete="country-name" maxLength={100} disabled={sending} />
+              </label>
+            </div>
+
+            {isQuote && (
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('startDate')}
+                  <input className={inputClass} name="startDate" type="date" disabled={sending} />
+                </label>
+
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('endDate')}
+                  <input className={inputClass} name="endDate" type="date" disabled={sending} />
+                </label>
+
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adults')}
+                  <input className={inputClass} name="adults" type="number" min={1} max={20} defaultValue={2} required disabled={sending} />
+                </label>
+
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('children')}
+                  <input className={inputClass} name="children" type="number" min={0} max={20} defaultValue={0} required disabled={sending} />
+                </label>
+              </div>
+            )}
+
+            <label className="block text-sm font-medium text-gray-700">
+              {t('message')}
+              <textarea className={inputClass} name="message" rows={5} maxLength={5000} disabled={sending} />
+            </label>
+
+            {error && (
+              <p className="flex items-start gap-2 text-sm text-red-700" role="alert">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                {error || t('required')}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={sending}
+              aria-live="polite"
+              className="inline-flex min-w-48 items-center justify-center gap-2 rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {sending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+              {sending ? t('sending') : isQuote ? t('submitQuote') : t('submit')}
+            </button>
+          </form>
+        )}
       </div>
+    </div>
   )
 
   if (isModalChoice) {

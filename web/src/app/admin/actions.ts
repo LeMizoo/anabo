@@ -1,10 +1,15 @@
+
 'use server'
 
 import { randomBytes } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { revalidatePath } from 'next/cache'
 import { Prisma } from '@/generated/prisma/client'
-import { QuoteStatus } from '@/generated/prisma/enums'
+import {
+  QuoteStatus,
+  RoadCondition,
+  TravelSeason,
+} from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { sendQuoteStatusEmail, sendNewUserEmail } from '@/lib/email'
@@ -17,15 +22,21 @@ type Role = (typeof ROLES)[number]
 
 async function requireSession() {
   const session = await auth()
-  if (!session?.user) throw new Error('Non autorisé')
+
+  if (!session?.user) {
+    throw new Error('Non autorisé')
+  }
+
   return session
 }
 
 async function requireSuperAdmin() {
   const session = await requireSession()
+
   if ((session.user as { role?: string }).role !== 'SUPER_ADMIN') {
     throw new Error('Seul un SUPER_ADMIN peut effectuer cette action.')
   }
+
   return session
 }
 
@@ -45,16 +56,26 @@ export async function updateQuoteStatus(
     select: { status: true },
   })
 
-  if (!existingQuote) throw new Error('Demande introuvable')
+  if (!existingQuote) {
+    throw new Error('Demande introuvable')
+  }
 
   const now = new Date()
   const dateData: Prisma.QuoteRequestUpdateInput = {}
 
   switch (newStatus) {
-    case 'CONTACTE': dateData.contactedAt = now; break
-    case 'DEVIS_ENVOYE': dateData.quoteSentAt = now; break
-    case 'CONFIRME': dateData.confirmedAt = now; break
-    case 'PERDU': dateData.lostAt = now; break
+    case 'CONTACTE':
+      dateData.contactedAt = now
+      break
+    case 'DEVIS_ENVOYE':
+      dateData.quoteSentAt = now
+      break
+    case 'CONFIRME':
+      dateData.confirmedAt = now
+      break
+    case 'PERDU':
+      dateData.lostAt = now
+      break
   }
 
   const updatedQuote = await prisma.quoteRequest.update({
@@ -93,6 +114,7 @@ export async function updateQuoteStatus(
       emailSent = true
     } catch (error) {
       console.error('Erreur e-mail :', error)
+
       emailError =
         "Le statut est mis à jour, mais l'e-mail n'a pas pu être envoyé."
     }
@@ -133,6 +155,114 @@ export async function saveQuoteDetails(
   return { success: true }
 }
 
+/**
+ * Enregistre la préparation du voyage.
+ *
+ * La saison est déterminée automatiquement depuis la date de départ :
+ * - Mai à octobre : DRY
+ * - Novembre à avril : RAINY
+ *
+ * La durée indicative dépend du circuit, de la saison et de l'état des routes.
+ * La durée finale reste librement choisie par Vonjy.
+ */
+export async function saveTripPlanning(
+  quoteId: string,
+  roadCondition: RoadCondition,
+  selectedDurationDays: number,
+) {
+  await requireSession()
+
+  if (!quoteId.trim()) {
+    throw new Error('Identifiant de demande invalide.')
+  }
+
+  if (!Object.values(RoadCondition).includes(roadCondition)) {
+    throw new Error('État des routes invalide.')
+  }
+
+  if (
+    !Number.isInteger(selectedDurationDays) ||
+    selectedDurationDays < 1 ||
+    selectedDurationDays > 365
+  ) {
+    throw new Error('La durée choisie doit être comprise entre 1 et 365 jours.')
+  }
+
+  const quote = await prisma.quoteRequest.findUnique({
+    where: { id: quoteId },
+    select: {
+      id: true,
+      startDate: true,
+      circuitSlug: true,
+    },
+  })
+
+  if (!quote) {
+    throw new Error('Demande introuvable.')
+  }
+
+  if (!quote.startDate) {
+    throw new Error('La date de départ est nécessaire pour déterminer la saison.')
+  }
+
+  // Utilisation du mois UTC pour éviter les différences de fuseau
+  // entre le serveur et le navigateur.
+  const departureMonth = quote.startDate.getUTCMonth() + 1
+
+  const tripSeason: TravelSeason =
+    departureMonth >= 5 && departureMonth <= 10
+      ? 'DRY'
+      : 'RAINY'
+
+  let indicativeMinDays: number | null = null
+  let indicativeMaxDays: number | null = null
+
+  // Les circuits sur mesure n'ont pas de durée indicative configurée.
+  if (quote.circuitSlug && quote.circuitSlug !== 'sur-mesure') {
+    const duration = await prisma.circuitDuration.findUnique({
+      where: {
+        circuitSlug_season_roadCondition: {
+          circuitSlug: quote.circuitSlug,
+          season: tripSeason,
+          roadCondition,
+        },
+      },
+      select: {
+        minDays: true,
+        maxDays: true,
+      },
+    })
+
+    if (duration) {
+      indicativeMinDays = duration.minDays
+      indicativeMaxDays = duration.maxDays
+    }
+  }
+
+  await prisma.quoteRequest.update({
+    where: { id: quoteId },
+    data: {
+      tripSeason,
+      roadCondition,
+      indicativeMinDays,
+      indicativeMaxDays,
+      selectedDurationDays,
+    },
+  })
+
+  revalidatePath(`/admin/demandes/${quoteId}`)
+  revalidatePath('/admin/demandes')
+
+  return {
+    success: true,
+    tripSeason,
+    roadCondition,
+    indicativeMinDays,
+    indicativeMaxDays,
+    selectedDurationDays,
+  }
+}
+
 export async function confirmQuoteByClient(
   quoteId: string,
   token: string,
@@ -146,16 +276,27 @@ export async function confirmQuoteByClient(
     select: { status: true },
   })
 
-  if (!quote) return { success: false, error: 'Demande introuvable.' }
-  if (quote.status === 'CONFIRME') return { success: true }
+  if (!quote) {
+    return { success: false, error: 'Demande introuvable.' }
+  }
+
+  if (quote.status === 'CONFIRME') {
+    return { success: true }
+  }
 
   if (quote.status !== 'DEVIS_ENVOYE') {
-    return { success: false, error: "Ce devis n'est pas disponible à la confirmation." }
+    return {
+      success: false,
+      error: "Ce devis n'est pas disponible à la confirmation.",
+    }
   }
 
   await prisma.quoteRequest.update({
     where: { id: quoteId },
-    data: { status: 'CONFIRME', confirmedAt: new Date() },
+    data: {
+      status: 'CONFIRME',
+      confirmedAt: new Date(),
+    },
   })
 
   revalidatePath('/admin/demandes')
@@ -177,9 +318,17 @@ export async function createAdminUser(data: {
   const email = String(data.email || '').trim().toLowerCase().slice(0, 191)
   const role = data.role as Role
 
-  if (!name) throw new Error('Nom requis.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('E-mail invalide.')
-  if (!ROLES.includes(role)) throw new Error('Rôle invalide.')
+  if (!name) {
+    throw new Error('Nom requis.')
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error('E-mail invalide.')
+  }
+
+  if (!ROLES.includes(role)) {
+    throw new Error('Rôle invalide.')
+  }
 
   let tempPassword: string | undefined
   let password = data.password
@@ -191,8 +340,13 @@ export async function createAdminUser(data: {
     throw new Error('Mot de passe trop court (10 caractères minimum).')
   }
 
-  const existing = await prisma.adminUser.findUnique({ where: { email } })
-  if (existing) throw new Error('Un utilisateur avec cet e-mail existe déjà.')
+  const existing = await prisma.adminUser.findUnique({
+    where: { email },
+  })
+
+  if (existing) {
+    throw new Error('Un utilisateur avec cet e-mail existe déjà.')
+  }
 
   await prisma.adminUser.create({
     data: {
@@ -207,17 +361,25 @@ export async function createAdminUser(data: {
   try {
     await sendNewUserEmail(email, name, password, role)
   } catch (error) {
-    console.error('Erreur lors de l\'envoi de l\'email de création de compte:', error)
+    console.error(
+      "Erreur lors de l'envoi de l'email de création de compte:",
+      error,
+    )
   }
 
   revalidatePath('/admin/utilisateurs')
+
   return { success: true, tempPassword }
 }
 
-export async function toggleAdminUserStatus(userId: string, active: boolean) {
+export async function toggleAdminUserStatus(
+  userId: string,
+  active: boolean,
+) {
   await requireSuperAdmin()
 
   const session = await auth()
+
   if (session?.user?.id === userId && !active) {
     throw new Error('Vous ne pouvez pas désactiver votre propre compte.')
   }
@@ -228,6 +390,7 @@ export async function toggleAdminUserStatus(userId: string, active: boolean) {
   })
 
   revalidatePath('/admin/utilisateurs')
+
   return { success: true }
 }
 
@@ -238,7 +401,9 @@ export async function resendAdminUserInvitation(userId: string) {
     where: { id: userId },
   })
 
-  if (!user) throw new Error('Utilisateur introuvable.')
+  if (!user) {
+    throw new Error('Utilisateur introuvable.')
+  }
 
   const tempPassword = randomBytes(12).toString('base64url')
 
@@ -251,20 +416,34 @@ export async function resendAdminUserInvitation(userId: string) {
   })
 
   try {
-    await sendNewUserEmail(user.email, user.name, tempPassword, user.role)
+    await sendNewUserEmail(
+      user.email,
+      user.name,
+      tempPassword,
+      user.role,
+    )
   } catch (error) {
-    console.error('Erreur lors du renvoi de l\'email:', error)
-    throw new Error("Le mot de passe a été réinitialisé, mais l'email n'a pas pu être envoyé.")
+    console.error("Erreur lors du renvoi de l'email:", error)
+
+    throw new Error(
+      "Le mot de passe a été réinitialisé, mais l'email n'a pas pu être envoyé.",
+    )
   }
 
   revalidatePath('/admin/utilisateurs')
+
   return { success: true, tempPassword }
 }
 
-// 👇 NOUVELLE FONCTION : Changer son propre mot de passe
-export async function changePassword(currentPassword: string, newPassword: string) {
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+) {
   const session = await auth()
-  if (!session?.user?.id) throw new Error('Non autorisé')
+
+  if (!session?.user?.id) {
+    throw new Error('Non autorisé')
+  }
 
   if (newPassword.length < 10) {
     throw new Error('Le nouveau mot de passe doit faire au moins 10 caractères.')
@@ -274,9 +453,15 @@ export async function changePassword(currentPassword: string, newPassword: strin
     where: { id: session.user.id },
   })
 
-  if (!user) throw new Error('Utilisateur introuvable.')
+  if (!user) {
+    throw new Error('Utilisateur introuvable.')
+  }
 
-  const isValid = await bcrypt.compare(currentPassword, user.passwordHash)
+  const isValid = await bcrypt.compare(
+    currentPassword,
+    user.passwordHash,
+  )
+
   if (!isValid) {
     throw new Error('Le mot de passe actuel est incorrect.')
   }

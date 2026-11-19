@@ -498,4 +498,8 @@ export interface Testimonial {
 export interface Circuit {
   slug: string
   title: string
+  stopDays?: {
+    place?: string
+    days: number
+  }[]
 }

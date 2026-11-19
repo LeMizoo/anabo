@@ -1,3 +1,4 @@
+
 {
   "nav": {
     "home": "Home",
@@ -117,6 +118,8 @@
     "circuit": "Tour principale desiderato",
     "circuitDefault": "Su misura / Non lo so ancora",
     "circuitExtras": "Desideri aggiungere un'estensione?",
+    "totalDuration": "Durata totale del viaggio: {days} giorni",
+    "durationIncomplete": "La durata di alcuni tour selezionati non è ancora stata inserita.",
     "firstName": "Nome",
     "lastName": "Cognome",
     "email": "Indirizzo e-mail",
