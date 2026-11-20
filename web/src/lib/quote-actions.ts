@@ -16,6 +16,15 @@ export async function confirmQuoteByClient(
     // Chargement de Prisma uniquement au moment de la confirmation.
     const { prisma } = await import('@/lib/prisma')
 
+    const current = await prisma.quoteRequest.findUnique({
+      where: { id: quoteId },
+      select: { startDate: true, endDate: true },
+    })
+
+    // Traçabilité : date et heure exactes de l'acceptation par le client
+    // (référence du délai d'annulation de 15 jours) et dates de voyage acceptées,
+    // conservées même si les dates du voyage sont modifiées ensuite.
+    const acceptedAt = new Date()
     const result = await prisma.quoteRequest.updateMany({
       where: {
         id: quoteId,
@@ -23,7 +32,10 @@ export async function confirmQuoteByClient(
       },
       data: {
         status: 'CONFIRME',
-        confirmedAt: new Date(),
+        confirmedAt: acceptedAt,
+        clientAcceptedAt: acceptedAt,
+        acceptedStartDate: current?.startDate ?? null,
+        acceptedEndDate: current?.endDate ?? null,
       },
     })
 

@@ -215,6 +215,7 @@ const STATUS_TEXTS: Record<
     quoteIntro: string
     quoteButton: string
     quoteOutro: string
+    cancellationNote: string
     confirmSubject: (ref: string) => string
     confirmBody1: string
     confirmBody2: string
@@ -229,6 +230,7 @@ const STATUS_TEXTS: Record<
       'Nous avons le plaisir de vous informer que votre devis personnalisé pour votre voyage à Madagascar est prêt.',
     quoteButton: 'Consulter mon devis',
     quoteOutro: 'Vous pourrez le consulter et le confirmer directement depuis ce lien.',
+    cancellationNote: 'Important : le délai d’annulation se calcule entre la date de votre confirmation et la date de départ. Un devis accepté à moins de 15 jours calendaires du départ ne peut pas être annulé dans le cadre de la procédure habituelle. En cas de départ anticipé, les jours non utilisés ne sont pas remboursés.',
     confirmSubject: (r) => `Votre voyage à Madagascar est confirmé ! (Réf: ${r})`,
     confirmBody1: 'Nous sommes ravis de confirmer votre réservation pour votre voyage à Madagascar.',
     confirmBody2: 'Nous avons hâte de vous accueillir et de vous faire découvrir notre belle île.',
@@ -242,6 +244,7 @@ const STATUS_TEXTS: Record<
       'We are pleased to let you know that your personalised quote for your trip to Madagascar is ready.',
     quoteButton: 'View my quote',
     quoteOutro: 'You can review and confirm it directly from this link.',
+    cancellationNote: 'Important: the cancellation period runs from the date you confirm to the departure date. A quote accepted less than 15 calendar days before departure cannot be cancelled under the usual procedure. If you leave the trip early, unused days are not refunded.',
     confirmSubject: (r) => `Your trip to Madagascar is confirmed! (Ref: ${r})`,
     confirmBody1: 'We are delighted to confirm your booking for your trip to Madagascar.',
     confirmBody2: 'We look forward to welcoming you and showing you our beautiful island.',
@@ -255,6 +258,7 @@ const STATUS_TEXTS: Record<
       'Siamo lieti di informarti che il tuo preventivo personalizzato per il viaggio in Madagascar è pronto.',
     quoteButton: 'Consulta il preventivo',
     quoteOutro: 'Potrai consultarlo e confermarlo direttamente da questo link.',
+    cancellationNote: 'Importante: il termine di annullamento si calcola tra la data della conferma e la data di partenza. Un preventivo accettato a meno di 15 giorni di calendario dalla partenza non può essere annullato secondo la procedura abituale. In caso di partenza anticipata, i giorni non utilizzati non vengono rimborsati.',
     confirmSubject: (r) => `Il tuo viaggio in Madagascar è confermato! (Rif: ${r})`,
     confirmBody1: 'Siamo felici di confermare la tua prenotazione per il viaggio in Madagascar.',
     confirmBody2: 'Non vediamo l’ora di accoglierti e di farti scoprire la nostra bellissima isola.',
@@ -291,6 +295,7 @@ export async function sendQuoteStatusEmail(
         </a>
       </p>
       <p>${t.quoteOutro}</p>
+      <p style="font-size: 13px; color: #92400e; background: #fffbeb; padding: 12px; border-radius: 6px;">${t.cancellationNote}</p>
       <p>${t.bye}<br/>${t.team}</p>
     `
   } else if (status === 'CONFIRME') {

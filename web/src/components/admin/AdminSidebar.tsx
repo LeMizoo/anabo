@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, CalendarDays, type LucideIcon } from 'lucide-react'
 import { signOut } from 'next-auth/react'
+import { AlertBell } from './AlertBell'
+import type { AdminAlerts } from '@/lib/admin-alerts'
 
-export function AdminSidebar({ userRole }: { userRole: string }) {
+export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: AdminAlerts }) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -72,7 +74,10 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
       >
         <div className="p-6 border-b border-gray-800 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">ANABO</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-bold tracking-tight text-white">ANABO</h2>
+              <AlertBell initial={alerts} />
+            </div>
             <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">Administration</p>
           </div>
           <button onClick={closeMenu} className="md:hidden text-gray-400 hover:text-white">

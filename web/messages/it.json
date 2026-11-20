@@ -111,7 +111,17 @@
     "confirming": "Conferma in corso...",
     "notReady": "Questo preventivo non è ancora disponibile per la conferma.",
     "questions": "Hai domande? Contattaci all'indirizzo ",
-    "cancellationLink": "Cancellazione e rimborso"
+    "cancellationLink": "Cancellazione e rimborso",
+    "conditionsTitle": "Condizioni importanti prima della conferma",
+    "lateWarning": "La partenza è prevista tra {days} giorno/i. Confermando questo preventivo a meno di 15 giorni di calendario dalla partenza, la prenotazione non potrà essere annullata secondo la procedura abituale.",
+    "cancellableInfo": "La partenza è prevista tra {days} giorni. Il termine di annullamento si calcola tra la data della conferma e la data di partenza: l'annullamento resta possibile secondo le nostre condizioni se la conferma avviene almeno 15 giorni di calendario prima della partenza.",
+    "departureUnknown": "Il termine di annullamento si calcola tra la data della conferma e la data di partenza. Una conferma a meno di 15 giorni di calendario dalla partenza rende la prenotazione non annullabile secondo la procedura abituale.",
+    "earlyDeparture": "Partenza anticipata: se lasci il viaggio prima della data di ritorno concordata, non è previsto alcun rimborso per i giorni non utilizzati.",
+    "acceptanceRecorded": "La data e l'ora esatte della conferma, così come le date di viaggio accettate, vengono registrate e fanno fede in caso di contestazione.",
+    "acceptConditions": "Ho letto e accetto le condizioni di annullamento e di partenza anticipata.",
+    "acceptedOn": "Preventivo accettato il {date} alle {time}.",
+    "notCancellableAccepted": "Accettazione avvenuta {days} giorno/i prima della partenza: la prenotazione non può essere annullata secondo la procedura abituale.",
+    "cancellableAccepted": "Accettazione avvenuta {days} giorni prima della partenza: l'annullamento resta possibile secondo le nostre condizioni."
   },
   "contactForm": {
     "openContact": "Contattaci",

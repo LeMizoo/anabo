@@ -13,7 +13,7 @@ import {
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { sendQuoteStatusEmail, sendNewUserEmail } from '@/lib/email'
-import { signQuoteToken, verifyQuoteToken } from '@/lib/quote-token'
+import { signQuoteToken } from '@/lib/quote-token'
 
 const MAX_TEXT = 20000
 const ROLES = ['ADMIN', 'SUPER_ADMIN'] as const
@@ -261,49 +261,6 @@ export async function saveTripPlanning(
     indicativeMaxDays,
     selectedDurationDays,
   }
-}
-
-export async function confirmQuoteByClient(
-  quoteId: string,
-  token: string,
-) {
-  if (!verifyQuoteToken(quoteId, token)) {
-    return { success: false, error: 'Lien invalide.' }
-  }
-
-  const quote = await prisma.quoteRequest.findUnique({
-    where: { id: quoteId },
-    select: { status: true },
-  })
-
-  if (!quote) {
-    return { success: false, error: 'Demande introuvable.' }
-  }
-
-  if (quote.status === 'CONFIRME') {
-    return { success: true }
-  }
-
-  if (quote.status !== 'DEVIS_ENVOYE') {
-    return {
-      success: false,
-      error: "Ce devis n'est pas disponible à la confirmation.",
-    }
-  }
-
-  await prisma.quoteRequest.update({
-    where: { id: quoteId },
-    data: {
-      status: 'CONFIRME',
-      confirmedAt: new Date(),
-    },
-  })
-
-  revalidatePath('/admin/demandes')
-  revalidatePath(`/admin/demandes/${quoteId}`)
-  revalidatePath('/admin/dashboard')
-
-  return { success: true }
 }
 
 export async function createAdminUser(data: {

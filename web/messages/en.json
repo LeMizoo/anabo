@@ -111,7 +111,17 @@
     "confirming": "Confirming...",
     "notReady": "This quote is not yet available for confirmation.",
     "questions": "Questions? Contact us at ",
-    "cancellationLink": "Cancellation and refund"
+    "cancellationLink": "Cancellation and refund",
+    "conditionsTitle": "Important conditions before confirming",
+    "lateWarning": "Your departure is in {days} day(s). If you confirm this quote less than 15 calendar days before departure, your booking cannot be cancelled under the usual procedure.",
+    "cancellableInfo": "Your departure is in {days} days. The cancellation period runs from the date you confirm to the departure date: cancellation remains possible under our conditions as long as you confirm at least 15 calendar days before departure.",
+    "departureUnknown": "The cancellation period runs from the date you confirm to the departure date. Confirming less than 15 calendar days before departure makes the booking non-cancellable under the usual procedure.",
+    "earlyDeparture": "Early departure: if you leave the trip before the agreed return date, no refund will be given for unused days.",
+    "acceptanceRecorded": "The exact date and time of your confirmation, as well as the accepted travel dates, are recorded and serve as a reference in the event of a dispute.",
+    "acceptConditions": "I have read and accept the cancellation and early departure conditions.",
+    "acceptedOn": "Quote accepted on {date} at {time}.",
+    "notCancellableAccepted": "Accepted {days} day(s) before departure: the booking cannot be cancelled under the usual procedure.",
+    "cancellableAccepted": "Accepted {days} days before departure: cancellation remains possible under our conditions."
   },
   "contactForm": {
     "openContact": "Contact us",

@@ -5,6 +5,7 @@ import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import { locales, defaultLocale, type Locale } from '@/lib/i18n'
 import { verifyQuoteToken } from '@/lib/quote-token'
+import { calendarDaysBetween, getCancellationStatus } from '@/lib/cancellation'
 
 const REFERENCE_PATTERN = /^AR-[A-Z0-9]+-[A-F0-9]+$/
 
@@ -43,6 +44,11 @@ async function confirm(formData: FormData) {
     redirect(`/${locale}/devis/${reference}?error=invalid`)
   }
 
+  // La case « J'accepte les conditions » est aussi vérifiée côté serveur.
+  if (formData.get('acceptConditions') !== 'on') {
+    redirect(`/${locale}/devis/${reference}?token=${encodeURIComponent(token)}`)
+  }
+
   const { confirmQuoteByClient } = await import('@/lib/quote-actions')
   const result = await confirmQuoteByClient(quoteId, token)
 
@@ -77,6 +83,9 @@ export default async function DevisPage({ params, searchParams }: Props) {
   // qu'avec le lien signé envoyé par e-mail.
   const hasValidToken = !!token && verifyQuoteToken(quote.id, token)
   const canConfirm = quote.status === 'DEVIS_ENVOYE' && hasValidToken
+  const daysUntilDeparture = quote.startDate ? calendarDaysBetween(new Date(), quote.startDate) : null
+  const acceptance = getCancellationStatus(quote.clientAcceptedAt, quote.acceptedStartDate || quote.startDate)
+  const intlLocale = locale === 'en' ? 'en-GB' : locale === 'it' ? 'it-IT' : 'fr-FR'
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -105,13 +114,49 @@ export default async function DevisPage({ params, searchParams }: Props) {
         )}
 
         {quote.status === 'CONFIRME' && (
-          <p className="rounded-lg bg-green-50 text-green-800 p-4 text-sm font-medium">
-            {t('alreadyConfirmed')}
-          </p>
+          <div className="space-y-2 rounded-lg bg-green-50 p-4 text-sm text-green-800">
+            <p className="font-medium">{t('alreadyConfirmed')}</p>
+            {hasValidToken && quote.clientAcceptedAt && (
+              <p>
+                {t('acceptedOn', {
+                  date: quote.clientAcceptedAt.toLocaleDateString(intlLocale, { timeZone: 'Indian/Antananarivo' }),
+                  time: quote.clientAcceptedAt.toLocaleTimeString(intlLocale, { timeZone: 'Indian/Antananarivo', hour: '2-digit', minute: '2-digit' }),
+                })}
+              </p>
+            )}
+            {hasValidToken && acceptance && (
+              <p>
+                {acceptance.cancellable
+                  ? t('cancellableAccepted', { days: acceptance.daysBeforeDeparture })
+                  : t('notCancellableAccepted', { days: Math.max(0, acceptance.daysBeforeDeparture) })}
+              </p>
+            )}
+          </div>
         )}
 
         {quote.status !== 'CONFIRME' && canConfirm && (
-          <form action={confirm} className="space-y-3">
+          <form action={confirm} className="space-y-4">
+            <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+              <p className="font-semibold">{t('conditionsTitle')}</p>
+              {daysUntilDeparture === null ? (
+                <p>{t('departureUnknown')}</p>
+              ) : daysUntilDeparture < 15 ? (
+                <p className="font-medium text-red-800">{t('lateWarning', { days: Math.max(0, daysUntilDeparture) })}</p>
+              ) : (
+                <p>{t('cancellableInfo', { days: daysUntilDeparture })}</p>
+              )}
+              <p>{t('earlyDeparture')}</p>
+              <p className="text-xs text-amber-800">{t('acceptanceRecorded')}</p>
+            </div>
+            <label className="flex items-start gap-2 text-sm text-gray-800">
+              <input type="checkbox" name="acceptConditions" required className="mt-1 h-4 w-4" />
+              <span>
+                {t('acceptConditions')}{' '}
+                <Link href={`/${locale}/annulation`} className="underline" target="_blank">
+                  {t('cancellationLink')}
+                </Link>
+              </span>
+            </label>
             <input type="hidden" name="quoteId" value={quote.id} />
             <input type="hidden" name="token" value={token} />
             <input type="hidden" name="reference" value={quote.reference} />

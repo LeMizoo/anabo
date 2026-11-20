@@ -18,6 +18,7 @@ import { SITE_URL } from '@/lib/site'
 import { CopyButton } from '@/components/admin/CopyButton'
 import { PrintButton } from '@/components/admin/PrintButton'
 import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
+import { getCancellationStatus } from '@/lib/cancellation'
 
 export const dynamic = 'force-dynamic'
 
@@ -150,6 +151,14 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
   const firstReplyHours = quote.contactedAt
     ? Math.round((quote.contactedAt.getTime() - quote.createdAt.getTime()) / 3_600_000)
     : null
+
+  const acceptance = getCancellationStatus(quote.clientAcceptedAt, quote.acceptedStartDate || quote.startDate)
+  const mgDateTime = (d: Date) =>
+    d.toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo', dateStyle: 'full', timeStyle: 'medium' })
+  const datesChanged =
+    !!quote.acceptedStartDate &&
+    (quote.acceptedStartDate.getTime() !== quote.startDate?.getTime() ||
+      (quote.acceptedEndDate?.getTime() ?? null) !== (quote.endDate?.getTime() ?? null))
 
   const estimate = parseEstimate(quote.estimateDetails)
   const vehicleEstimate = parseVehicleEstimate(quote.estimateDetails)
@@ -660,6 +669,55 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
         </div>
 
         <aside className="space-y-4">
+          {quote.status === 'CONFIRME' && (
+            <section
+              className={`rounded-xl border p-6 shadow-sm text-sm ${
+                !quote.clientAcceptedAt
+                  ? 'border-gray-200 bg-white'
+                  : acceptance && !acceptance.cancellable
+                    ? 'border-red-200 bg-red-50'
+                    : 'border-green-200 bg-green-50'
+              }`}
+            >
+              <h2 className="mb-2 text-lg font-semibold">Acceptation et annulation</h2>
+              {quote.clientAcceptedAt ? (
+                <dl className="space-y-2">
+                  <div>
+                    <dt className="text-xs text-gray-500">Accepté par le client (heure de Madagascar)</dt>
+                    <dd className="font-medium text-gray-900">{mgDateTime(quote.clientAcceptedAt)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-gray-500">Dates acceptées</dt>
+                    <dd className="text-gray-900">
+                      {quote.acceptedStartDate ? quote.acceptedStartDate.toLocaleDateString('fr-FR') : '—'} →{' '}
+                      {quote.acceptedEndDate ? quote.acceptedEndDate.toLocaleDateString('fr-FR') : '—'}
+                    </dd>
+                    {datesChanged && (
+                      <dd className="mt-1 text-xs font-semibold text-orange-700">
+                        Les dates actuelles diffèrent des dates acceptées.
+                      </dd>
+                    )}
+                  </div>
+                  {acceptance ? (
+                    <p className={`rounded-lg px-3 py-2 font-semibold ${acceptance.cancellable ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900'}`}>
+                      {acceptance.cancellable
+                        ? `Annulable : acceptation ${acceptance.daysBeforeDeparture} jours avant le départ.`
+                        : `Non annulable (procédure habituelle) : acceptation ${Math.max(0, acceptance.daysBeforeDeparture)} jour(s) avant le départ.`}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-600">Date de départ non renseignée : délai non calculable.</p>
+                  )}
+                  <p className="text-xs text-gray-500">Départ anticipé : aucun remboursement des jours non utilisés.</p>
+                </dl>
+              ) : (
+                <p className="text-xs text-gray-600">
+                  Statut confirmé par l’équipe, sans acceptation enregistrée via le lien client.
+                  Pour une preuve horodatée, demandez au client de confirmer depuis son lien.
+                </p>
+              )}
+            </section>
+          )}
+
           <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
             <h2 className="mb-4 text-lg font-semibold">Suivi de la demande</h2>
             <ol className="relative space-y-4 border-l border-gray-200 pl-5">

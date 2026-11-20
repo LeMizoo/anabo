@@ -111,7 +111,17 @@
     "confirming": "Confirmation...",
     "notReady": "Ce devis n'est pas encore disponible pour confirmation.",
     "questions": "Une question ? Contactez-nous à ",
-    "cancellationLink": "Annulation et remboursement"
+    "cancellationLink": "Annulation et remboursement",
+    "conditionsTitle": "Conditions importantes avant de confirmer",
+    "lateWarning": "Votre départ est prévu dans {days} jour(s). En confirmant ce devis à moins de 15 jours calendaires du départ, votre réservation ne pourra pas être annulée dans le cadre de la procédure habituelle.",
+    "cancellableInfo": "Votre départ est prévu dans {days} jours. Le délai d'annulation se calcule entre la date de votre confirmation et la date de départ : une annulation reste possible selon nos conditions tant que la confirmation intervient au moins 15 jours calendaires avant le départ.",
+    "departureUnknown": "Le délai d'annulation se calcule entre la date de votre confirmation et la date de départ. Une confirmation à moins de 15 jours calendaires du départ rend la réservation non annulable dans le cadre de la procédure habituelle.",
+    "earlyDeparture": "Départ anticipé : si vous quittez le voyage avant la date de retour convenue, aucun remboursement des jours non utilisés ne sera accordé.",
+    "acceptanceRecorded": "La date et l'heure exactes de votre confirmation, ainsi que les dates de voyage acceptées, sont enregistrées et servent de référence en cas de contestation.",
+    "acceptConditions": "J'ai lu et j'accepte les conditions d'annulation et de départ anticipé.",
+    "acceptedOn": "Devis accepté le {date} à {time}.",
+    "notCancellableAccepted": "Acceptation intervenue {days} jour(s) avant le départ : la réservation ne peut pas être annulée dans le cadre de la procédure habituelle.",
+    "cancellableAccepted": "Acceptation intervenue {days} jours avant le départ : l'annulation reste possible selon nos conditions."
   },
   "contactForm": {
     "openContact": "Nous contacter",

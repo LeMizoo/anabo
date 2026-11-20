@@ -1,4 +1,3 @@
-
 generator client {
   provider   = "prisma-client"
   engineType = "client"
@@ -75,27 +74,34 @@ model QuoteRequest {
   adminNotes   String?   @db.Text
 
   // Informations historiques de devis
-  quoteDetails       String?      @db.Text
-  estimateDetails    String?      @db.Text
-  vehicleCode        String?      @db.VarChar(120)
-  vehicleLabel       String?      @db.VarChar(120)
-  pricingMode        PricingMode?
-  pricingPackageId   String?      @db.VarChar(30)
-  pricingPackageName String?      @db.VarChar(120)
-  vehicleCount       Int          @default(1)
-  consecutiveCircuits Int         @default(1)
+  quoteDetails        String?      @db.Text
+  estimateDetails     String?      @db.Text
+  vehicleCode         String?      @db.VarChar(120)
+  vehicleLabel        String?      @db.VarChar(120)
+  pricingMode         PricingMode?
+  pricingPackageId    String?      @db.VarChar(30)
+  pricingPackageName  String?      @db.VarChar(120)
+  vehicleCount        Int          @default(1)
+  consecutiveCircuits Int          @default(1)
 
   // Informations du nouveau traitement de devis
-  tripSeason          TravelSeason?
-  roadCondition       RoadCondition?
-  indicativeMinDays   Int?
-  indicativeMaxDays   Int?
+  tripSeason           TravelSeason?
+  roadCondition        RoadCondition?
+  indicativeMinDays    Int?
+  indicativeMaxDays    Int?
   selectedDurationDays Int?
 
   contactedAt DateTime?
   quoteSentAt DateTime?
   confirmedAt DateTime?
   lostAt      DateTime?
+
+  // Acceptation du devis par le client via son lien signé (preuve, jamais écrasée).
+  // Sert de référence au calcul du délai d'annulation de 15 jours.
+  clientAcceptedAt  DateTime?
+  // Dates de voyage telles qu'acceptées par le client (conservées même si modifiées ensuite).
+  acceptedStartDate DateTime?
+  acceptedEndDate   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -138,17 +144,17 @@ model CircuitDuration {
 
 // ANCIENS MODÈLES CONSERVÉS POUR LA COMPATIBILITÉ
 model PricingConfig {
-  id               String          @id @default(cuid()) @db.VarChar(30)
-  circuitSlug      String          @unique @db.VarChar(191)
-  dailyCarEnabled  Boolean         @default(false)
-  tourPriceEnabled Boolean         @default(false)
+  id               String           @id @default(cuid()) @db.VarChar(30)
+  circuitSlug      String           @unique @db.VarChar(191)
+  dailyCarEnabled  Boolean          @default(false)
+  tourPriceEnabled Boolean          @default(false)
   tourPrice        Int?
-  basePrice        Int             @default(0)
-  currency         String          @default("EUR") @db.VarChar(3)
+  basePrice        Int              @default(0)
+  currency         String           @default("EUR") @db.VarChar(3)
   vehicles         PricingVehicle[]
   packages         PricingPackage[]
-  updatedAt        DateTime        @updatedAt
-  createdAt        DateTime        @default(now())
+  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime         @default(now())
 }
 
 model PricingVehicle {
@@ -215,4 +221,19 @@ model AdminUser {
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+/// Abonnements aux notifications push des administrateurs (un par navigateur/appareil).
+model AdminPushSubscription {
+  id           String    @id @default(cuid()) @db.VarChar(30)
+  adminUserId  String    @db.VarChar(30)
+  endpointHash String    @unique @db.VarChar(64)
+  endpoint     String    @db.Text
+  p256dh       String    @db.VarChar(255)
+  auth         String    @db.VarChar(255)
+  userAgent    String?   @db.VarChar(255)
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  @@index([adminUserId])
 }

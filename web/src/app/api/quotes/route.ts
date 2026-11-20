@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { sendQuoteEmails } from '@/lib/email'
+import { sendPushToAdmins } from '@/lib/push'
 import {
   calculateTripVehiclePrice,
   type VehicleEstimateSnapshot,
@@ -219,6 +220,14 @@ export async function POST(request: Request) {
         emailErr
       )
     }
+
+    // Notification push aux administrateurs (sendPushToAdmins n'échoue jamais).
+    await sendPushToAdmins({
+      title: `Nouvelle demande ${quote.reference}`,
+      body: `${data.firstName} ${data.lastName}${data.circuitTitle ? ` — ${data.circuitTitle}` : ''}`,
+      url: `/admin/demandes/${quote.id}`,
+      tag: `quote-${quote.id}`,
+    })
 
     return NextResponse.json(
       {
