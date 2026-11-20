@@ -103,12 +103,16 @@ model QuoteRequest {
   acceptedStartDate DateTime?
   acceptedEndDate   DateTime?
 
+  // Chauffeur(-guide) affecté au voyage
+  assignedDriverId String? @db.VarChar(30)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status, createdAt])
   @@index([email])
   @@index([circuitSlug])
+  @@index([assignedDriverId])
 }
 
 // Nouveau catalogue global de véhicules
@@ -236,4 +240,23 @@ model AdminPushSubscription {
   lastUsedAt   DateTime?
 
   @@index([adminUserId])
+}
+
+/// Chauffeurs(-guides) : équipe permanente et renforts temporaires.
+model Driver {
+  id            String   @id @default(cuid()) @db.VarChar(30)
+  name          String   @db.VarChar(150)
+  phone         String?  @db.VarChar(40)
+  email         String?  @db.VarChar(191)
+  languages     String?  @db.VarChar(191)
+  licenseNumber String?  @db.VarChar(80)
+  vehicleLabel  String?  @db.VarChar(150)
+  vehicleSeats  Int?
+  isTemporary   Boolean  @default(false)
+  active        Boolean  @default(true)
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
 }

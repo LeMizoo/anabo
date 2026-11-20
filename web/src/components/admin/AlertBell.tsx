@@ -50,6 +50,7 @@ export function AlertBell({ initial }: { initial: AdminAlerts }) {
     { label: 'Nouvelles demandes à traiter', count: alerts.newRequests, href: '/admin/demandes?status=NOUVEAU' },
     { label: 'Devis à envoyer (clients contactés)', count: alerts.quotesToSend, href: '/admin/demandes?status=CONTACTE' },
     { label: 'Devis à relancer (+7 j)', count: alerts.quotesToFollowUp, href: '/admin/demandes?suivi=relance' },
+    { label: 'Voyages qui se chevauchent (renfort)', count: alerts.capacityIssues, href: '/admin/planning' },
   ]
 
   return (

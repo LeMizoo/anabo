@@ -19,6 +19,8 @@ import { CopyButton } from '@/components/admin/CopyButton'
 import { PrintButton } from '@/components/admin/PrintButton'
 import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
 import { getCancellationStatus } from '@/lib/cancellation'
+import { assignDriver } from '@/app/admin/(protected)/chauffeurs/actions'
+import { shortageForTrip } from '@/lib/fleet-capacity'
 
 export const dynamic = 'force-dynamic'
 
@@ -151,6 +153,16 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
   const firstReplyHours = quote.contactedAt
     ? Math.round((quote.contactedAt.getTime() - quote.createdAt.getTime()) / 3_600_000)
     : null
+
+  const [drivers, shortage] = await Promise.all([
+    prisma.driver.findMany({
+      where: { OR: [{ active: true }, ...(quote.assignedDriverId ? [{ id: quote.assignedDriverId }] : [])] },
+      orderBy: [{ isTemporary: 'asc' }, { name: 'asc' }],
+      select: { id: true, name: true, isTemporary: true, vehicleLabel: true, vehicleSeats: true, phone: true, active: true },
+    }),
+    quote.status === 'CONFIRME' ? shortageForTrip(quote.id) : Promise.resolve(null),
+  ])
+  const assignedDriver = drivers.find((d) => d.id === quote.assignedDriverId) || null
 
   const acceptance = getCancellationStatus(quote.clientAcceptedAt, quote.acceptedStartDate || quote.startDate)
   const mgDateTime = (d: Date) =>
@@ -717,6 +729,49 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               )}
             </section>
           )}
+
+          <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
+            <h2 className="mb-2 text-lg font-semibold">Chauffeur affecté</h2>
+            {shortage && (
+              <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-900">
+                Ce voyage chevauche {shortage.trips.length - 1} autre(s) voyage(s) confirmé(s) : il manque{' '}
+                {shortage.missing} véhicule(s)/chauffeur(s).{' '}
+                <Link href="/admin/chauffeurs?new=1&temporaire=1" className="font-semibold underline">Ajouter un renfort</Link>
+              </p>
+            )}
+            {assignedDriver && (
+              <p className="mb-3 text-gray-700">
+                <strong>{assignedDriver.name}</strong>
+                {assignedDriver.isTemporary ? ' (renfort)' : ''}
+                {assignedDriver.vehicleLabel ? ` · ${assignedDriver.vehicleLabel}` : ''}
+                {assignedDriver.vehicleSeats ? ` · ${assignedDriver.vehicleSeats} places` : ''}
+                {assignedDriver.phone ? ` · ${assignedDriver.phone}` : ''}
+              </p>
+            )}
+            {drivers.length === 0 ? (
+              <p className="text-xs text-gray-500">
+                Aucun chauffeur enregistré. <Link href="/admin/chauffeurs?new=1" className="text-blue-600 hover:underline">Ajouter un chauffeur</Link>
+              </p>
+            ) : (
+              <form action={assignDriver} className="flex gap-2 print:hidden">
+                <input type="hidden" name="quoteId" value={quote.id} />
+                <select
+                  name="driverId"
+                  defaultValue={quote.assignedDriverId || ''}
+                  aria-label="Chauffeur affecté"
+                  className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm"
+                >
+                  <option value="">— Non affecté —</option>
+                  {drivers.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}{d.isTemporary ? ' (renfort)' : ''}{!d.active ? ' (inactif)' : ''}
+                    </option>
+                  ))}
+                </select>
+                <FormSubmitButton label="Affecter" pendingLabel="…" className="rounded-lg bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60" />
+              </form>
+            )}
+          </section>
 
           <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
             <h2 className="mb-4 text-lg font-semibold">Suivi de la demande</h2>

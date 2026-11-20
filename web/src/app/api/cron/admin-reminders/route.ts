@@ -31,12 +31,13 @@ export async function GET(request: Request) {
     alerts.newRequests && `${alerts.newRequests} nouvelle(s) demande(s)`,
     alerts.quotesToSend && `${alerts.quotesToSend} devis à envoyer`,
     alerts.quotesToFollowUp && `${alerts.quotesToFollowUp} devis à relancer`,
+    alerts.capacityIssues && `${alerts.capacityIssues} chevauchement(s) de voyages : ajoutez des véhicules/chauffeurs en renfort`,
   ].filter(Boolean)
 
   const result = await sendPushToAdmins({
     title: `ANABO : ${alerts.total} action(s) à faire`,
     body: parts.join(' · '),
-    url: alerts.quotesToSend ? '/admin/demandes?status=CONTACTE' : alerts.newRequests ? '/admin/demandes?status=NOUVEAU' : '/admin/demandes?suivi=relance',
+    url: alerts.capacityIssues ? '/admin/planning' : alerts.quotesToSend ? '/admin/demandes?status=CONTACTE' : alerts.newRequests ? '/admin/demandes?status=NOUVEAU' : '/admin/demandes?suivi=relance',
     tag: 'daily-reminder',
   })
 

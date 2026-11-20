@@ -14,6 +14,7 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { sendQuoteStatusEmail, sendNewUserEmail } from '@/lib/email'
 import { signQuoteToken } from '@/lib/quote-token'
+import { notifyIfShortage } from '@/lib/capacity-alerts'
 
 const MAX_TEXT = 20000
 const ROLES = ['ADMIN', 'SUPER_ADMIN'] as const
@@ -123,6 +124,10 @@ export async function updateQuoteStatus(
   revalidatePath('/admin/demandes')
   revalidatePath(`/admin/demandes/${quoteId}`)
   revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/planning')
+
+  // Voyage confirmé : prévenir si des voyages se chevauchent (renfort nécessaire).
+  if (newStatus === 'CONFIRME') await notifyIfShortage(quoteId)
 
   return {
     success: true,

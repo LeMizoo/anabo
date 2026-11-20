@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { ArrowRight, FileText, CheckCircle, Clock, TrendingUp, CalendarDays, BellRing } from 'lucide-react'
 import DashboardCharts from './DashboardCharts'
 import { quoteStatusColor, quoteStatusLabel } from '@/lib/quote-status'
+import { getCapacityReport } from '@/lib/fleet-capacity'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,6 +53,8 @@ export default async function AdminDashboardPage() {
     prisma.quoteRequest.groupBy({ by: ['status'], _count: { status: true } }),
   ])
 
+  const capacity = await getCapacityReport()
+
   // 12 derniers mois, dans l'ordre chronologique (mois + année).
   const chartData = Array.from({ length: 12 }, (_, i) => {
     const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 11 + i, 1))
@@ -98,6 +101,24 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
       </div>
+
+      {capacity.shortages.length > 0 && (
+        <div role="alert" className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-950 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold">
+              {capacity.shortages.length} période(s) où des voyages confirmés se chevauchent
+            </p>
+            <p>
+              Il manque jusqu’à {Math.max(...capacity.shortages.map((s) => s.missing))} véhicule(s)/chauffeur(s) :
+              ajoutez-en temporairement pour honorer toutes les demandes.
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Link href="/admin/planning" className="rounded-lg border border-red-300 bg-white px-3 py-2 font-semibold text-red-800 hover:bg-red-100">Voir le planning</Link>
+            <Link href="/admin/chauffeurs?new=1&temporaire=1" className="rounded-lg bg-red-700 px-3 py-2 font-semibold text-white hover:bg-red-800">Ajouter un renfort</Link>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
         {cards.map((card) => (

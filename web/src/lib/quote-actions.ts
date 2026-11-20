@@ -3,6 +3,7 @@
 
 import { verifyQuoteToken } from '@/lib/quote-token'
 import { revalidatePath } from 'next/cache'
+import { notifyIfShortage } from '@/lib/capacity-alerts'
 
 export async function confirmQuoteByClient(
   quoteId: string,
@@ -65,6 +66,9 @@ export async function confirmQuoteByClient(
     revalidatePath('/admin/demandes')
     revalidatePath(`/admin/demandes/${quoteId}`)
     revalidatePath('/admin/dashboard')
+    revalidatePath('/admin/planning')
+
+    await notifyIfShortage(quoteId)
 
     return { success: true }
   } catch (error) {

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { quoteStatusColor, quoteStatusLabel } from '@/lib/quote-status'
+import { getCapacityReport } from '@/lib/fleet-capacity'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,7 @@ type Trip = {
   days: number
   travellers: string
   vehicle: string
+  driver: string | null
 }
 
 function tripEnd(start: Date, end: Date | null, duration: number | null) {
@@ -49,9 +51,14 @@ export default async function PlanningPage({ searchParams }: Props) {
       id: true, reference: true, status: true, firstName: true, lastName: true,
       circuitTitle: true, circuitSlug: true, startDate: true, endDate: true,
       selectedDurationDays: true, adults: true, children: true,
-      vehicleLabel: true, vehicleCount: true,
+      vehicleLabel: true, vehicleCount: true, assignedDriverId: true,
     },
   })
+  const [report, drivers] = await Promise.all([
+    getCapacityReport(),
+    prisma.driver.findMany({ select: { id: true, name: true } }),
+  ])
+  const driverName = new Map(drivers.map((d) => [d.id, d.name]))
 
   const trips: Trip[] = quotes
     .map((q) => {
@@ -68,21 +75,18 @@ export default async function PlanningPage({ searchParams }: Props) {
         days: Math.round((end.getTime() - start.getTime()) / DAY) + 1,
         travellers: `${q.adults} ad.${q.children ? ` / ${q.children} enf.` : ''}`,
         vehicle: q.vehicleLabel ? `${q.vehicleLabel}${q.vehicleCount > 1 ? ` ×${q.vehicleCount}` : ''}` : '—',
+        driver: q.assignedDriverId ? driverName.get(q.assignedDriverId) || null : null,
       }
     })
     .filter((t) => showPast || t.end >= today)
 
-  // Chevauchements entre voyages confirmés (un même chauffeur-guide ne peut pas être sur deux circuits).
+  // Voyages confirmés en manque de véhicule/chauffeur (renfort nécessaire).
   const confirmed = trips.filter((t) => t.status === 'CONFIRME')
   const overlaps = new Map<string, string[]>()
-  for (let i = 0; i < confirmed.length; i++) {
-    for (let j = i + 1; j < confirmed.length; j++) {
-      const a = confirmed[i]
-      const b = confirmed[j]
-      if (a.start <= b.end && b.start <= a.end) {
-        overlaps.set(a.id, [...(overlaps.get(a.id) || []), b.reference])
-        overlaps.set(b.id, [...(overlaps.get(b.id) || []), a.reference])
-      }
+  for (const shortage of report.shortages) {
+    for (const trip of shortage.trips) {
+      const others = shortage.trips.filter((o) => o.id !== trip.id).map((o) => o.reference)
+      overlaps.set(trip.id, [...new Set([...(overlaps.get(trip.id) || []), ...others])])
     }
   }
 
@@ -130,9 +134,39 @@ export default async function PlanningPage({ searchParams }: Props) {
         </div>
       </div>
 
-      {overlaps.size > 0 && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
-          <strong>Attention :</strong> {overlaps.size} voyages confirmés se chevauchent. Vérifiez la disponibilité du chauffeur-guide et des véhicules.
+      {report.shortages.length > 0 && (
+        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-950">
+          <p className="text-base font-semibold">
+            {report.shortages.length === 1 ? 'Des voyages confirmés se chevauchent' : `${report.shortages.length} périodes où des voyages confirmés se chevauchent`}
+          </p>
+          <p className="mt-1">
+            Disponibles : {report.capacity} véhicule(s)/chauffeur(s) actif(s){report.activeDrivers === 0 ? ' (Vonjy seul, aucun chauffeur enregistré)' : ''}.
+            Pour honorer toutes les demandes, ajoutez temporairement des véhicules et chauffeurs.
+          </p>
+          <ul className="mt-3 list-disc space-y-1 pl-5">
+            {report.shortages.map((s) => (
+              <li key={s.start.toISOString()}>
+                <strong>{fmt(s.start)} → {fmt(s.end)}</strong> : {s.required} véhicule(s) nécessaires, {s.capacity} disponible(s) —
+                il manque <strong>{s.missing}</strong> véhicule(s)/chauffeur(s) ({s.trips.map((t) => `${t.reference} · ${t.client}`).join(' ; ')}).
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/admin/chauffeurs?new=1&temporaire=1" className="rounded-lg bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-800">
+              Ajouter un chauffeur / véhicule de renfort
+            </Link>
+            <Link href="/admin/chauffeurs" className="rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-800 hover:bg-red-100">
+              Gérer les chauffeurs
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {report.driverConflicts.length > 0 && (
+        <div role="alert" className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-950">
+          <strong>Double affectation :</strong>{' '}
+          {report.driverConflicts.map((c) => `${c.driverName} est affecté(e) à ${c.references.join(' et ')} sur des dates qui se chevauchent`).join(' ; ')}.
+          Réaffectez l’un des voyages depuis sa fiche.
         </div>
       )}
 
@@ -161,9 +195,12 @@ export default async function PlanningPage({ searchParams }: Props) {
                       <span className="text-gray-400">· {trip.reference}</span>
                       <p className="text-gray-600">{trip.circuit}</p>
                       <p className="text-xs text-gray-500">{trip.travellers} · {trip.vehicle}</p>
+                      <p className={`text-xs ${trip.driver ? 'text-gray-600' : 'text-orange-700'}`}>
+                        Chauffeur : {trip.driver || 'non affecté'}
+                      </p>
                       {overlaps.has(trip.id) && (
                         <p className="mt-1 text-xs font-semibold text-red-700">
-                          Chevauche : {overlaps.get(trip.id)?.join(', ')}
+                          Renfort nécessaire, chevauche : {overlaps.get(trip.id)?.join(', ')}
                         </p>
                       )}
                     </div>
