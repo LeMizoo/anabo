@@ -14,22 +14,24 @@
 --
 -- À exécuter dans phpMyAdmin sur la base de production.
 -- Effectuer une sauvegarde complète avant exécution.
+-- Les tables sont préfixées par le nom de la base : le script fonctionne
+-- quelle que soit la base sélectionnée dans phpMyAdmin.
 -- ============================================================
 
 USE `anabomg1_anabo_roadtrip`;
 
 -- 1. Date et heure exactes de l'acceptation du devis par le client,
 --    et dates de voyage acceptées (référence du délai d'annulation de 15 jours).
-ALTER TABLE `QuoteRequest`
+ALTER TABLE `anabomg1_anabo_roadtrip`.`QuoteRequest`
     ADD COLUMN IF NOT EXISTS `clientAcceptedAt` DATETIME(3) NULL,
     ADD COLUMN IF NOT EXISTS `acceptedStartDate` DATETIME(3) NULL,
     ADD COLUMN IF NOT EXISTS `acceptedEndDate` DATETIME(3) NULL,
     ADD COLUMN IF NOT EXISTS `assignedDriverId` VARCHAR(30) NULL;
 
-CREATE INDEX IF NOT EXISTS `QuoteRequest_assignedDriverId_idx` ON `QuoteRequest`(`assignedDriverId`);
+CREATE INDEX IF NOT EXISTS `QuoteRequest_assignedDriverId_idx` ON `anabomg1_anabo_roadtrip`.`QuoteRequest`(`assignedDriverId`);
 
 -- 2. Abonnements aux notifications push des administrateurs.
-CREATE TABLE IF NOT EXISTS `AdminPushSubscription` (
+CREATE TABLE IF NOT EXISTS `anabomg1_anabo_roadtrip`.`AdminPushSubscription` (
     `id` VARCHAR(30) NOT NULL,
     `adminUserId` VARCHAR(30) NOT NULL,
     `endpointHash` VARCHAR(64) NOT NULL,
@@ -45,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `AdminPushSubscription` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- 3. Chauffeurs (équipe permanente et renforts temporaires).
-CREATE TABLE IF NOT EXISTS `Driver` (
+CREATE TABLE IF NOT EXISTS `anabomg1_anabo_roadtrip`.`Driver` (
     `id` VARCHAR(30) NOT NULL,
     `name` VARCHAR(150) NOT NULL,
     `phone` VARCHAR(40) NULL,
