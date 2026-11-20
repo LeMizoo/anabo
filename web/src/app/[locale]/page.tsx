@@ -10,6 +10,7 @@ import { locales, type Locale } from '@/lib/i18n'
 import type { HomePage, HeroBlock, Circuit } from '@/lib/types'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
+import { pageAlternates } from '@/lib/seo'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -40,10 +41,7 @@ export async function generateMetadata({
   return {
     title: { absolute: SITE_NAME },
     description: t('description'),
-    alternates: {
-      canonical: `/${localeParam}`,
-      languages: { en: '/en', fr: '/fr', it: '/it', 'x-default': '/en' },
-    },
+    alternates: pageAlternates(localeParam, ''),
     openGraph: {
       type: 'website',
       url: `${SITE_URL}/${localeParam}`,

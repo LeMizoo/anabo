@@ -475,3 +475,32 @@ export async function changePassword(
 
   return { success: true }
 }
+
+/**
+ * Suppression définitive d'une demande (spam, doublon, test).
+ * Réservée au SUPER_ADMIN ; la référence doit être retapée pour confirmer.
+ */
+export async function deleteQuote(quoteId: string, confirmation: string) {
+  await requireSuperAdmin()
+
+  const quote = await prisma.quoteRequest.findUnique({
+    where: { id: quoteId },
+    select: { reference: true },
+  })
+
+  if (!quote) {
+    throw new Error('Demande introuvable.')
+  }
+
+  if (confirmation.trim().toUpperCase() !== quote.reference.toUpperCase()) {
+    throw new Error('La référence saisie ne correspond pas.')
+  }
+
+  await prisma.quoteRequest.delete({ where: { id: quoteId } })
+
+  revalidatePath('/admin/demandes')
+  revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/planning')
+
+  return { success: true }
+}

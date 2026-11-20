@@ -71,8 +71,9 @@
     "noImage": "No image",
     "itinerary": "Route",
     "viewRoute": "View route",
-    "routeNotConfigured": "Route not configured in Sanity Studio.",
-    "suggestedRoute": "Suggested route, to be confirmed according to trip length, season, and road conditions."
+    "routeNotConfigured": "Detailed route on request: Vonjy tailors it to your dates and wishes.",
+    "suggestedRoute": "Suggested route, to be confirmed according to trip length, season, and road conditions.",
+    "routeRequest": "Request the route"
   },
   "slider": {
     "learnMore": "Learn more",
@@ -102,7 +103,7 @@
   "quotePage": {
     "title": "Your quote {reference}",
     "invalidLink": "Invalid link: the confirmation token is missing or incorrect.",
-    "notWritten": "The quote has not been prepared yet.",
+    "notWritten": "Your personalised quote is being prepared. You will receive it by e-mail very soon.",
     "alreadyConfirmed": "This quote has already been confirmed. Thank you!",
     "requestNotFound": "The quote request could not be found.",
     "confirmationError": "An error occurred while confirming the quote.",
@@ -129,7 +130,7 @@
     "durationSeasonRainy": "Rainy season (November to April)",
     "durationCircuitRange": "{title}: {min} to {max} days",
     "durationTotalRange": "Estimated total duration: {min} to {max} days",
-    "durationIncomplete": "The duration of some selected tours has not been entered yet.",
+    "durationIncomplete": "Duration on request: Vonjy will confirm it with your personalised quote.",
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email address",

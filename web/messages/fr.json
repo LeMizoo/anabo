@@ -71,8 +71,9 @@
     "noImage": "Pas d'image",
     "itinerary": "Itinéraire",
     "viewRoute": "Voir le trajet",
-    "routeNotConfigured": "Itinéraire à renseigner dans Sanity Studio.",
-    "suggestedRoute": "Parcours indicatif, à confirmer selon la durée du séjour, la saison et les conditions de route."
+    "routeNotConfigured": "Itinéraire détaillé sur demande : Vonjy l’adapte à vos dates et à vos envies.",
+    "suggestedRoute": "Parcours indicatif, à confirmer selon la durée du séjour, la saison et les conditions de route.",
+    "routeRequest": "Demander l’itinéraire"
   },
   "slider": {
     "learnMore": "En savoir plus",
@@ -102,7 +103,7 @@
   "quotePage": {
     "title": "Votre devis {reference}",
     "invalidLink": "Lien invalide : le jeton de confirmation est absent ou incorrect.",
-    "notWritten": "Le devis n'a pas encore été rédigé.",
+    "notWritten": "Votre devis personnalisé est en cours de préparation. Vous le recevrez très prochainement par e-mail.",
     "alreadyConfirmed": "Ce devis a déjà été confirmé. Merci !",
     "requestNotFound": "La demande de devis est introuvable.",
     "confirmationError": "Une erreur est survenue lors de la confirmation du devis.",
@@ -129,7 +130,7 @@
     "durationSeasonRainy": "Saison des pluies (novembre à avril)",
     "durationCircuitRange": "{title} : {min} à {max} jours",
     "durationTotalRange": "Durée totale estimée : {min} à {max} jours",
-    "durationIncomplete": "La durée de certains circuits sélectionnés n'est pas encore renseignée.",
+    "durationIncomplete": "Durée précisée sur demande : Vonjy vous l’indiquera avec votre devis personnalisé.",
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Adresse e-mail",

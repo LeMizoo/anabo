@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, CalendarDays, type LucideIcon } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 export function AdminSidebar({ userRole }: { userRole: string }) {
@@ -13,6 +13,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
   const primaryItems = [
     { label: 'Tableau de bord', href: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Demandes de devis', href: '/admin/demandes', icon: FileText },
+    { label: 'Planning', href: '/admin/planning', icon: CalendarDays },
   ]
 
   const adminItems = userRole === 'SUPER_ADMIN' ? [
@@ -46,7 +47,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
   return (
     <>
       {/* Bouton Burger (Mobile uniquement) */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-4 left-4 z-50 print:hidden">
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 bg-white rounded-md shadow-md text-gray-700 hover:bg-gray-50"
@@ -65,7 +66,7 @@ export function AdminSidebar({ userRole }: { userRole: string }) {
 
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 md:static md:translate-x-0 shrink-0 ${
+        className={`print:hidden w-64 bg-gray-900 text-white min-h-screen flex flex-col fixed inset-y-0 left-0 z-50 transition-transform duration-300 md:static md:translate-x-0 shrink-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

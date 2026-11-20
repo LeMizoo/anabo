@@ -83,5 +83,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
+  // Conditions d'annulation : texte unique en français (URL canonique).
+  entries.push({
+    url: `${baseUrl}/fr/annulation`,
+    changeFrequency: 'yearly',
+    priority: 0.2,
+  })
+
   return entries
 }

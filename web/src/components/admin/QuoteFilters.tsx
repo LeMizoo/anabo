@@ -24,6 +24,7 @@ export function QuoteFilters() {
     const params = new URLSearchParams(searchParams.toString())
     if (e.target.value) params.set('status', e.target.value)
     else params.delete('status')
+    params.delete('suivi') // Un statut choisi remplace la vue « À relancer »
     params.set('page', '1') // Retour à la page 1 lors d'un changement de filtre
     router.push(`?${params.toString()}`)
   }

@@ -71,8 +71,9 @@
     "noImage": "Nessuna immagine",
     "itinerary": "Itinerario",
     "viewRoute": "Vedi percorso",
-    "routeNotConfigured": "Itinerario da configurare in Sanity Studio.",
-    "suggestedRoute": "Itinerario indicativo, da confermare in base alla durata del viaggio, alla stagione e alle condizioni stradali."
+    "routeNotConfigured": "Itinerario dettagliato su richiesta: Vonjy lo adatta alle tue date e ai tuoi desideri.",
+    "suggestedRoute": "Itinerario indicativo, da confermare in base alla durata del viaggio, alla stagione e alle condizioni stradali.",
+    "routeRequest": "Richiedi l’itinerario"
   },
   "slider": {
     "learnMore": "Scopri di più",
@@ -102,7 +103,7 @@
   "quotePage": {
     "title": "Il tuo preventivo {reference}",
     "invalidLink": "Link non valido: il token di conferma è assente o errato.",
-    "notWritten": "Il preventivo non è ancora stato preparato.",
+    "notWritten": "Il tuo preventivo personalizzato è in preparazione. Lo riceverai molto presto via e-mail.",
     "alreadyConfirmed": "Questo preventivo è già stato confermato. Grazie!",
     "requestNotFound": "La richiesta di preventivo non è stata trovata.",
     "confirmationError": "Si è verificato un errore durante la conferma del preventivo.",
@@ -129,7 +130,7 @@
     "durationSeasonRainy": "Stagione delle piogge (da novembre ad aprile)",
     "durationCircuitRange": "{title}: da {min} a {max} giorni",
     "durationTotalRange": "Durata totale stimata: da {min} a {max} giorni",
-    "durationIncomplete": "La durata di alcuni tour selezionati non è ancora stata inserita.",
+    "durationIncomplete": "Durata su richiesta: Vonjy te la confermerà con il preventivo personalizzato.",
     "firstName": "Nome",
     "lastName": "Cognome",
     "email": "Indirizzo e-mail",

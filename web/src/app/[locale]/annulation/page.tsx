@@ -1,5 +1,14 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { locales } from '@/lib/i18n'
+
+// Le texte n'existe qu'en français : les versions /en et /it désignent
+// /fr/annulation comme URL canonique pour éviter le contenu en double.
+export const metadata: Metadata = {
+  title: 'Annulation et remboursement',
+  description: 'Conditions d’annulation et de remboursement des voyages ANABO Roadtrip Madagascar avec Vonjy, chauffeur-guide.',
+  alternates: { canonical: '/fr/annulation' },
+}
 
 export default async function CancellationPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params

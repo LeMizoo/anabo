@@ -12,6 +12,7 @@ import type { Page, SanityImage, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { ImagePlaceholder } from '@/components/pages/ImagePlaceholder'
 import { titleCase, titleSizeClass } from '@/lib/typography'
+import { pageAlternates } from '@/lib/seo'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -75,7 +76,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     keywords: page?.seo?.keywords || getKeywords(t.raw('keywords')),
-    openGraph: { title, description },
+    alternates: pageAlternates(localeParam, '/tour-ideas'),
+    openGraph: { title, description, url: `/${localeParam}/tour-ideas` },
   }
 }
 
@@ -232,9 +234,16 @@ export default async function TourIdeasPage({ params }: Props) {
                     />
                   </div>
                 ) : (
-                  <p className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
-                    {t('routeNotConfigured')}
-                  </p>
+                  <div className="flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-[#F8F6F1] px-4 py-5 text-center">
+                    <MapPinned className="h-5 w-5 text-[#E0A01C]" aria-hidden="true" />
+                    <p className="text-sm text-slate-700">{t('routeNotConfigured')}</p>
+                    <Link
+                      href={`/${locale}/contact`}
+                      className="rounded-full bg-[#06245F] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#0b347d]"
+                    >
+                      {t('routeRequest')}
+                    </Link>
+                  </div>
                 )}
               </div>
             </article>

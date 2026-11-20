@@ -50,14 +50,8 @@ export async function generateMetadata({
       default: SITE_NAME,
     },
     description: t('description'),
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        en: '/en',
-        fr: '/fr',
-        it: '/it',
-      },
-    },
+    // Pas de canonical ici : chaque page déclare la sienne (sinon toutes
+    // les pages pointeraient vers l'accueil et seraient vues comme doublons).
     openGraph: {
       type: 'website',
       url: `${siteUrl}/${locale}`,

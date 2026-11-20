@@ -13,6 +13,11 @@ import type { RoadCondition } from '@/generated/prisma/enums'
 import type { QuoteEstimateSnapshot } from '@/lib/pricing'
 import { parseVehicleEstimateSnapshot } from '@/lib/trip-pricing'
 import { quoteStatusColor, quoteStatusLabel, whatsappDigits } from '@/lib/quote-status'
+import { signQuoteToken } from '@/lib/quote-token'
+import { SITE_URL } from '@/lib/site'
+import { CopyButton } from '@/components/admin/CopyButton'
+import { PrintButton } from '@/components/admin/PrintButton'
+import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -120,6 +125,32 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
 
   if (!quote) notFound()
 
+  const isSuperAdmin = (session.user as { role?: string })?.role === 'SUPER_ADMIN'
+  const otherQuotes = await prisma.quoteRequest.findMany({
+    where: { email: quote.email, NOT: { id: quote.id } },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+    select: { id: true, reference: true, status: true, createdAt: true, circuitTitle: true },
+  })
+  let clientLink: string | null = null
+  try {
+    const lang = ['fr', 'en', 'it'].includes(quote.locale) ? quote.locale : 'fr'
+    clientLink = `${SITE_URL}/${lang}/devis/${encodeURIComponent(quote.reference)}?token=${signQuoteToken(quote.id)}`
+  } catch {
+    clientLink = null
+  }
+  const timeline = [
+    { label: 'Demande reçue', date: quote.createdAt, done: true },
+    { label: 'Client contacté', date: quote.contactedAt, done: !!quote.contactedAt },
+    { label: 'Devis envoyé', date: quote.quoteSentAt, done: !!quote.quoteSentAt },
+    quote.lostAt
+      ? { label: 'Demande perdue', date: quote.lostAt, done: true, lost: true }
+      : { label: 'Voyage confirmé', date: quote.confirmedAt, done: !!quote.confirmedAt },
+  ]
+  const firstReplyHours = quote.contactedAt
+    ? Math.round((quote.contactedAt.getTime() - quote.createdAt.getTime()) / 3_600_000)
+    : null
+
   const estimate = parseEstimate(quote.estimateDetails)
   const vehicleEstimate = parseVehicleEstimate(quote.estimateDetails)
   const season = getSeason(quote.startDate)
@@ -136,7 +167,8 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 print:hidden">
+          <PrintButton />
           <a
             href={`mailto:${quote.email}?subject=${encodeURIComponent(`Votre demande ${quote.reference}`)}`}
             className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -629,42 +661,88 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
 
         <aside className="space-y-4">
           <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
-            <h2 className="text-lg font-semibold mb-2">Historique</h2>
-            <ul className="space-y-1 text-gray-600">
-              <li>
-                Créée le{' '}
-                {new Date(quote.createdAt).toLocaleDateString('fr-FR')}
-              </li>
-
-              {quote.contactedAt && (
-                <li>
-                  Contactée le{' '}
-                  {new Date(quote.contactedAt).toLocaleDateString('fr-FR')}
+            <h2 className="mb-4 text-lg font-semibold">Suivi de la demande</h2>
+            <ol className="relative space-y-4 border-l border-gray-200 pl-5">
+              {timeline.map((step) => (
+                <li key={step.label} className="relative">
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -left-[27px] top-0.5 h-3.5 w-3.5 rounded-full border-2 ${
+                      'lost' in step && step.lost
+                        ? 'border-red-600 bg-red-600'
+                        : step.done
+                          ? 'border-green-600 bg-green-600'
+                          : 'border-gray-300 bg-white'
+                    }`}
+                  />
+                  <p className={`font-medium ${step.done ? 'text-gray-900' : 'text-gray-400'}`}>{step.label}</p>
+                  <p className="text-xs text-gray-500">
+                    {step.date ? new Date(step.date).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }) : 'En attente'}
+                  </p>
                 </li>
-              )}
-
-              {quote.quoteSentAt && (
-                <li>
-                  Devis envoyé le{' '}
-                  {new Date(quote.quoteSentAt).toLocaleDateString('fr-FR')}
-                </li>
-              )}
-
-              {quote.confirmedAt && (
-                <li>
-                  Confirmée le{' '}
-                  {new Date(quote.confirmedAt).toLocaleDateString('fr-FR')}
-                </li>
-              )}
-
-              {quote.lostAt && (
-                <li>
-                  Perdue le{' '}
-                  {new Date(quote.lostAt).toLocaleDateString('fr-FR')}
-                </li>
-              )}
-            </ul>
+              ))}
+            </ol>
+            {firstReplyHours !== null && (
+              <p className="mt-4 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                Délai de première réponse : <strong>{firstReplyHours < 1 ? 'moins d’1 h' : `${firstReplyHours} h`}</strong>
+              </p>
+            )}
           </section>
+
+          {clientLink && (
+            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm print:hidden">
+              <h2 className="mb-2 text-lg font-semibold">Lien client</h2>
+              <p className="mb-3 text-xs text-gray-500">
+                Lien personnel et sécurisé : le client y consulte son devis et le confirme en ligne.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <CopyButton value={clientLink} label="Copier le lien" />
+                <a
+                  href={`https://wa.me/${whatsappDigits(quote.phone)}?text=${encodeURIComponent(`Bonjour ${quote.firstName}, voici votre devis ${quote.reference} : ${clientLink}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-lg border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 hover:bg-green-100"
+                >
+                  Envoyer par WhatsApp
+                </a>
+                <a
+                  href={clientLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  Aperçu client
+                </a>
+              </div>
+            </section>
+          )}
+
+          <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm print:hidden">
+            <h2 className="mb-2 text-lg font-semibold">Autres demandes du client</h2>
+            {otherQuotes.length === 0 ? (
+              <p className="text-xs text-gray-500">Première demande de ce client.</p>
+            ) : (
+              <ul className="space-y-2">
+                {otherQuotes.map((other) => (
+                  <li key={other.id} className="flex items-center justify-between gap-2">
+                    <Link href={`/admin/demandes/${other.id}`} className="font-medium text-blue-600 hover:underline">
+                      {other.reference}
+                    </Link>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${quoteStatusColor(other.status)}`}>
+                      {quoteStatusLabel(other.status)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {isSuperAdmin && (
+            <section className="rounded-xl border border-red-200 bg-red-50/50 p-6 shadow-sm text-sm print:hidden">
+              <h2 className="mb-2 text-lg font-semibold text-red-900">Zone sensible</h2>
+              <DeleteQuoteForm quoteId={quote.id} reference={quote.reference} />
+            </section>
+          )}
         </aside>
       </div>
     </div>

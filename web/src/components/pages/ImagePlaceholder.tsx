@@ -8,9 +8,9 @@ type Props = {
 }
 
 const labels: Record<Locale, string> = {
-  fr: 'Photo à venir',
-  en: 'Photo coming soon',
-  it: 'Foto in arrivo',
+  fr: 'Anabo Roadtrip Madagascar',
+  en: 'Anabo Roadtrip Madagascar',
+  it: 'Anabo Roadtrip Madagascar',
 }
 
 export function ImagePlaceholder({

@@ -14,6 +14,11 @@ function safeLocale(value: string): Locale {
 
 export const dynamic = 'force-dynamic'
 
+// Pages personnelles des clients : exclues des moteurs de recherche.
+export const metadata = {
+  robots: { index: false, follow: false },
+}
+
 type Props = {
   params: Promise<{ locale: string; reference: string }>
   searchParams: Promise<{ token?: string; error?: string }>
