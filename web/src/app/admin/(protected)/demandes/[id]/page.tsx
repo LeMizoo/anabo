@@ -12,6 +12,7 @@ import {
 import type { RoadCondition } from '@/generated/prisma/enums'
 import type { QuoteEstimateSnapshot } from '@/lib/pricing'
 import { parseVehicleEstimateSnapshot } from '@/lib/trip-pricing'
+import { quoteStatusColor, quoteStatusLabel, whatsappDigits } from '@/lib/quote-status'
 
 export const dynamic = 'force-dynamic'
 
@@ -135,12 +136,34 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
           </p>
         </div>
 
-        <Link
-          href="/admin/demandes"
-          className="text-sm font-medium text-blue-600 hover:underline"
-        >
-          ← Retour à la liste
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href={`mailto:${quote.email}?subject=${encodeURIComponent(`Votre demande ${quote.reference}`)}`}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            E-mail
+          </a>
+          <a
+            href={`https://wa.me/${whatsappDigits(quote.phone)}?text=${encodeURIComponent(`Bonjour ${quote.firstName}, je reviens vers vous concernant votre demande ${quote.reference}.`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-green-300 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-800 hover:bg-green-100"
+          >
+            WhatsApp
+          </a>
+          <a
+            href={`tel:${quote.phone.replace(/[^\d+]/g, '')}`}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Appeler
+          </a>
+          <Link
+            href="/admin/demandes"
+            className="ml-2 text-sm font-medium text-blue-600 hover:underline"
+          >
+            ← Retour à la liste
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -153,7 +176,11 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
                 <dt className="text-gray-500">Statut actuel</dt>
-                <dd className="mt-1 font-medium">{quote.status}</dd>
+                <dd className="mt-1">
+                  <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${quoteStatusColor(quote.status)}`}>
+                    {quoteStatusLabel(quote.status)}
+                  </span>
+                </dd>
               </div>
 
               <div>

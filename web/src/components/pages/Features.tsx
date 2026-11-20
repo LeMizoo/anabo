@@ -50,7 +50,7 @@ export function Features({ block, locale, globalHeadingFont, globalHeadingWeight
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
+              transition={{ duration: 0.5, delay: Math.min(i, 6) * 0.08 }}
               className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm"
             >
               <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#E0A01C] text-sm font-semibold text-white">

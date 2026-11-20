@@ -34,7 +34,7 @@ export function HeadingSection({ block, locale }: Props) {
             className={`mt-3 whitespace-pre-line ${block.subtitleFont || 'font-sans'} ${block.subtitleWeight || 'font-normal'} ${subtitleSizeClass(block.subtitleSize)}`}
             style={{ color: brandTextColor(block.subtitleColor) }}
           >
-            {titleCase(block.subtitle, locale)}
+            {block.subtitle}
           </p>
         )}
       </div>

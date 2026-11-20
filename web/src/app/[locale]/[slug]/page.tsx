@@ -44,15 +44,25 @@ export async function generateMetadata({
 
   const seo = page.seo
 
+  // Versions linguistiques existantes de cette page (même slug) → balises hreflang.
+  const availableLocales = await sanityClient.fetch<string[]>(
+    `*[_type == "page" && slug.current == $slug && !(_id in path("drafts.**"))].language`,
+    { slug },
+  )
+  const languages = Object.fromEntries(
+    locales
+      .filter((code) => availableLocales.includes(code))
+      .map((code) => [code, `/${code}/${slug}`]),
+  )
+
   return {
     title: seo?.metaTitle || page.title,
     description: seo?.metaDescription || page.excerpt,
     keywords: seo?.keywords,
-    alternates: seo?.canonicalUrl
-      ? {
-          canonical: seo.canonicalUrl,
-        }
-      : undefined,
+    alternates: {
+      canonical: seo?.canonicalUrl || `/${locale}/${slug}`,
+      languages: { ...languages, ...(languages.en ? { 'x-default': languages.en } : {}) },
+    },
     robots: seo?.noIndex
       ? {
           index: false,

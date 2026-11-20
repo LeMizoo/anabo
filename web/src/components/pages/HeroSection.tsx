@@ -121,7 +121,7 @@ export function HeroSection({ block, locale }: Props) {
               className={`mt-5 max-w-2xl text-white/90 ${subtitleSizeClass(block.subtitleSize || 'lg')} ${subtitleFont} leading-relaxed [text-shadow:0_1px_12px_rgba(0,0,0,0.45)]`}
               style={{ color: brandTextColor(block.subtitleColor === 'gold' ? 'gold' : 'white') }}
             >
-              {titleCase(block.subtitle, locale)}
+              {block.subtitle}
             </p>
           )}
 

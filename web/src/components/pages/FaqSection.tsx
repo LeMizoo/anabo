@@ -28,7 +28,7 @@ export function FaqSection({ block, locale }: Props) {
           {items.map((item, index) => (
             <details key={item._key || index} className="group py-3">
               <summary className={`cursor-pointer pr-8 text-[clamp(1rem,2vw,1.25rem)] text-gray-900 ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'}`}>
-                {titleCase(item.question, locale)}
+                {item.question}
               </summary>
               {item.answer && (
                 <div className="prose mt-4 max-w-none text-gray-700">

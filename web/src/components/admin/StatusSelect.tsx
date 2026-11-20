@@ -4,14 +4,9 @@ import { useState, useTransition } from 'react'
 import { updateQuoteStatus } from '@/app/admin/actions'
 import { QuoteStatus } from '@/generated/prisma/enums'
 import { AlertCircle, Loader2 } from 'lucide-react'
+import { QUOTE_STATUSES } from '@/lib/quote-status'
 
-const statuses: { value: QuoteStatus; label: string; color: string }[] = [
-  { value: 'NOUVEAU', label: 'Nouveau', color: 'bg-blue-100 text-blue-800' },
-  { value: 'CONTACTE', label: 'Contacté', color: 'bg-yellow-100 text-yellow-800' },
-  { value: 'DEVIS_ENVOYE', label: 'Devis envoyé', color: 'bg-purple-100 text-purple-800' },
-  { value: 'CONFIRME', label: 'Confirmé', color: 'bg-green-100 text-green-800' },
-  { value: 'PERDU', label: 'Perdu', color: 'bg-red-100 text-red-800' },
-]
+const statuses = QUOTE_STATUSES
 
 export function StatusSelect({ quoteId, currentStatus }: { quoteId: string, currentStatus: QuoteStatus }) {
   const [isPending, startTransition] = useTransition()

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { StatusSelect } from '@/components/admin/StatusSelect'
 import { QuoteFilters } from '@/components/admin/QuoteFilters'
 import { Prisma } from '@/generated/prisma/client'
-import { QuoteStatus } from '@/generated/prisma/enums'
+import { isQuoteStatus } from '@/lib/quote-status'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,17 +25,22 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
 
   const whereClause: Prisma.QuoteRequestWhereInput = {}
   
-  if (q) {
+  const search = (q || '').trim().slice(0, 100)
+
+  if (search) {
     whereClause.OR = [
-      { reference: { contains: q } },
-      { firstName: { contains: q } },
-      { lastName: { contains: q } },
-      { email: { contains: q } },
+      { reference: { contains: search } },
+      { firstName: { contains: search } },
+      { lastName: { contains: search } },
+      { email: { contains: search } },
+      { phone: { contains: search } },
+      { circuitTitle: { contains: search } },
     ]
   }
-  
-  if (status) {
-    whereClause.status = status as QuoteStatus
+
+  // Un statut inconnu dans l'URL ne doit pas faire planter la page.
+  if (isQuoteStatus(status)) {
+    whereClause.status = status
   }
 
   const [quotes, totalQuotes] = await Promise.all([
@@ -67,6 +72,13 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
             Connecté en tant que <strong>{session.user?.name}</strong> ({session.user?.email})
           </p>
         </div>
+
+        <a
+          href={`/admin/demandes/export?${new URLSearchParams({ ...(search ? { q: search } : {}), ...(isQuoteStatus(status) ? { status } : {}) }).toString()}`}
+          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+        >
+          Exporter en CSV ({totalQuotes})
+        </a>
       </div>
 
       <QuoteFilters />

@@ -101,7 +101,7 @@ export function PuzzleGallery({ block, locale }: Props) {
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: (index % 8) * 0.06 }}
                 style={{
                   x: item.overlap?.endsWith('left') ? -16 : item.overlap?.endsWith('right') ? 16 : 0,
                   y: item.overlap?.startsWith('top') ? -16 : item.overlap?.startsWith('bottom') ? 16 : 0,
@@ -123,6 +123,7 @@ export function PuzzleGallery({ block, locale }: Props) {
                         src={imageUrl}
                         alt={item.image.alt || item.caption || 'Galerie'}
                         fill
+                        sizes="(min-width: 768px) 50vw, 100vw"
                         unoptimized={Boolean(item.pixelation && item.pixelation !== 'none')}
                         className="transition-transform duration-700 ease-in-out group-hover:scale-110"
                         style={{

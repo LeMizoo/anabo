@@ -126,7 +126,7 @@ export default async function TourIdeasPage({ params }: Props) {
     '@type': 'FAQPage',
     mainEntity: faqs.map(({ question, answer }) => ({
       '@type': 'Question',
-      name: titleCase(question, locale),
+      name: question,
       acceptedAnswer: {
         '@type': 'Answer',
         text: answer,
@@ -185,7 +185,7 @@ export default async function TourIdeasPage({ params }: Props) {
                   </span>
                   {tour.cardTagline && (
                     <span className="absolute right-4 top-4 max-w-[60%] rounded-full bg-[#F4C566] px-3 py-1.5 text-right text-xs font-bold tracking-wide text-[#06245F] shadow-sm">
-                      {titleCase(tour.cardTagline, locale)}
+                      {tour.cardTagline}
                     </span>
                   )}
                   <h2 className={`absolute inset-x-5 bottom-5 font-caflisch font-normal leading-tight text-white drop-shadow ${titleSizeClass('md')}`}>
@@ -257,7 +257,7 @@ export default async function TourIdeasPage({ params }: Props) {
             {faqs.map(({ question, answer }) => (
               <details key={question} className="group py-4">
                 <summary className="cursor-pointer pr-8 font-caflisch font-normal text-gray-900">
-                  {titleCase(question, locale)}
+                  {question}
                 </summary>
                 <p className="mt-3 leading-7 text-gray-700">{answer}</p>
               </details>

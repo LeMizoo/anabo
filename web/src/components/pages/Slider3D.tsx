@@ -129,7 +129,7 @@ export function Slider3D({ block, locale }: Props) {
                         className={`mt-1 ${s.subtitleFont || 'font-sans'} ${subtitleSizeClass(s.subtitleSize)}`}
                         style={{ color: brandTextColor(s.subtitleColor) }}
                       >
-                        {s.subtitle && titleCase(s.subtitle, locale)}
+                        {s.subtitle && s.subtitle}
                       </p>
                     )}
                     

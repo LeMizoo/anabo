@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { HomeHero } from '@/components/home/HomeHero'
 import { JotformWidget } from '@/components/pages/JotformWidget'
 import { PageRenderer } from '@/components/pages/PageRenderer'
-import { sanityClient } from '@/lib/sanity'
+import { sanityClient, getImageUrl } from '@/lib/sanity'
 import { circuitsQuery, homePageQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import type { HomePage, HeroBlock, Circuit } from '@/lib/types'
@@ -26,11 +26,35 @@ export async function generateMetadata({
 
   setRequestLocale(localeParam as Locale)
 
-  const t = await getTranslations('metadata')
+  const [t, homePage] = await Promise.all([
+    getTranslations('metadata'),
+    sanityClient.fetch<HomePage | null>(homePageQuery, { locale: localeParam }),
+  ])
+  const hero = homePage?.modules?.find(
+    (module): module is HeroBlock => module._type === 'heroBlock',
+  )
+  const shareImage = hero?.backgroundImage?.asset?.url
+    ? getImageUrl(hero.backgroundImage.asset.url, 1200, 80)
+    : null
 
   return {
     title: { absolute: SITE_NAME },
     description: t('description'),
+    alternates: {
+      canonical: `/${localeParam}`,
+      languages: { en: '/en', fr: '/fr', it: '/it', 'x-default': '/en' },
+    },
+    openGraph: {
+      type: 'website',
+      url: `${SITE_URL}/${localeParam}`,
+      siteName: SITE_NAME,
+      locale: localeParam,
+      title: SITE_NAME,
+      description: t('description'),
+      ...(shareImage
+        ? { images: [{ url: shareImage, width: 1200, alt: hero?.backgroundImage?.alt || SITE_NAME }] }
+        : {}),
+    },
   }
 }
 

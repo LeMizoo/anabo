@@ -79,7 +79,7 @@ export function AlternatingSection({
                 className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} block text-[#E0A01C] dark:text-[#E0A01C]`}
                 style={{ color: brandTextColor(block.subtitleColor) }}
               >
-                {block.subtitle && titleCase(block.subtitle, locale)}
+                {block.subtitle && block.subtitle}
               </span>
             )}
 
@@ -133,6 +133,7 @@ export function AlternatingSection({
                           src={src}
                           alt={image.alt || block.title || 'Illustration de la section'}
                           fill
+                          sizes="(min-width: 1024px) 50vw, 100vw"
                           className="transition-transform duration-700 hover:scale-105"
                           style={imageContentStyle(image.presentation)}
                         />
@@ -155,6 +156,7 @@ export function AlternatingSection({
                       src={imageUrl}
                       alt={block.image?.alt || block.title || 'Illustration de la section'}
                       fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
                       className="transition-transform duration-700 hover:scale-105"
                       style={imageContentStyle(block.image?.presentation)}
                     />
@@ -191,6 +193,7 @@ export function AlternatingSection({
                             src={floatUrl}
                             alt={floatImg.image.alt || 'Image superposée'}
                             fill
+                            sizes="(min-width: 1024px) 50vw, 100vw"
                             className="h-auto w-full"
                             style={imageContentStyle({
                               ...floatImg.image.presentation,

@@ -44,7 +44,7 @@ export function CommitmentsSection({ block, locale, globalHeadingFont, globalHea
             className={`${subtitleFont} ${subtitleSizeClass(block.subtitleSize)} text-[#E0A01C] block mb-2`}
             style={{ color: brandTextColor(block.subtitleColor) }}
           >
-            {titleCase(block.subtitle, locale)}
+            {block.subtitle}
           </span>
         )}
         {block.title && (
@@ -63,7 +63,7 @@ export function CommitmentsSection({ block, locale, globalHeadingFont, globalHea
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: Math.min(index, 6) * 0.08 }}
             >
               <h3 className={`text-[clamp(1rem,2vw,1.25rem)] text-[#06245F] dark:text-white flex items-center gap-2 mb-4 ${titleFont} ${titleWeight}`}>
                 <span className="text-[#E0A01C]">

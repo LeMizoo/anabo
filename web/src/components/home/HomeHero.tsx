@@ -80,7 +80,7 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
           {hero.subtitle && (
             /* 👇 Application de la police du sous-titre */
             <p className={`mt-6 max-w-2xl leading-8 text-white/90 ${subtitleSizeClass(hero.subtitleSize)} ${subtitleFont}`}>
-              {titleCase(hero.subtitle, locale)}
+              {hero.subtitle}
             </p>
           )}
 
