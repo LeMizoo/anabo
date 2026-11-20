@@ -4,10 +4,8 @@
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { calculateQuoteEstimate } from '@/lib/pricing'
 import type {
   PackagePricingScope,
-  PricingMode,
   TravelSeason,
   RoadCondition,
 } from '@/generated/prisma/enums'
@@ -414,108 +412,4 @@ export async function deletePricingRule(formData: FormData) {
   if (!id) throw new Error('Réduction introuvable.')
   await prisma.pricingRule.delete({ where: { id } })
   revalidatePath('/admin/prix')
-}
-
-// ======================================================
-// ANCIENNES ACTIONS PUBLIQUES CONSERVÉES POUR CUSTOMQUOTEFORM
-// ======================================================
-
-// Seuls les résultats nécessaires sont transmis au navigateur.
-// Les prix unitaires et les règles restent côté serveur.
-export async function getPublicPricingModes(circuitSlug: string) {
-  if (!/^[a-z0-9-]{1,191}$/.test(circuitSlug)) return []
-
-  const config = await prisma.pricingConfig.findUnique({
-    where: { circuitSlug },
-    select: {
-      dailyCarEnabled: true,
-      tourPriceEnabled: true,
-      tourPrice: true,
-      vehicles: { select: { pricePerDay: true } },
-    },
-  })
-
-  if (!config) return []
-
-  const modes: PricingMode[] = []
-  if (config.dailyCarEnabled && config.vehicles.some((vehicle) => vehicle.pricePerDay > 0)) {
-    modes.push('DAILY_CAR')
-  }
-  if (config.tourPriceEnabled && config.tourPrice !== null && config.tourPrice > 0) {
-    modes.push('TOUR_INCLUDED')
-  }
-
-  return modes
-}
-
-export async function getPublicPricingPackages(
-  circuitSlug: string,
-  pricingMode: PricingMode,
-) {
-  if (
-    !/^[a-z0-9-]{1,191}$/.test(circuitSlug) ||
-    !['DAILY_CAR', 'TOUR_INCLUDED'].includes(pricingMode)
-  ) {
-    return []
-  }
-
-  const config = await prisma.pricingConfig.findUnique({
-    where: { circuitSlug },
-    select: {
-      packages: {
-        where: {
-          active: true,
-          OR: [{ scope: pricingMode }, { scope: 'BOTH' }],
-        },
-        select: { id: true, name: true },
-        orderBy: { name: 'asc' },
-      },
-    },
-  })
-
-  return config?.packages || []
-}
-
-export async function calculateIndicativeQuote(input: {
-  circuitSlug: string
-  pricingMode: PricingMode
-  vehicleCode?: string
-  packageId?: string
-  people: number
-  days: number
-  consecutiveCircuits: number
-  vehicleCount: number
-}) {
-  if (
-    !/^[a-z0-9-]{1,191}$/.test(input.circuitSlug) ||
-    !['DAILY_CAR', 'TOUR_INCLUDED'].includes(input.pricingMode) ||
-    !Number.isInteger(input.people) ||
-    input.people < 1 ||
-    input.people > 40 ||
-    !Number.isInteger(input.days) ||
-    input.days < 0 ||
-    input.days > 90 ||
-    !Number.isInteger(input.consecutiveCircuits) ||
-    input.consecutiveCircuits < 1 ||
-    input.consecutiveCircuits > 20 ||
-    !Number.isInteger(input.vehicleCount) ||
-    input.vehicleCount < 1 ||
-    input.vehicleCount > 20
-  ) {
-    return null
-  }
-
-  const result = await calculateQuoteEstimate({
-    circuitSlug: input.circuitSlug,
-    pricingMode: input.pricingMode,
-    vehicleCode: input.vehicleCode,
-    packageId: input.packageId,
-    adults: input.people,
-    children: 0,
-    days: input.days,
-    consecutiveCircuits: input.consecutiveCircuits,
-    vehicleCount: input.vehicleCount,
-  })
-
-  return result?.publicEstimate || null
 }

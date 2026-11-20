@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Star } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
 import { subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
@@ -83,6 +83,15 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
               {titleCase(hero.subtitle, locale)}
             </p>
           )}
+
+          {/* Mise en avant de Vonjy, chauffeur-guide */}
+          <p className="mt-7 inline-flex max-w-full items-center gap-2 rounded-full border border-white/30 bg-black/30 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+            <Star
+              className="h-4 w-4 shrink-0 fill-[#E0A01C] text-[#E0A01C]"
+              aria-hidden="true"
+            />
+            <span>{t('vonjyBadge')}</span>
+          </p>
 
           {(hero.ctaPrimary?.label || hero.ctaSecondary?.label) && (
             <div className="mt-9 flex flex-wrap gap-4">

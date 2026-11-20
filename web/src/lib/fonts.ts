@@ -168,3 +168,20 @@ export const scriptIn = localFont({
   variable: '--font-script-in',
   display: 'swap',
 })
+/** Variables CSS de toutes les polices, à appliquer sur la balise <html>. */
+export const fontVariables = [
+  inter,
+  dmSans,
+  poppins,
+  playfair,
+  perfectGirlScript,
+  perfectGirlSans,
+  playfairDisplaySc,
+  caflischScript,
+  euphoriaScript,
+  haigrastScript,
+  scriptAlt,
+  scriptIn,
+]
+  .map((font) => font.variable)
+  .join(' ')

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { sanityClient } from '@/lib/sanity'
 import { locales, type Locale } from '@/lib/i18n'
+import { SITE_URL } from '@/lib/site'
 
 type SitemapPage = {
   _id: string
@@ -14,7 +15,7 @@ type SitemapPage = {
 export const revalidate = 300
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://roadtrip.anabo.mg').replace(/\/+$/, '')
+  const baseUrl = SITE_URL
   const pages = await sanityClient.fetch<SitemapPage[]>(`
     *[_type == "page" && !(_id in path("drafts.**")) && language in $locales]{
       _id,

@@ -1,4 +1,3 @@
-
 {
   "nav": {
     "home": "Accueil",
@@ -16,8 +15,10 @@
   },
   "home": {
     "eyebrow": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "fallbackTitle": "Découvrez Madagascar avec un chauffeur-guide local",
-    "fallbackDescription": "Explorez Madagascar à travers des roadtrips authentiques et des voyages sur mesure."
+    "fallbackTitle": "Découvrez Madagascar avec Vonjy, votre chauffeur-guide",
+    "fallbackDescription": "Voyagez à Madagascar avec Vonjy, chauffeur-guide malgache reconnu par des voyageurs du monde entier : circuits privés, road trips authentiques et voyages sur mesure.",
+    "vonjyBadge": "Avec Vonjy, chauffeur-guide reconnu par des voyageurs du monde entier",
+    "vonjyJobTitle": "Chauffeur-guide à Madagascar"
   },
   "footer": {
     "navigation": "Navigation",
@@ -33,21 +34,22 @@
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "description": "Découvrez Madagascar avec un chauffeur-guide local. Explorez l'île à travers des road trips authentiques et des voyages sur mesure."
+    "description": "Voyagez à Madagascar avec Vonjy, chauffeur-guide malgache reconnu par des voyageurs du monde entier : circuits privés, road trips authentiques et voyages sur mesure."
   },
   "tourIdeas": {
     "title": "Idées de circuits à Madagascar",
     "subtitle": "Madagascar, terre de merveilles naturelles et de trésors culturels, vous invite à imaginer votre propre aventure.",
     "intro": "Avec ses paysages variés, sa faune singulière et sa culture riche, l’île offre mille façons de voyager. Les circuits présentés donnent un aperçu des possibilités et peuvent vous inspirer pour concevoir un itinéraire selon vos envies et vos centres d’intérêt. Je serai ravi de vous aider à choisir les étapes et le rythme qui vous conviennent.",
     "metaTitle": "Idées de circuits à Madagascar | Anabo Roadtrip",
-    "metaDescription": "Découvrez des idées de circuits à Madagascar : RN7, Tsingy, baobabs, parcs, côte Est et Nosy Be. Voyagez avec un chauffeur-guide local.",
+    "metaDescription": "Idées de circuits à Madagascar : RN7, Tsingy, baobabs, parcs, côte Est et Nosy Be, avec Vonjy, chauffeur-guide reconnu par des voyageurs du monde entier.",
     "keywords": [
       "circuit Madagascar",
       "idées voyage Madagascar",
       "road trip Madagascar",
       "circuit RN7",
       "circuit Nosy Be",
-      "chauffeur-guide Madagascar"
+      "chauffeur-guide Madagascar",
+      "Vonjy chauffeur-guide Madagascar"
     ],
     "faqTitle": "Questions pour choisir un circuit à Madagascar",
     "faqs": [
@@ -57,7 +59,7 @@
       },
       {
         "question": "Comment choisir un itinéraire adapté à mon voyage ?",
-        "answer": "Tenez compte de la durée du séjour, des régions souhaitées, de la saison et des conditions routières. Les étapes peuvent être discutées avec un chauffeur-guide local."
+        "answer": "Tenez compte de la durée du séjour, des régions souhaitées, de la saison et des conditions routières. Les étapes peuvent être discutées avec Vonjy, votre chauffeur-guide."
       },
       {
         "question": "Les circuits proposés sont-ils personnalisables ?",
@@ -107,7 +109,8 @@
     "confirm": "Confirmer ce devis",
     "confirming": "Confirmation...",
     "notReady": "Ce devis n'est pas encore disponible pour confirmation.",
-    "questions": "Une question ? Contactez-nous à "
+    "questions": "Une question ? Contactez-nous à ",
+    "cancellationLink": "Annulation et remboursement"
   },
   "contactForm": {
     "openContact": "Nous contacter",
@@ -119,6 +122,13 @@
     "circuitDefault": "Sur-mesure / Je ne sais pas encore",
     "circuitExtras": "Souhaitez-vous ajouter une extension ?",
     "totalDuration": "Durée totale du séjour : {days} jours",
+    "durationEstimateTitle": "Durée indicative de votre voyage",
+    "durationLoading": "Calcul des durées indicatives en cours...",
+    "durationLoadError": "Impossible de charger les durées indicatives. Veuillez réessayer.",
+    "durationSeasonDry": "Saison sèche (mai à octobre)",
+    "durationSeasonRainy": "Saison des pluies (novembre à avril)",
+    "durationCircuitRange": "{title} : {min} à {max} jours",
+    "durationTotalRange": "Durée totale estimée : {min} à {max} jours",
     "durationIncomplete": "La durée de certains circuits sélectionnés n'est pas encore renseignée.",
     "firstName": "Prénom",
     "lastName": "Nom",

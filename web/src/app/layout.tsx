@@ -1,22 +1,7 @@
 import 'flag-icons/css/flag-icons.min.css'
 import type { Metadata } from 'next'
 import './globals.css'
-// 👇 Ajout des imports
-import {
-  dmSans,
-  caflischScript,
-  euphoriaScript,
-  haigrastScript,
-  inter,
-  playfair,
-  playfairDisplaySc,
-  perfectGirlSans,
-  perfectGirlScript,
-  poppins,
-  scriptAlt,
-  scriptIn,
-} from '@/lib/fonts'
-import { SITE_NAME } from '@/lib/site'
+import { SITE_NAME, SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: {
@@ -24,37 +9,19 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    'Circuits privés, roadtrips et voyages sur mesure à Madagascar avec chauffeur-guide.',
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://anabo.mg',
-  ),
+    'Circuits privés, road trips et voyages sur mesure à Madagascar avec Vonjy, chauffeur-guide reconnu par des voyageurs du monde entier.',
+  metadataBase: new URL(SITE_URL),
 }
 
+/**
+ * Layout racine « transparent » (schéma recommandé par next-intl) :
+ * les balises <html>/<body> sont rendues par app/[locale]/layout.tsx
+ * (avec la bonne langue en/fr/it) et par app/admin/layout.tsx.
+ */
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    // 👇 Ajout des variables
-    <html 
-      lang="fr" 
-      className={`
-        ${inter.variable} 
-        ${dmSans.variable}
-        ${poppins.variable} 
-        ${playfair.variable} 
-        ${perfectGirlScript.variable} 
-        ${perfectGirlSans.variable}
-        ${playfairDisplaySc.variable}
-        ${caflischScript.variable}
-        ${euphoriaScript.variable}
-        ${haigrastScript.variable}
-        ${scriptAlt.variable}
-        ${scriptIn.variable}
-      `}
-    >
-      <body className="font-sans antialiased">{children}</body>
-    </html>
-  )
+  return children
 }

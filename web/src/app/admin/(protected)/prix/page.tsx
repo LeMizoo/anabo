@@ -17,9 +17,6 @@ const input =
 const button =
   'rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800'
 
-const secondaryButton =
-  'rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50'
-
 const seasons = [
   { value: 'DRY', label: 'Saison sèche' },
   { value: 'RAINY', label: 'Saison des pluies' },

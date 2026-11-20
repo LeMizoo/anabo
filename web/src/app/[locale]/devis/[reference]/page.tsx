@@ -3,6 +3,14 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { FormSubmitButton } from '@/components/admin/FormSubmitButton'
 import { titleCase, titleSizeClass } from '@/lib/typography'
+import { locales, defaultLocale, type Locale } from '@/lib/i18n'
+import { verifyQuoteToken } from '@/lib/quote-token'
+
+const REFERENCE_PATTERN = /^AR-[A-Z0-9]+-[A-F0-9]+$/
+
+function safeLocale(value: string): Locale {
+  return locales.includes(value as Locale) ? (value as Locale) : defaultLocale
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -15,12 +23,18 @@ async function confirm(formData: FormData) {
   'use server'
   const quoteId = String(formData.get('quoteId') || '')
   const token = String(formData.get('token') || '')
-  const reference = String(formData.get('reference') || '')
-  const locale = String(formData.get('locale') || 'fr')
+  const rawReference = String(formData.get('reference') || '')
+  // Valeurs issues du formulaire : validées pour éviter toute redirection externe.
+  const locale = safeLocale(String(formData.get('locale') || ''))
+  const reference = REFERENCE_PATTERN.test(rawReference) ? rawReference : ''
 
   const { redirect } = await import('next/navigation')
 
-  if (!quoteId || !token || !reference) {
+  if (!reference) {
+    redirect(`/${locale}`)
+  }
+
+  if (!quoteId || !token) {
     redirect(`/${locale}/devis/${reference}?error=invalid`)
   }
 
@@ -47,22 +61,29 @@ export default async function DevisPage({ params, searchParams }: Props) {
   const localizedError = errorTranslations[errorMessage] || errorMessage
 
   const { prisma } = await import('@/lib/prisma')
+  if (!REFERENCE_PATTERN.test(reference)) notFound()
+
   const quote = await prisma.quoteRequest.findUnique({
     where: { reference },
   })
   if (!quote) notFound()
 
-  const canConfirm = quote.status === 'DEVIS_ENVOYE' && !!token
+  // Les données personnelles et le contenu du devis ne sont visibles
+  // qu'avec le lien signé envoyé par e-mail.
+  const hasValidToken = !!token && verifyQuoteToken(quote.id, token)
+  const canConfirm = quote.status === 'DEVIS_ENVOYE' && hasValidToken
 
   return (
-    <main className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="mx-auto max-w-2xl rounded-xl bg-white p-8 shadow-sm border border-gray-200">
         <h1 className={`font-bold text-gray-900 mb-2 ${titleSizeClass('md')}`}>
           {titleCase(t('title', { reference: quote.reference }), locale)}
         </h1>
-        <p className="text-sm text-gray-600 mb-6">
-          {quote.firstName} {quote.lastName} — {quote.email}
-        </p>
+        {hasValidToken && (
+          <p className="text-sm text-gray-600 mb-6">
+            {quote.firstName} {quote.lastName} — {quote.email}
+          </p>
+        )}
 
         {error && (
           <p className="mb-6 rounded-lg bg-yellow-50 text-yellow-800 p-4 text-sm">
@@ -72,9 +93,11 @@ export default async function DevisPage({ params, searchParams }: Props) {
           </p>
         )}
 
-        <section className="mb-8 whitespace-pre-wrap text-sm text-gray-800">
-          {quote.quoteDetails || t('notWritten')}
-        </section>
+        {hasValidToken && (
+          <section className="mb-8 whitespace-pre-wrap text-sm text-gray-800">
+            {quote.quoteDetails || t('notWritten')}
+          </section>
+        )}
 
         {quote.status === 'CONFIRME' && (
           <p className="rounded-lg bg-green-50 text-green-800 p-4 text-sm font-medium">
@@ -108,9 +131,9 @@ export default async function DevisPage({ params, searchParams }: Props) {
           {t('questions')} contact@anabo.mg
         </p>
         <p className="mt-3 text-xs text-gray-500">
-          <Link href={`/${locale}/annulation`} className="underline">Annulation et remboursement</Link>
+          <Link href={`/${locale}/annulation`} className="underline">{t('cancellationLink')}</Link>
         </p>
       </div>
-    </main>
+    </div>
   )
 }

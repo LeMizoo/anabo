@@ -4,11 +4,11 @@ import type { Metadata } from 'next'
 import { ArrowUpRight, MapPinned } from 'lucide-react'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { sanityClient, getImageUrl } from '@/lib/sanity'
-import { pageBySlugQuery, tourIdeasQuery } from '@/lib/queries'
+import { pageBySlugQuery, tourIdeasQuery, circuitsQuery } from '@/lib/queries'
 import { getRouteMapUrls, getTourRouteStops } from '@/lib/tour-routes'
 import { locales, type Locale } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
-import type { Page, SanityImage } from '@/lib/types'
+import type { Page, SanityImage, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
 import { ImagePlaceholder } from '@/components/pages/ImagePlaceholder'
 import { titleCase, titleSizeClass } from '@/lib/typography'
@@ -88,7 +88,8 @@ export default async function TourIdeasPage({ params }: Props) {
 
   const t = await getTranslations('tourIdeas')
   const faqs = getSearchFaqs(t.raw('faqs'))
-  const [page, tours] = await Promise.all([
+
+  const [page, tours, circuits] = await Promise.all([
     sanityClient.fetch<Page | null>(
       pageBySlugQuery,
       { slug: 'tour-ideas', locale },
@@ -99,7 +100,13 @@ export default async function TourIdeasPage({ params }: Props) {
       { locale },
       { cache: 'no-store' },
     ),
+    sanityClient.fetch<Circuit[]>(
+      circuitsQuery,
+      { locale },
+      { cache: 'no-store' },
+    ),
   ])
+
   const heroModule = page?.modules?.find(
     (module) => module._type === 'heroBlock' && !module.settings?.hidden,
   )
@@ -113,6 +120,7 @@ export default async function TourIdeasPage({ params }: Props) {
           ),
       )
     : page?.modules
+
   const faqStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -135,7 +143,15 @@ export default async function TourIdeasPage({ params }: Props) {
           {page.excerpt}
         </p>
       )}
-      {remainingModules?.length ? <PageRenderer modules={remainingModules} locale={locale} sectionLinks /> : null}
+
+      {remainingModules?.length ? (
+        <PageRenderer
+          modules={remainingModules}
+          circuits={circuits}
+          locale={locale}
+          sectionLinks
+        />
+      ) : null}
 
       <div className="container-custom mx-auto mt-10 grid gap-7 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         {tours.map((tour) => {

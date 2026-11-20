@@ -15,7 +15,8 @@ import { locales, type Locale } from '@/lib/i18n'
 import { sanityClient } from '@/lib/sanity'
 import { siteSettingsQuery } from '@/lib/queries'
 import type { SiteSettings } from '@/lib/types'
-import { SITE_NAME } from '@/lib/site'
+import { SITE_NAME, SITE_URL } from '@/lib/site'
+import { fontVariables } from '@/lib/fonts'
 
 type Props = {
   children: React.ReactNode
@@ -41,7 +42,7 @@ export async function generateMetadata({
   setRequestLocale(locale)
 
   const t = await getTranslations('metadata')
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://anabo.mg'
+  const siteUrl = SITE_URL
 
   return {
     title: {
@@ -89,24 +90,28 @@ export default async function LocaleLayout({ children, params }: Props) {
   ])
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      {/* 👇 Le ThemeProvider englobe tout le contenu pour gérer le mode sombre 👇 */}
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        {/* On ajoute les classes de fond et de texte de base + transition */}
-        <div className="flex min-h-screen flex-col bg-white text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
-          <Header settings={settings} />
-          <main className="flex-1">{children}</main>
-          <Footer settings={settings} />
-          <FloatingWhatsApp
-            phone={settings?.whatsappNumber || settings?.contactPhone}
-            enabled={settings?.showFloatingWhatsapp !== false}
-            locale={locale}
-          />
+    <html lang={locale} className={fontVariables} suppressHydrationWarning>
+      <body className="font-sans antialiased">
+        <NextIntlClientProvider messages={messages}>
+          {/* 👇 Le ThemeProvider englobe tout le contenu pour gérer le mode sombre 👇 */}
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {/* On ajoute les classes de fond et de texte de base + transition */}
+            <div className="flex min-h-screen flex-col bg-white text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
+              <Header settings={settings} />
+              <main className="flex-1">{children}</main>
+              <Footer settings={settings} />
+              <FloatingWhatsApp
+                phone={settings?.whatsappNumber || settings?.contactPhone}
+                enabled={settings?.showFloatingWhatsapp !== false}
+                locale={locale}
+              />
           
-          {/* 👇 Bandeau de cookies ajouté ici 👇 */}
-          <CookieBanner />
-        </div>
-      </ThemeProvider>
-    </NextIntlClientProvider>
+              {/* 👇 Bandeau de cookies ajouté ici 👇 */}
+              <CookieBanner />
+            </div>
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   )
 }

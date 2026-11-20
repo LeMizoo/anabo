@@ -1,5 +1,7 @@
 import { Resend } from 'resend'
 import type { QuoteEstimateSnapshot } from '@/lib/pricing'
+import type { VehicleEstimateSnapshot } from '@/lib/trip-pricing'
+import { signQuoteToken } from '@/lib/quote-token'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -24,6 +26,7 @@ type QuoteData = {
   children: number
   message?: string | null
   estimateDetails?: QuoteEstimateSnapshot | null
+  vehicleEstimate?: VehicleEstimateSnapshot | null
   vehicleCode?: string | null
   vehicleLabel?: string | null
   pricingMode?: string | null
@@ -73,7 +76,17 @@ async function sendMail(payload: {
 
 function buildAdminEmail(data: QuoteData) {
   const estimate = data.estimateDetails
-  const estimateSection = estimate ? `
+  const vehicleEstimate = data.vehicleEstimate
+  const estimateSection = vehicleEstimate ? `
+    <hr />
+    <h3>Estimation indicative (véhicule)</h3>
+    <p><strong>Total estimé :</strong> ${formatMoney(vehicleEstimate.total, vehicleEstimate.currency)}</p>
+    <ul>
+      <li>Véhicule : ${escapeHtml(vehicleEstimate.vehicleName)} [${escapeHtml(vehicleEstimate.vehicleCode)}], capacité ${vehicleEstimate.capacity} pers.</li>
+      <li>Calcul : ${formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)} / jour × ${vehicleEstimate.days} jour(s) × ${vehicleEstimate.vehicleCount} véhicule(s)</li>
+      ${vehicleEstimate.indicativeOnly ? '<li>Tarif indicatif : confirmer disponibilité et saison.</li>' : ''}
+    </ul>
+  ` : estimate ? `
     <hr />
     <h3>Estimation indicative recalculée</h3>
     <p><strong>Total estimé :</strong> ${formatMoney(estimate.finalPrice, estimate.currency)}</p>
@@ -114,6 +127,10 @@ function buildAdminEmail(data: QuoteData) {
   `
 }
 
+function clientQuoteUrl(d: QuoteData, lang: string) {
+  return `${SITE_URL}/${lang}/devis/${encodeURIComponent(d.reference)}?token=${encodeURIComponent(signQuoteToken(d.id))}`
+}
+
 function buildClientEmail(data: QuoteData) {
   const subjects: Record<string, string> = {
     fr: 'Votre demande de devis a bien été reçue',
@@ -126,26 +143,28 @@ function buildClientEmail(data: QuoteData) {
       <p>Bonjour ${escapeHtml(d.firstName)},</p>
       <p>Nous avons bien reçu votre demande de devis et vous remercions de votre confiance.</p>
       <p><strong>Référence :</strong> ${escapeHtml(d.reference)}</p>
-      <p><a href="${SITE_URL}/fr/devis/${encodeURIComponent(d.reference)}">Suivre votre demande</a> · <a href="${SITE_URL}/fr/annulation">Conditions d’annulation et de remboursement</a></p>
+      <p><a href="${clientQuoteUrl(d, 'fr')}">Suivre votre demande</a> · <a href="${SITE_URL}/fr/annulation">Conditions d’annulation et de remboursement</a></p>
       ${d.circuitTitle ? `<p><strong>Itinéraire :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Notre équipe vous répondra sous 24 à 48 heures ouvrées.</p>
-      <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>
+      <p>À très bientôt,<br />Vonjy, votre chauffeur-guide, et l'équipe ANABO Roadtrip Madagascar</p>
     `,
     en: (d) => `
       <p>Hello ${escapeHtml(d.firstName)},</p>
       <p>We have received your quote request and thank you for your trust.</p>
       <p><strong>Reference:</strong> ${escapeHtml(d.reference)}</p>
+      <p><a href="${clientQuoteUrl(d, 'en')}">Track your request</a> · <a href="${SITE_URL}/en/annulation">Cancellation and refund policy</a></p>
       ${d.circuitTitle ? `<p><strong>Itinerary:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Our team will reply within 24 to 48 business hours.</p>
-      <p>See you soon,<br />The ANABO Roadtrip Madagascar team</p>
+      <p>See you soon,<br />Vonjy, your driver-guide, and the ANABO Roadtrip Madagascar team</p>
     `,
     it: (d) => `
       <p>Ciao ${escapeHtml(d.firstName)},</p>
       <p>Abbiamo ricevuto la tua richiesta di preventivo e ti ringraziamo per la fiducia.</p>
       <p><strong>Riferimento:</strong> ${escapeHtml(d.reference)}</p>
+      <p><a href="${clientQuoteUrl(d, 'it')}">Segui la tua richiesta</a> · <a href="${SITE_URL}/it/annulation">Condizioni di cancellazione e rimborso</a></p>
       ${d.circuitTitle ? `<p><strong>Itinerario:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Il nostro team risponderà entro 24-48 ore lavorative.</p>
-      <p>A presto,<br />Il team ANABO Roadtrip Madagascar</p>
+      <p>A presto,<br />Vonjy, il tuo autista-guida, e il team ANABO Roadtrip Madagascar</p>
     `,
   }
 

@@ -3,8 +3,10 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { sendQuoteEmails } from '@/lib/email'
-import { calculateQuoteEstimate } from '@/lib/pricing'
-import type { PricingMode } from '@/generated/prisma/enums'
+import {
+  calculateTripVehiclePrice,
+  type VehicleEstimateSnapshot,
+} from '@/lib/trip-pricing'
 
 export const runtime = 'nodejs'
 
@@ -30,11 +32,11 @@ const quoteSchema = z.object({
   children: z.coerce.number().int().min(0).max(20).default(0),
   vehicleCode: z.string().trim().max(120).optional().or(z.literal('')),
   vehicleLabel: z.string().trim().max(120).optional().or(z.literal('')),
-  pricingMode: z.enum(['DAILY_CAR', 'TOUR_INCLUDED']).optional(),
-  packageId: z.string().trim().max(30).optional().or(z.literal('')),
   consecutiveCircuits: z.coerce.number().int().min(1).max(20).default(1),
   vehicleCount: z.coerce.number().int().min(1).max(20).default(1),
   message: z.string().trim().max(5000).optional().or(z.literal('')),
+  // Champ piège anti-spam : invisible pour les humains, rempli par les robots.
+  website: z.string().max(500).optional(),
 })
 
 function parseDate(value?: string): Date | null {
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { error: 'Le contenu envoyé est invalide.' },
-      { status: 400 },
+      { status: 400 }
     )
   }
 
@@ -72,11 +74,19 @@ export async function POST(request: Request) {
         error: 'Veuillez vérifier les champs du formulaire.',
         fields: result.error.flatten().fieldErrors,
       },
-      { status: 400 },
+      { status: 400 }
     )
   }
 
   const data = result.data
+
+  if (data.website) {
+    // Robot détecté : on simule un succès sans rien enregistrer.
+    return NextResponse.json(
+      { success: true, reference: null, estimate: null },
+      { status: 201 },
+    )
+  }
 
   let startDate: Date | null
   let endDate: Date | null
@@ -87,53 +97,61 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json(
       { error: 'Une date du voyage est invalide.' },
-      { status: 400 },
+      { status: 400 }
     )
   }
 
   if (startDate && endDate && endDate < startDate) {
     return NextResponse.json(
-      { error: 'La date de retour doit être postérieure ou égale à la date de départ.' },
-      { status: 400 },
+      {
+        error:
+          'La date de retour doit être postérieure ou égale à la date de départ.',
+      },
+      { status: 400 }
     )
   }
 
-  const rentalDays = startDate && endDate
-    ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000))
-    : 0
-  let estimateResult: Awaited<ReturnType<typeof calculateQuoteEstimate>> = null
-  let selectedPackage: { id: string; name: string } | null = null
-  try {
-    if (data.packageId) {
-      if (!data.pricingMode || !data.circuitSlug) return NextResponse.json({ error: 'Choisissez un mode de tarification valide pour ce package.' }, { status: 400 })
-      selectedPackage = await prisma.pricingPackage.findFirst({
-        where: {
-          id: data.packageId,
-          active: true,
-          config: { circuitSlug: data.circuitSlug },
-          OR: [{ scope: data.pricingMode }, { scope: 'BOTH' }],
-        },
-        select: { id: true, name: true },
-      })
-      if (!selectedPackage) return NextResponse.json({ error: 'Le package sélectionné n’est plus disponible.' }, { status: 400 })
-    }
-    if (data.pricingMode && data.circuitSlug) estimateResult = await calculateQuoteEstimate({
-        circuitSlug: data.circuitSlug,
-        pricingMode: data.pricingMode as PricingMode,
-        vehicleCode: data.vehicleCode || undefined,
-        vehicleLabel: data.vehicleLabel || undefined,
-        packageId: selectedPackage?.id,
-        adults: data.adults,
-        children: data.children,
+  // Jours inclus : du 1er au 5 = 5 jours (jour de départ et de retour comptés).
+  const rentalDays =
+    startDate && endDate
+      ? Math.round(
+          (endDate.getTime() - startDate.getTime()) / 86_400_000
+        ) + 1
+      : 0
+
+  // Estimation indicative : prix journalier × durée × nombre de véhicules.
+  // Le snapshot complet (avec prix journalier) reste côté serveur.
+  let estimateSnapshot: VehicleEstimateSnapshot | null = null
+
+  if (data.vehicleCode && rentalDays > 0) {
+    try {
+      const estimate = await calculateTripVehiclePrice({
+        vehicleCode: data.vehicleCode,
         days: rentalDays,
-        consecutiveCircuits: data.consecutiveCircuits,
         vehicleCount: data.vehicleCount,
       })
-  } catch (error) {
-    console.error('[api/quotes] Estimate calculation failed:', error)
-    return NextResponse.json({ error: 'Impossible de calculer le prix indicatif pour le moment.' }, { status: 503 })
+
+      if (estimate) {
+        estimateSnapshot = {
+          version: 3,
+          calculatedAt: new Date().toISOString(),
+          ...estimate,
+        }
+      }
+    } catch (error) {
+      console.error('[api/quotes] Estimate calculation failed:', error)
+    }
   }
-  const estimateDetails = estimateResult?.snapshot || null
+
+  const publicEstimate = estimateSnapshot
+    ? {
+        total: estimateSnapshot.total,
+        currency: estimateSnapshot.currency,
+        indicativeOnly: estimateSnapshot.indicativeOnly,
+        days: estimateSnapshot.days,
+        vehicleName: estimateSnapshot.vehicleName,
+      }
+    : null
 
   const reference =
     `AR-${Date.now().toString(36).toUpperCase()}-` +
@@ -156,14 +174,14 @@ export async function POST(request: Request) {
         adults: data.adults,
         children: data.children,
         message: data.message || null,
-        estimateDetails: estimateDetails ? JSON.stringify(estimateDetails) : null,
         vehicleCode: data.vehicleCode || null,
         vehicleLabel: data.vehicleLabel || null,
-        pricingMode: data.pricingMode || null,
-        pricingPackageId: selectedPackage?.id || null,
-        pricingPackageName: selectedPackage?.name || null,
         vehicleCount: data.vehicleCount,
         consecutiveCircuits: data.consecutiveCircuits,
+
+        estimateDetails: estimateSnapshot
+          ? JSON.stringify(estimateSnapshot)
+          : null,
       },
       select: {
         id: true,
@@ -172,7 +190,6 @@ export async function POST(request: Request) {
       },
     })
 
-    // Envoi des e-mails (ne bloque pas la réponse en cas d'échec Resend)
     try {
       await sendQuoteEmails({
         id: quote.id,
@@ -190,16 +207,17 @@ export async function POST(request: Request) {
         adults: data.adults,
         children: data.children,
         message: data.message || null,
-        estimateDetails,
         vehicleCode: data.vehicleCode || null,
         vehicleLabel: data.vehicleLabel || null,
-        pricingMode: data.pricingMode || null,
-        pricingPackageName: selectedPackage?.name || null,
         vehicleCount: data.vehicleCount,
         consecutiveCircuits: data.consecutiveCircuits,
+        vehicleEstimate: estimateSnapshot,
       })
     } catch (emailErr) {
-      console.error('[api/quotes] Email send failed:', emailErr)
+      console.error(
+        '[api/quotes] Email send failed:',
+        emailErr
+      )
     }
 
     return NextResponse.json(
@@ -207,15 +225,19 @@ export async function POST(request: Request) {
         success: true,
         message: 'Votre demande a bien été enregistrée.',
         reference: quote.reference,
-        estimate: estimateResult?.publicEstimate || null,
+        estimate: publicEstimate,
       },
-      { status: 201 },
+      { status: 201 }
     )
   } catch (err) {
     console.error('[api/quotes] Prisma error:', err)
+
     return NextResponse.json(
-      { error: 'Impossible d’enregistrer la demande pour le moment.' },
-      { status: 500 },
+      {
+        error:
+          'Impossible d’enregistrer la demande pour le moment.',
+      },
+      { status: 500 }
     )
   }
 }

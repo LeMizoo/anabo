@@ -11,6 +11,7 @@ import {
 } from '@/app/admin/actions'
 import type { RoadCondition } from '@/generated/prisma/enums'
 import type { QuoteEstimateSnapshot } from '@/lib/pricing'
+import { parseVehicleEstimateSnapshot } from '@/lib/trip-pricing'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,6 +30,16 @@ function parseEstimate(value: string | null): QuoteEstimateSnapshot | null {
       typeof parsed.currency === 'string'
       ? parsed
       : null
+  } catch {
+    return null
+  }
+}
+
+function parseVehicleEstimate(value: string | null) {
+  if (!value) return null
+
+  try {
+    return parseVehicleEstimateSnapshot(JSON.parse(value))
   } catch {
     return null
   }
@@ -109,6 +120,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
   if (!quote) notFound()
 
   const estimate = parseEstimate(quote.estimateDetails)
+  const vehicleEstimate = parseVehicleEstimate(quote.estimateDetails)
   const season = getSeason(quote.startDate)
 
   return (
@@ -342,6 +354,49 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               </div>
             </form>
           </section>
+
+          {vehicleEstimate && (
+            <section className="rounded-xl border border-green-200 bg-green-50 p-6 shadow-sm">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-green-950">
+                    Estimation indicative reçue (véhicule)
+                  </h2>
+                  <p className="mt-1 text-sm text-green-800">
+                    Calculée côté serveur le{' '}
+                    {new Date(vehicleEstimate.calculatedAt).toLocaleString('fr-FR')}
+                  </p>
+                </div>
+                <p className="text-2xl font-bold text-green-950">
+                  {formatMoney(vehicleEstimate.total, vehicleEstimate.currency)}
+                </p>
+              </div>
+
+              <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-green-800">Véhicule</dt>
+                  <dd className="mt-1 text-green-950">
+                    {vehicleEstimate.vehicleName} [{vehicleEstimate.vehicleCode}]
+                    · {vehicleEstimate.capacity} pers.
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-green-800">Calcul</dt>
+                  <dd className="mt-1 text-green-950">
+                    {formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)}{' '}
+                    / jour × {vehicleEstimate.days} jour(s) ×{' '}
+                    {vehicleEstimate.vehicleCount} véhicule(s)
+                  </dd>
+                </div>
+              </dl>
+
+              {vehicleEstimate.indicativeOnly && (
+                <p className="mt-3 text-sm text-green-800">
+                  Tarif indicatif : confirmer disponibilité et saison.
+                </p>
+              )}
+            </section>
+          )}
 
           {estimate && (
             <section className="rounded-xl border border-green-200 bg-green-50 p-6 shadow-sm">

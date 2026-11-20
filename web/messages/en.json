@@ -1,4 +1,3 @@
-
 {
   "nav": {
     "home": "Home",
@@ -16,8 +15,10 @@
   },
   "home": {
     "eyebrow": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "fallbackTitle": "Discover Madagascar with a local driver guide",
-    "fallbackDescription": "Explore Madagascar through authentic road trips and tailor-made journeys."
+    "fallbackTitle": "Discover Madagascar with Vonjy, your driver-guide",
+    "fallbackDescription": "Travel Madagascar with Vonjy, a Malagasy driver-guide trusted by travellers from around the world: private tours, authentic road trips and tailor-made journeys.",
+    "vonjyBadge": "With Vonjy, a driver-guide trusted by travellers worldwide",
+    "vonjyJobTitle": "Driver-guide in Madagascar"
   },
   "footer": {
     "navigation": "Navigation",
@@ -33,21 +34,22 @@
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "description": "Discover Madagascar with a local driver guide. Explore the island through authentic road trips and tailor-made journeys."
+    "description": "Travel Madagascar with Vonjy, a Malagasy driver-guide trusted by travellers from around the world: private tours, authentic road trips and tailor-made journeys."
   },
   "tourIdeas": {
     "title": "Tour Ideas in Madagascar",
     "subtitle": "Madagascar, a land of natural wonders and cultural treasures, invites you to imagine your own adventure.",
     "intro": "With varied landscapes, distinctive wildlife and a rich culture, the island offers many ways to travel. These circuits give you a glimpse of what is possible and inspiration for an itinerary shaped around your interests. I would be happy to help you choose suitable stops and a comfortable pace.",
     "metaTitle": "Madagascar Tour Ideas | Anabo Roadtrip",
-    "metaDescription": "Explore Madagascar tour ideas: the RN7, Tsingy, baobabs, national parks, the East Coast and Nosy Be with a local driver-guide.",
+    "metaDescription": "Madagascar tour ideas: the RN7, Tsingy, baobabs, national parks, the East Coast and Nosy Be with Vonjy, a driver-guide trusted by travellers worldwide.",
     "keywords": [
       "Madagascar tour ideas",
       "Madagascar itinerary",
       "Madagascar road trip",
       "RN7 tour Madagascar",
       "Nosy Be tour",
-      "Madagascar driver-guide"
+      "Madagascar driver-guide",
+      "Vonjy driver-guide Madagascar"
     ],
     "faqTitle": "Questions about choosing a Madagascar tour",
     "faqs": [
@@ -107,7 +109,8 @@
     "confirm": "Confirm this quote",
     "confirming": "Confirming...",
     "notReady": "This quote is not yet available for confirmation.",
-    "questions": "Questions? Contact us at "
+    "questions": "Questions? Contact us at ",
+    "cancellationLink": "Cancellation and refund"
   },
   "contactForm": {
     "openContact": "Contact us",
@@ -119,6 +122,13 @@
     "circuitDefault": "Tailor-made / I don't know yet",
     "circuitExtras": "Would you like to add an extension?",
     "totalDuration": "Total trip duration: {days} days",
+    "durationEstimateTitle": "Estimated trip duration",
+    "durationLoading": "Loading estimated durations...",
+    "durationLoadError": "Unable to load estimated durations. Please try again.",
+    "durationSeasonDry": "Dry season (May to October)",
+    "durationSeasonRainy": "Rainy season (November to April)",
+    "durationCircuitRange": "{title}: {min} to {max} days",
+    "durationTotalRange": "Estimated total duration: {min} to {max} days",
     "durationIncomplete": "The duration of some selected tours has not been entered yet.",
     "firstName": "First name",
     "lastName": "Last name",
