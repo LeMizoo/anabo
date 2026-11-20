@@ -107,7 +107,7 @@ export function PuzzleGallery({ block, locale }: Props) {
                   y: item.overlap?.startsWith('top') ? -16 : item.overlap?.startsWith('bottom') ? 16 : 0,
                   zIndex: item.overlap && item.overlap !== 'none' ? 1 : undefined,
                 }}
-                className={`relative group overflow-visible rounded-xl transition duration-300 hover:z-10 hover:scale-[1.03] hover:shadow-2xl hover:ring-4 hover:ring-[#E0A01C] focus-within:z-10 ${getItemClasses(
+                className={`relative group overflow-visible rounded-xl transition duration-300 hover:z-10 hover:scale-[1.03] hover:shadow-2xl hover:ring-4 hover:ring-[#06245F] focus-within:z-10 ${getItemClasses(
                   block.layout === 'manual'
                     ? item.size || 'small'
                     : automaticSizes[index % automaticSizes.length] || 'small',
@@ -118,6 +118,8 @@ export function PuzzleGallery({ block, locale }: Props) {
                     <ImageFrame
                       className="h-full w-full"
                       presentation={item.image.presentation}
+                      // Bordure bleu marine et fond clair : l'image entière reste visible.
+                      style={{ border: '2px solid #06245F', backgroundColor: '#F8F6F1' }}
                     >
                       <Image
                         src={imageUrl}
@@ -125,9 +127,11 @@ export function PuzzleGallery({ block, locale }: Props) {
                         fill
                         sizes="(min-width: 768px) 50vw, 100vw"
                         unoptimized={Boolean(item.pixelation && item.pixelation !== 'none')}
-                        className="transition-transform duration-700 ease-in-out group-hover:scale-110"
+                        className="transition-transform duration-700 ease-in-out group-hover:scale-105"
                         style={{
                           ...imageContentStyle(item.image.presentation),
+                          // Affichage intégral : aucune partie de la photo n'est rognée.
+                          objectFit: 'contain',
                           imageRendering: item.pixelation && item.pixelation !== 'none' ? 'pixelated' : undefined,
                         }}
                       />
