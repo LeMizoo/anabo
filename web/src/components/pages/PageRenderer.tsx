@@ -94,7 +94,13 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
             case 'heroBlock':
               return <HeroSection block={module} locale={locale} />
             case 'textMediaBlock':
-              return <TextMediaSection block={module} locale={locale} />
+              return (
+                <TextMediaSection
+                  block={module}
+                  locale={locale}
+                  globalHeadingFont={globalHeadingFont}
+                />
+              )
             case 'ctaBlock':
               return <CtaSection block={module} locale={locale} />
             case 'contactFormBlock':

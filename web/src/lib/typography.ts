@@ -11,11 +11,12 @@ const TITLE_SIZE_CLASSES: Record<string, string> = {
   '2xl': 'text-[clamp(2rem,5vw,3.75rem)]',
 }
 
+// Variables CSS (définies dans globals.css) : la couleur s'adapte au mode clair / sombre.
 const BRAND_TEXT_COLORS: Record<BrandTextColor, string> = {
-  navy: '#06245F',
-  gold: '#E0A01C',
-  charcoal: '#374151',
-  white: '#FFFFFF',
+  navy: 'var(--brand-navy)',
+  gold: 'var(--brand-gold)',
+  charcoal: 'var(--brand-charcoal)',
+  white: 'var(--brand-white)',
 }
 
 export function brandTextColor(color?: BrandTextColor) {
@@ -104,24 +105,14 @@ export function titleCase(value: string, locale: string) {
   return sentenceCase(value, locale)
 }
 
-
-const SCRIPT_FONTS = new Set([
-  'font-caflisch', 'font-euphoria', 'font-haigrast', 'font-script', 'font-script-alt', 'font-script-in', 'font-perfect-girl-script',
-])
-
 /**
- * Police d'un titre : les polices manuscrites ne sont gardées que pour les textes
- * courts (≤ 30 caractères), où elles restent lisibles et élégantes. Au-delà, on passe
- * à une police moderne : Playfair Display (font-serif) pour les titres, sans-serif pour les sous-titres.
+ * Police d'un titre : conserve toujours la police sélectionnée dans Sanity,
+ * quelle que soit la longueur du texte.
  */
 export function headingFont(
   font: string | undefined | null,
-  text: string | undefined | null,
+  _text: string | undefined | null,
   options: { fallback?: string; long?: string } = {},
 ) {
-  const chosen = font || options.fallback || 'font-caflisch'
-  if (SCRIPT_FONTS.has(chosen) && (text || '').trim().length > 30) {
-    return options.long || 'font-serif'
-  }
-  return chosen
+  return font || options.fallback || 'font-caflisch'
 }

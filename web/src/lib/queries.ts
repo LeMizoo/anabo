@@ -375,6 +375,7 @@ export const tourIdeasQuery = `
     pageType,
     excerpt,
     cardTagline,
+    cardSummary,
     routeStops,
     featuredImage{ ..., asset->, alt }
   }

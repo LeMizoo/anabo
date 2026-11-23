@@ -27,6 +27,7 @@ type TourIdea = {
   pageType: string
   excerpt?: string
   cardTagline?: string
+  cardSummary?: string
   featuredImage?: SanityImage
   routeStops?: string[]
 }
@@ -195,8 +196,8 @@ export default async function TourIdeasPage({ params }: Props) {
                   </h2>
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  {tour.excerpt && (
-                    <p className="line-clamp-3 text-sm leading-6 text-slate-600">{tour.excerpt}</p>
+                  {(tour.cardSummary || tour.excerpt) && (
+                    <p className="line-clamp-4 text-sm leading-6 text-slate-600 dark:text-slate-300">{tour.cardSummary || tour.excerpt}</p>
                   )}
                   <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#06245F]">
                     {tour.pageType === 'custom-trip' ? t('createTrip') : t('details')}

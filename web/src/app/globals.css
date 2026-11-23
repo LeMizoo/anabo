@@ -3,6 +3,31 @@
 @tailwind utilities;
 
 @layer base {
+  /* Couleurs de marque : lisibles en mode clair comme en mode sombre. */
+  :root {
+    --brand-navy: #06245f;
+    --brand-gold: #e0a01c;
+    --brand-charcoal: #374151;
+    --brand-white: #ffffff;
+  }
+
+  .dark {
+    --brand-navy: #dce6f7;
+    --brand-charcoal: #e5e7eb;
+  }
+
+  /* Zones claires sans variante sombre (cartes blanches, formulaire crème…) :
+     elles restent claires en mode sombre, donc gardent les couleurs d'origine. */
+  .dark :is(.bg-white, .bg-\[\#F8F6F1\], .bg-\[\#FDF8F5\], .bg-slate-50, .bg-gray-50, .bg-amber-50, .bg-stone-50):not([class*='dark:bg-']) {
+    --brand-navy: #06245f;
+    --brand-charcoal: #374151;
+  }
+
+  /* Bleu marine écrit en dur dans les composants : suit la même règle. */
+  .dark .text-\[\#06245F\] {
+    color: var(--brand-navy);
+  }
+
   * {
     @apply border-gray-200;
   }

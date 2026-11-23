@@ -9,16 +9,36 @@ import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/ty
 import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { TextMediaBlock } from '@/lib/types'
-import type { ReactNode } from 'react'
+import { Children, isValidElement, type ReactNode } from 'react'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 import { ImagePlaceholder } from './ImagePlaceholder'
 
 type Props = {
   block: TextMediaBlock
   locale: Locale
+  globalHeadingFont?: string
 }
 
-function getPortableTextComponents(locale: Locale): PortableTextComponents {
+function getTextContent(node: ReactNode): string {
+  return Children.toArray(node)
+    .map((child) => {
+      if (typeof child === 'string' || typeof child === 'number') {
+        return String(child)
+      }
+
+      if (isValidElement<{ children?: ReactNode }>(child)) {
+        return getTextContent(child.props.children)
+      }
+
+      return ''
+    })
+    .join('')
+}
+
+function getPortableTextComponents(
+  locale: Locale,
+  globalHeadingFont?: string,
+): PortableTextComponents {
   return {
     list: {
       bullet: ({ children }: { children?: ReactNode }) => (
@@ -46,12 +66,26 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
       ),
     },
     block: {
-      h2: ({ children }: { children?: ReactNode }) => (
-        <h3 className="text-[clamp(1.25rem,3vw,1.875rem)] font-bold text-[#06245F] mt-8 mb-4 font-serif">{children}</h3>
-      ),
-      h3: ({ children }: { children?: ReactNode }) => (
-        <h4 className="text-[clamp(1.125rem,2.5vw,1.5rem)] font-bold text-[#06245F] mt-6 mb-3 font-serif">{children}</h4>
-      ),
+      h2: ({ children }: { children?: ReactNode }) => {
+        const text = getTextContent(children)
+        const fontClass = headingFont(globalHeadingFont, text)
+
+        return (
+          <h3 className={`text-[clamp(1.25rem,3vw,1.875rem)] font-bold text-[#06245F] mt-8 mb-4 ${fontClass}`}>
+            {children}
+          </h3>
+        )
+      },
+      h3: ({ children }: { children?: ReactNode }) => {
+        const text = getTextContent(children)
+        const fontClass = headingFont(globalHeadingFont, text)
+
+        return (
+          <h4 className={`text-[clamp(1.125rem,2.5vw,1.5rem)] font-bold text-[#06245F] mt-6 mb-3 ${fontClass}`}>
+            {children}
+          </h4>
+        )
+      },
       blockquote: ({ children }: { children?: ReactNode }) => (
         <blockquote className="border-l-4 border-[#E0A01C] pl-4 italic text-gray-600 my-6 dark:text-gray-300">
           {children}
@@ -63,6 +97,7 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
         const href = typeof value?.href === 'string'
           ? localizeInternalPath(value.href, locale)
           : '#'
+
         return (
           <a
             href={href}
@@ -78,12 +113,12 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
   }
 }
 
-export function TextMediaSection({ block, locale }: Props) {
-  const portableTextComponents = getPortableTextComponents(locale)
+export function TextMediaSection({ block, locale, globalHeadingFont }: Props) {
+  const portableTextComponents = getPortableTextComponents(locale, globalHeadingFont)
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
-  const titleFontClass = headingFont(block.titleFont, block.title)
+  const titleFontClass = headingFont(block.titleFont || globalHeadingFont, block.title)
   const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
-  
+
   // Nouvelles positions
   const isImageTop = block.imagePosition === 'top'
   const isImageBottom = block.imagePosition === 'bottom'
@@ -94,9 +129,9 @@ export function TextMediaSection({ block, locale }: Props) {
     return (
       <section className="container-custom overflow-hidden">
         <div className="max-w-5xl mx-auto flex flex-col gap-8">
-          
+
           {isImageTop && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -122,7 +157,7 @@ export function TextMediaSection({ block, locale }: Props) {
             </motion.div>
           )}
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -151,7 +186,7 @@ export function TextMediaSection({ block, locale }: Props) {
           </motion.div>
 
           {isImageBottom && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -185,8 +220,8 @@ export function TextMediaSection({ block, locale }: Props) {
   return (
     <section className="container-custom overflow-hidden">
       <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}

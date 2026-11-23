@@ -54,13 +54,19 @@ export function CardsSection({
       ? 'text-white/85'
       : 'text-gray-700 dark:text-gray-300'
 
+  const sectionTitleFont = headingFont(
+    block.titleFont || globalHeadingFont,
+    block.title,
+    { fallback: 'font-caflisch' },
+  )
+
   return (
     <section className="container-custom">
       {block.title && (
         <h2
-          className={`mb-4 text-center ${titleSizeClass(block.titleSize)} ${
-            block.titleFont || globalHeadingFont || 'font-caflisch'
-          } ${block.titleWeight || globalHeadingWeight || 'font-normal'}`}
+          className={`mb-4 text-center ${titleSizeClass(block.titleSize)} ${sectionTitleFont} ${
+            block.titleWeight || globalHeadingWeight || 'font-normal'
+          }`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
           {titleCase(block.title, locale)}

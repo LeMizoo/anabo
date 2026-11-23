@@ -464,6 +464,7 @@ export interface Page {
   pageType?: string
   excerpt?: string
   cardTagline?: string
+  cardSummary?: string
   featuredImage?: SanityImage
   routeStops?: string[]
   seo?: PageSeo

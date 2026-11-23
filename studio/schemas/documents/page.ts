@@ -98,6 +98,16 @@ export default {
       hidden: ({ document }: any) => document?.pageType !== 'circuit',
       group: 'content',
     },
+    {
+      name: 'cardSummary',
+      type: 'text',
+      rows: 3,
+      title: 'Résumé de la carte circuit',
+      description: 'Deux ou trois phrases affichées sur la carte du circuit (page Idées de circuits). Si vide, l’extrait est utilisé.',
+      validation: (Rule: any) => Rule.max(320).warning('Restez sous 320 caractères pour un affichage lisible sur la carte.'),
+      hidden: ({ document }: any) => document?.pageType !== 'circuit',
+      group: 'content',
+    },
     defineField({
       name: 'routeStops',
       type: 'array',
