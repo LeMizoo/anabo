@@ -51,6 +51,7 @@ export function AlertBell({ initial }: { initial: AdminAlerts }) {
     { label: 'Devis à envoyer (clients contactés)', count: alerts.quotesToSend, href: '/admin/demandes?status=CONTACTE' },
     { label: 'Devis à relancer (+7 j)', count: alerts.quotesToFollowUp, href: '/admin/demandes?suivi=relance' },
     { label: 'Voyages qui se chevauchent (renfort)', count: alerts.capacityIssues, href: '/admin/planning' },
+    { label: 'Acomptes en attente', count: alerts.depositsPending, href: '/admin/demandes?suivi=acompte' },
   ]
 
   return (

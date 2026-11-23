@@ -4,6 +4,44 @@
 import { verifyQuoteToken } from '@/lib/quote-token'
 import { revalidatePath } from 'next/cache'
 import { notifyIfShortage } from '@/lib/capacity-alerts'
+import { sendClientAcceptedAdminEmail, sendQuoteStatusEmail } from '@/lib/email'
+import { sendPushToAdmins } from '@/lib/push'
+import { depositAmount, formatAmount, getPaymentSettings } from '@/lib/payment-settings'
+
+/**
+ * Après l'acceptation en ligne : e-mail de confirmation au client (avec les
+ * instructions d'acompte) et alerte à l'équipe. N'échoue jamais.
+ */
+async function afterClientAcceptance(quoteId: string, acceptedAt: Date) {
+  try {
+    const { prisma } = await import('@/lib/prisma')
+    const quote = await prisma.quoteRequest.findUnique({
+      where: { id: quoteId },
+      select: { id: true, reference: true, firstName: true, lastName: true, email: true, phone: true, locale: true, quoteTotalAmount: true, quoteCurrency: true },
+    })
+    if (!quote) return
+    const settings = await getPaymentSettings()
+    const amount = depositAmount(quote.quoteTotalAmount, settings.depositPercent)
+    const depositText = amount ? formatAmount(amount, quote.quoteCurrency) : null
+
+    await Promise.allSettled([
+      sendQuoteStatusEmail(quote.email, quote.firstName, 'CONFIRME', quote.reference, undefined, quote.locale, {
+        settings,
+        total: quote.quoteTotalAmount,
+        currency: quote.quoteCurrency,
+      }),
+      sendClientAcceptedAdminEmail({ ...quote, acceptedAt, depositPercent: settings.depositPercent, depositText }),
+      sendPushToAdmins({
+        title: `Devis accepté — ${quote.reference}`,
+        body: `${quote.firstName} ${quote.lastName} a confirmé en ligne. Acompte attendu (${settings.depositPercent} %${depositText ? ` : ${depositText}` : ''}).`,
+        url: `/admin/demandes/${quote.id}`,
+        tag: `accepted-${quote.id}`,
+      }),
+    ])
+  } catch (error) {
+    console.error('[confirmation] Notifications impossibles :', error)
+  }
+}
 
 export async function confirmQuoteByClient(
   quoteId: string,
@@ -69,6 +107,7 @@ export async function confirmQuoteByClient(
     revalidatePath('/admin/planning')
 
     await notifyIfShortage(quoteId)
+    await afterClientAcceptance(quoteId, acceptedAt)
 
     return { success: true }
   } catch (error) {

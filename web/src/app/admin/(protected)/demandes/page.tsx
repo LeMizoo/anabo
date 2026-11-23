@@ -30,6 +30,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
   const search = (q || '').trim().slice(0, 100)
   const sortMode = sort === 'depart' ? 'depart' : 'recent'
   const followUp = suivi === 'relance'
+  const depositView = suivi === 'acompte'
   const followUpLimit = new Date(Date.now() - FOLLOW_UP_DAYS * 86_400_000)
 
   const searchWhere: Prisma.QuoteRequestWhereInput = search
@@ -50,9 +51,11 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
     quoteSentAt: { lt: followUpLimit },
   }
 
+  const depositWhere: Prisma.QuoteRequestWhereInput = { status: 'CONFIRME', depositPaidAt: null }
+
   const whereClause: Prisma.QuoteRequestWhereInput = {
     ...searchWhere,
-    ...(followUp ? followUpWhere : isQuoteStatus(status) ? { status } : {}),
+    ...(followUp ? followUpWhere : depositView ? depositWhere : isQuoteStatus(status) ? { status } : {}),
   }
 
   const orderBy: Prisma.QuoteRequestOrderByWithRelationInput[] =
@@ -60,12 +63,13 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
       ? [{ startDate: { sort: 'asc', nulls: 'last' } }, { createdAt: 'desc' }]
       : [{ createdAt: 'desc' }]
 
-  const [quotes, totalQuotes, statusGroups, totalAll, followUpCount] = await Promise.all([
+  const [quotes, totalQuotes, statusGroups, totalAll, followUpCount, depositCount] = await Promise.all([
     prisma.quoteRequest.findMany({ where: whereClause, orderBy, skip, take: ITEMS_PER_PAGE }),
     prisma.quoteRequest.count({ where: whereClause }),
     prisma.quoteRequest.groupBy({ by: ['status'], where: searchWhere, _count: { status: true } }),
     prisma.quoteRequest.count({ where: searchWhere }),
     prisma.quoteRequest.count({ where: { ...searchWhere, ...followUpWhere } }),
+    prisma.quoteRequest.count({ where: { ...searchWhere, ...depositWhere } }),
   ])
 
   const countFor = (value: string) =>
@@ -78,7 +82,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
       q: search || undefined,
       status: isQuoteStatus(status) ? status : undefined,
       sort: sortMode === 'depart' ? 'depart' : undefined,
-      suivi: followUp ? 'relance' : undefined,
+      suivi: followUp ? 'relance' : depositView ? 'acompte' : undefined,
     }
     for (const [key, value] of Object.entries({ ...current, ...changes })) {
       if (value) params.set(key, value)
@@ -88,14 +92,15 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
   }
 
   const tabs = [
-    { label: 'Toutes', count: totalAll, href: buildUrl({ status: null, suivi: null, page: null }), active: !followUp && !isQuoteStatus(status) },
+    { label: 'Toutes', count: totalAll, href: buildUrl({ status: null, suivi: null, page: null }), active: !followUp && !depositView && !isQuoteStatus(status) },
     ...QUOTE_STATUSES.map((item) => ({
       label: item.label,
       count: countFor(item.value),
       href: buildUrl({ status: item.value, suivi: null, page: null }),
-      active: !followUp && status === item.value,
+      active: !followUp && !depositView && status === item.value,
     })),
     { label: `À relancer (+${FOLLOW_UP_DAYS} j)`, count: followUpCount, href: buildUrl({ status: null, suivi: 'relance', page: null }), active: followUp },
+    { label: 'Acompte en attente', count: depositCount, href: buildUrl({ status: null, suivi: 'acompte', page: null }), active: depositView },
   ]
 
   const exportParams = new URLSearchParams({
@@ -193,6 +198,12 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
                         {quote.reference}
                         {toFollowUp && (
                           <span className="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-semibold text-orange-800">À relancer</span>
+                        )}
+                        {quote.status === 'CONFIRME' && !quote.depositPaidAt && (
+                          <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-800">Acompte en attente</span>
+                        )}
+                        {quote.status === 'CONFIRME' && quote.depositPaidAt && (
+                          <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-800">Acompte reçu</span>
                         )}
                         {isNewAndOld && (
                           <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800">+24 h</span>

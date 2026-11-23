@@ -2,7 +2,7 @@ import { Resend } from 'resend'
 import type { QuoteEstimateSnapshot } from '@/lib/pricing'
 import type { VehicleEstimateSnapshot } from '@/lib/trip-pricing'
 import { signQuoteToken } from '@/lib/quote-token'
-import { depositAmount, formatAmount, type PaymentSettingsData } from '@/lib/payment-settings'
+import { depositAmount, formatAmount, getPaymentSettings, type PaymentSettingsData } from '@/lib/payment-settings'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -132,7 +132,7 @@ function clientQuoteUrl(d: QuoteData, lang: string) {
   return `${SITE_URL}/${lang}/devis/${encodeURIComponent(d.reference)}?token=${encodeURIComponent(signQuoteToken(d.id))}`
 }
 
-function buildClientEmail(data: QuoteData) {
+function buildClientEmail(data: QuoteData, depositPercent = 0) {
   const subjects: Record<string, string> = {
     fr: 'Votre demande de devis a bien été reçue',
     en: 'Your quote request has been received',
@@ -147,6 +147,7 @@ function buildClientEmail(data: QuoteData) {
       <p><a href="${clientQuoteUrl(d, 'fr')}">Suivre votre demande</a> · <a href="${SITE_URL}/fr/annulation">Conditions d’annulation et de remboursement</a></p>
       ${d.circuitTitle ? `<p><strong>Itinéraire :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Notre équipe vous répondra sous 24 à 48 heures ouvrées.</p>
+      ${depositPercent > 0 ? `<p>Bon à savoir : la réservation se confirme avec un acompte de ${depositPercent} % du montant du devis.</p>` : ''}
       <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>
     `,
     en: (d) => `
@@ -156,6 +157,7 @@ function buildClientEmail(data: QuoteData) {
       <p><a href="${clientQuoteUrl(d, 'en')}">Track your request</a> · <a href="${SITE_URL}/en/annulation">Cancellation and refund policy</a></p>
       ${d.circuitTitle ? `<p><strong>Itinerary:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Our team will reply within 24 to 48 business hours.</p>
+      ${depositPercent > 0 ? `<p>Good to know: your booking is confirmed with a deposit of ${depositPercent}% of the quote amount.</p>` : ''}
       <p>See you soon,<br />The ANABO Roadtrip Madagascar team</p>
     `,
     it: (d) => `
@@ -165,6 +167,7 @@ function buildClientEmail(data: QuoteData) {
       <p><a href="${clientQuoteUrl(d, 'it')}">Segui la tua richiesta</a> · <a href="${SITE_URL}/it/annulation">Condizioni di cancellazione e rimborso</a></p>
       ${d.circuitTitle ? `<p><strong>Itinerario:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Il nostro team risponderà entro 24-48 ore lavorative.</p>
+      ${depositPercent > 0 ? `<p>Da sapere: la prenotazione si conferma con un acconto del ${depositPercent}% dell’importo del preventivo.</p>` : ''}
       <p>A presto,<br />Il team ANABO Roadtrip Madagascar</p>
     `,
   }
@@ -191,7 +194,7 @@ export async function sendQuoteEmails(data: QuoteData) {
   }
 
   try {
-    const clientEmail = buildClientEmail(data)
+    const clientEmail = buildClientEmail(data, (await getPaymentSettings()).depositPercent)
     await sendMail({
       from: FROM_EMAIL,
       to: data.email,
@@ -386,4 +389,55 @@ export async function sendNewUserEmail(
   `
 
   await sendMail({ from: FROM_EMAIL, to, subject, html })
+}
+
+const DEPOSIT_RECEIVED = {
+  fr: { subject: (r: string) => `Acompte reçu — votre voyage est réservé (Réf : ${r})`, hello: 'Bonjour', body: 'Nous avons bien reçu votre acompte. Votre réservation est désormais définitive.', next: 'Nous reviendrons vers vous pour les derniers détails avant le départ.', bye: 'À très bientôt,', team: "L'équipe ANABO Roadtrip Madagascar" },
+  en: { subject: (r: string) => `Deposit received — your trip is booked (Ref: ${r})`, hello: 'Hello', body: 'We have received your deposit. Your booking is now final.', next: 'We will be in touch with the final details before your departure.', bye: 'See you soon,', team: 'The ANABO Roadtrip Madagascar team' },
+  it: { subject: (r: string) => `Acconto ricevuto — il tuo viaggio è prenotato (Rif: ${r})`, hello: 'Ciao', body: 'Abbiamo ricevuto il tuo acconto. La prenotazione è ora definitiva.', next: 'Ti ricontatteremo per gli ultimi dettagli prima della partenza.', bye: 'A presto,', team: 'Il team ANABO Roadtrip Madagascar' },
+}
+
+/** E-mail au client lorsque l'administrateur marque l'acompte comme reçu. */
+export async function sendDepositReceivedEmail(to: string, firstName: string, reference: string, locale: string = 'fr') {
+  const lang = locale === 'en' || locale === 'it' ? locale : 'fr'
+  const t = DEPOSIT_RECEIVED[lang]
+  await sendMail({
+    from: FROM_EMAIL,
+    to,
+    subject: t.subject(reference),
+    html: `
+      <p>${t.hello} ${escapeHtml(firstName)},</p>
+      <p>${t.body}</p>
+      <p>${t.next}</p>
+      <p>${t.bye}<br/>${t.team}</p>
+    `,
+  })
+}
+
+/** E-mail à l'équipe : le client a accepté son devis en ligne (acompte attendu). */
+export async function sendClientAcceptedAdminEmail(data: {
+  id: string
+  reference: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  acceptedAt: Date
+  depositPercent: number
+  depositText: string | null
+}) {
+  await sendMail({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
+    replyTo: data.email,
+    subject: `[ANABO] Devis accepté en ligne — ${data.reference}`,
+    html: `
+      <h2>Devis accepté par le client — ${escapeHtml(data.reference)}</h2>
+      <p><strong>${escapeHtml(data.firstName)} ${escapeHtml(data.lastName)}</strong> a confirmé son devis le
+      ${data.acceptedAt.toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo', dateStyle: 'full', timeStyle: 'short' })} (heure de Madagascar).</p>
+      <p>Acompte attendu : ${data.depositPercent} %${data.depositText ? ` — <strong>${escapeHtml(data.depositText)}</strong>` : ' (montant total du devis non renseigné dans l’admin)'}.</p>
+      <p>Contact : ${escapeHtml(data.email)} · ${escapeHtml(data.phone)}</p>
+      <p><a href="${SITE_URL}/admin/demandes/${encodeURIComponent(data.id)}">Ouvrir la fiche et suivre l’acompte</a></p>
+    `,
+  })
 }

@@ -12,7 +12,7 @@ import {
 } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { sendQuoteStatusEmail, sendNewUserEmail } from '@/lib/email'
+import { sendQuoteStatusEmail, sendNewUserEmail, sendDepositReceivedEmail } from '@/lib/email'
 import { signQuoteToken } from '@/lib/quote-token'
 import { notifyIfShortage } from '@/lib/capacity-alerts'
 import { getPaymentSettings } from '@/lib/payment-settings'
@@ -504,12 +504,21 @@ export async function saveQuotePayment(formData: FormData) {
 export async function toggleDepositPaid(formData: FormData) {
   await requireSession()
   const quoteId = String(formData.get('quoteId') || '')
-  const quote = await prisma.quoteRequest.findUnique({ where: { id: quoteId }, select: { depositPaidAt: true } })
+  const quote = await prisma.quoteRequest.findUnique({
+    where: { id: quoteId },
+    select: { depositPaidAt: true, email: true, firstName: true, reference: true, locale: true },
+  })
   if (!quote) throw new Error('Demande introuvable.')
   await prisma.quoteRequest.update({
     where: { id: quoteId },
     data: { depositPaidAt: quote.depositPaidAt ? null : new Date() },
   })
+  // Acompte reçu : le client est prévenu que sa réservation est définitive.
+  if (!quote.depositPaidAt) {
+    await sendDepositReceivedEmail(quote.email, quote.firstName, quote.reference, quote.locale).catch((error) =>
+      console.error('[acompte] E-mail de confirmation impossible :', error),
+    )
+  }
   revalidatePath(`/admin/demandes/${quoteId}`)
   revalidatePath('/admin/demandes')
   revalidatePath('/admin/planning')

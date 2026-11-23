@@ -32,6 +32,7 @@ export async function GET(request: Request) {
     alerts.quotesToSend && `${alerts.quotesToSend} devis à envoyer`,
     alerts.quotesToFollowUp && `${alerts.quotesToFollowUp} devis à relancer`,
     alerts.capacityIssues && `${alerts.capacityIssues} chevauchement(s) de voyages : ajoutez des véhicules/chauffeurs en renfort`,
+    alerts.depositsPending && `${alerts.depositsPending} acompte(s) en attente`,
   ].filter(Boolean)
 
   const result = await sendPushToAdmins({

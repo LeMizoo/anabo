@@ -9,6 +9,7 @@ export type AdminAlerts = {
   quotesToSend: number
   quotesToFollowUp: number
   capacityIssues: number
+  depositsPending: number
   total: number
 }
 
@@ -19,13 +20,15 @@ export type AdminAlerts = {
  * - devis envoyés depuis plus de 7 jours sans réponse (à relancer).
  */
 export async function getAdminAlerts(): Promise<AdminAlerts> {
-  const [newRequests, quotesToSend, quotesToFollowUp, capacity] = await Promise.all([
+  const [newRequests, quotesToSend, quotesToFollowUp, capacity, depositsPending] = await Promise.all([
     prisma.quoteRequest.count({ where: { status: 'NOUVEAU' } }),
     prisma.quoteRequest.count({ where: { status: 'CONTACTE' } }),
     prisma.quoteRequest.count({
       where: { status: 'DEVIS_ENVOYE', quoteSentAt: { lt: new Date(Date.now() - FOLLOW_UP_DAYS * DAY) } },
     }),
     getCapacityReport().catch(() => ({ shortages: [], driverConflicts: [] })),
+    // Voyages confirmés dont l'acompte n'est pas encore reçu
+    prisma.quoteRequest.count({ where: { status: 'CONFIRME', depositPaidAt: null } }),
   ])
   // Chevauchements sans assez de véhicules/chauffeurs + doubles affectations d'un chauffeur.
   const capacityIssues = capacity.shortages.length + capacity.driverConflicts.length
@@ -34,6 +37,7 @@ export async function getAdminAlerts(): Promise<AdminAlerts> {
     quotesToSend,
     quotesToFollowUp,
     capacityIssues,
-    total: newRequests + quotesToSend + quotesToFollowUp + capacityIssues,
+    depositsPending,
+    total: newRequests + quotesToSend + quotesToFollowUp + capacityIssues + depositsPending,
   }
 }
