@@ -6,7 +6,7 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
 import type { SanityImage } from '@/lib/types'
 import { ImagePlaceholder } from './ImagePlaceholder'
@@ -113,14 +113,14 @@ export function TestimonialsSection({ block, locale }: Props) {
       <section className="bg-gray-50">
         <div className="container-custom">
           <h2
-            className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`text-center text-[#06245F] mb-8 ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title || translate('title'), locale)}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {testimonials.map((t) => (
-              <div key={t._id} className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full">
+              <div key={t._id} className="flex h-full flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:p-8">
                 {renderTestimonialImage(t)}
                 {renderStars(t.rating)}
                 <p className="text-gray-700 italic flex-1 leading-relaxed">&ldquo;{t.content}&rdquo;</p>
@@ -138,7 +138,7 @@ export function TestimonialsSection({ block, locale }: Props) {
     <section className="bg-gray-50 overflow-hidden">
       <div className="container-custom">
         <h2
-          className={`text-center text-[#06245F] mb-8 ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+          className={`text-center text-[#06245F] mb-8 ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
           {titleCase(block.title || translate('title'), locale)}
@@ -172,14 +172,14 @@ export function TestimonialsSection({ block, locale }: Props) {
             <>
               <button
                 onClick={prev}
-                className="absolute top-1/2 -left-4 md:-left-12 -translate-y-1/2 bg-white p-3 rounded-full shadow-md text-gray-600 hover:text-[#06245F] transition-colors"
+                className="absolute top-1/2 left-1 md:-left-12 -translate-y-1/2 bg-white p-3 rounded-full shadow-md text-gray-600 hover:text-[#06245F] transition-colors"
                 aria-label={translate('previous')}
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={next}
-                className="absolute top-1/2 -right-4 md:-right-12 -translate-y-1/2 bg-white p-3 rounded-full shadow-md text-gray-600 hover:text-[#06245F] transition-colors"
+                className="absolute top-1/2 right-1 md:-right-12 -translate-y-1/2 bg-white p-3 rounded-full shadow-md text-gray-600 hover:text-[#06245F] transition-colors"
                 aria-label={translate('next')}
               >
                 <ChevronRight className="w-6 h-6" />

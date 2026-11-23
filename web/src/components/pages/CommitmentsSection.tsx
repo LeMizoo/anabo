@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { Locale } from '@/lib/i18n'
-import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 
 type Props = {
   block: {
@@ -32,9 +32,9 @@ type Props = {
 
 export function CommitmentsSection({ block, locale, globalHeadingFont, globalHeadingWeight }: Props) {
   // 👇 Logique de priorité : local > global > défaut 👇
-  const titleFont = block.titleFont || globalHeadingFont || 'font-caflisch'
+  const titleFont = headingFont(block.titleFont || globalHeadingFont, block.title)
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
-  const subtitleFont = block.subtitleFont || 'font-script'
+  const subtitleFont = headingFont(block.subtitleFont, block.subtitle, { fallback: 'font-script', long: 'font-sans' })
 
   return (
     <section className="bg-white dark:bg-gray-900">

@@ -88,7 +88,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           {/* 👇 Le ThemeProvider englobe tout le contenu pour gérer le mode sombre 👇 */}
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             {/* On ajoute les classes de fond et de texte de base + transition */}
             <div className="flex min-h-screen flex-col bg-white text-gray-900 transition-colors duration-300 dark:bg-gray-900 dark:text-gray-100">
               <Header settings={settings} />

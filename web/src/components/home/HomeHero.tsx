@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { ArrowRight, Star } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { getImageUrl } from '@/lib/sanity'
-import { subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { subtitleSizeClass, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
 import type { HeroBlock, BlockSettings } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
@@ -34,14 +34,14 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
         : 'items-center text-center'
 
   // 👇 Récupération des polices depuis Sanity
-  const titleFont = hero.titleFont || 'font-caflisch'
-  const subtitleFont = hero.subtitleFont || 'font-sans'
+  const titleFont = headingFont(hero.titleFont, hero.title)
+  const subtitleFont = headingFont(hero.subtitleFont, hero.subtitle, { fallback: 'font-sans', long: 'font-sans' })
 
   return (
     // 👇 Ajout de l'id pour permettre les liens internes (ex: /fr#accueil)
     <section 
       id={settings?.anchorId} 
-      className="relative isolate min-h-[calc(100vh-5rem)] overflow-hidden bg-gray-900"
+      className="relative isolate min-h-[calc(100svh-4rem)] overflow-hidden bg-gray-900 sm:min-h-[calc(100svh-5rem)]"
     >
       {backgroundImage ? (
         <Image
@@ -66,7 +66,7 @@ export async function HomeHero({ hero, settings, locale }: HomeHeroProps) {
         }`}
       />
 
-      <div className="container-custom flex min-h-[calc(100vh-5rem)] items-center py-20">
+      <div className="container-custom flex min-h-[calc(100svh-4rem)] items-center py-14 sm:min-h-[calc(100svh-5rem)] sm:py-20">
         <div className={`flex w-full max-w-4xl flex-col ${alignment}`}>
           <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
             {SITE_NAME}

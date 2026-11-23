@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import type { CSSProperties } from 'react'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
 import type { ImageMarqueeBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -30,7 +30,7 @@ export function ImageMarquee({ block, locale }: Props) {
     <section className="overflow-hidden">
       {block.title && (
         <h2
-          className={`container-custom mb-6 text-center text-[#06245F] ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+          className={`container-custom mb-6 text-center text-[#06245F] ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
           {titleCase(block.title, locale)}

@@ -6,7 +6,7 @@ import { useState, type FormEvent, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { CustomQuoteBlock, CustomQuoteOption } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
 import {
@@ -388,7 +388,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <h2
             className={`${titleSizeClass(block.titleSize || 'h2')} ${
-              block.titleFont || 'font-caflisch'
+              headingFont(block.titleFont, block.title)
             } ${block.titleWeight || 'font-normal'} text-[#06245F]`}
             style={{ color: brandTextColor(block.titleColor) }}
           >

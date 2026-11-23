@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
 import type { GalleryBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -19,7 +19,7 @@ export function GallerySection({ block, locale }: Props) {
       <div className="mx-auto max-w-6xl">
         {block.title && (
           <h2
-            className={`mb-6 text-center text-[#06245F] ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`mb-6 text-center text-[#06245F] ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}
@@ -31,7 +31,7 @@ export function GallerySection({ block, locale }: Props) {
                 const imageUrl = getImageUrl(image, 900, 85)
 
                 return (
-                  <figure key={image._key || index} className="relative">
+                  <figure key={image._key || index} className="group relative overflow-hidden rounded-xl transition-shadow duration-300 hover:shadow-xl">
                     <ImageFrame
                       className="relative aspect-[4/3]"
                       presentation={image.presentation}
@@ -42,6 +42,7 @@ export function GallerySection({ block, locale }: Props) {
                           alt={image.alt || image.caption || ''}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="transition-transform duration-500 group-hover:scale-105"
                           style={imageContentStyle(image.presentation)}
                         />
                       ) : (

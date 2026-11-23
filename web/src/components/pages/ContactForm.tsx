@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
 import { getPublicCircuitDurations } from '@/lib/circuit-duration-actions'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 
 type Circuit = {
   slug: string
@@ -344,7 +344,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
         {block.title && (
           <h2
-            className={`mb-3 text-gray-900 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'}`}
+            className={`mb-3 text-gray-900 ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}
@@ -685,7 +685,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
         <div className="mx-auto max-w-3xl px-4 text-center">
           {block.title && (
             <h2
-              className={`mb-3 ${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'}`}
+              className={`mb-3 ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
               style={{ color: brandTextColor(block.titleColor) }}
             >
               {titleCase(block.title, locale)}

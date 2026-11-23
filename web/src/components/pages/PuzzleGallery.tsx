@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
 import type { PuzzleGalleryBlock, PuzzleItem } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -75,7 +75,7 @@ export function PuzzleGallery({ block, locale }: Props) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`text-center text-[#06245F] mb-6 ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`text-center text-[#06245F] mb-6 ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}

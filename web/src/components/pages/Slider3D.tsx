@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { BrandTextColor, ImagePresentation } from '@/lib/types'
@@ -65,7 +65,7 @@ export function Slider3D({ block, locale }: Props) {
       <div className="container-custom">
         {block.title && (
           <h2
-            className={`mb-8 text-center ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
+            className={`mb-8 text-center ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${titleSizeClass(block.titleSize)}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}
@@ -73,7 +73,7 @@ export function Slider3D({ block, locale }: Props) {
         )}
 
         <div
-          className="relative mx-auto h-[320px] max-w-5xl sm:h-[420px]"
+          className="relative mx-auto h-[300px] max-w-5xl sm:h-[380px] lg:h-[420px]"
           style={{ perspective: '1200px' }}
         >
           {slides.map((s, i) => {
@@ -87,7 +87,7 @@ export function Slider3D({ block, locale }: Props) {
               <div
                 key={i}
                 onClick={() => setActive(i)}
-                className="absolute left-1/2 top-0 h-full w-[70%] cursor-pointer overflow-hidden rounded-xl shadow-2xl transition-all duration-700 sm:w-[60%]"
+                className="absolute left-1/2 top-0 h-full w-[82%] cursor-pointer overflow-hidden rounded-xl shadow-2xl transition-all duration-700 hover:brightness-105 sm:w-[60%]"
                 style={{
                   ...presentationStyle,
                   transform: `translateX(-50%) translateX(${offset * 55}%) translateZ(${-abs * 150}px) rotateY(${-offset * 35}deg) rotateZ(${s.imagePresentation?.rotation || 0}deg)`,
@@ -118,7 +118,7 @@ export function Slider3D({ block, locale }: Props) {
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-5 text-white">
                     {s.title && (
                       <h3
-                        className={`${s.titleFont || 'font-caflisch'} ${s.titleWeight || 'font-normal'} ${titleSizeClass(s.titleSize)}`}
+                        className={`${headingFont(s.titleFont, s.title)} ${s.titleWeight || 'font-normal'} ${titleSizeClass(s.titleSize)}`}
                         style={{ color: brandTextColor(s.titleColor) }}
                       >
                         {s.title && titleCase(s.title, locale)}

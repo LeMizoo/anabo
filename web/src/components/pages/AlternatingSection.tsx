@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { PortableText } from '@portabletext/react'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { Locale } from '@/lib/i18n'
 import type { AlternatingBlock } from '@/lib/types'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
@@ -54,9 +54,9 @@ export function AlternatingSection({
     bottom: 'md:items-end',
   }[block.contentVerticalAlignment || 'center']
 
-  const titleFont = block.titleFont || globalHeadingFont || 'font-caflisch'
+  const titleFont = headingFont(block.titleFont || globalHeadingFont, block.title)
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
-  const subtitleFont = block.subtitleFont || 'font-script'
+  const subtitleFont = headingFont(block.subtitleFont, block.subtitle, { fallback: 'font-script', long: 'font-sans' })
 
   return (
     <section className={`overflow-hidden ${bgClass}`}>

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, subtitleSizeClass, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { HeroBlock } from '@/lib/types'
@@ -30,12 +30,12 @@ export function HeroSection({ block, locale }: Props) {
     radius: 'none' as const,
     shadow: 'none' as const,
   }
-  const titleFont = block.titleFont || 'font-caflisch'
-  const subtitleFont = block.subtitleFont || 'font-sans'
+  const titleFont = headingFont(block.titleFont, block.title)
+  const subtitleFont = headingFont(block.subtitleFont, block.subtitle, { fallback: 'font-sans', long: 'font-sans' })
   const heightClasses = {
-    compact: 'min-h-[420px]',
-    standard: 'min-h-[520px]',
-    tall: 'min-h-[680px]',
+    compact: 'min-h-[340px] md:min-h-[420px]',
+    standard: 'min-h-[420px] md:min-h-[520px]',
+    tall: 'min-h-[520px] md:min-h-[680px]',
     screen: 'min-h-screen',
   } as const
   const contentAnimationClasses = {

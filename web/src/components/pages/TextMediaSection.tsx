@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import { motion } from 'framer-motion'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
 import type { Locale } from '@/lib/i18n'
 import type { TextMediaBlock } from '@/lib/types'
@@ -22,13 +22,13 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
   return {
     list: {
       bullet: ({ children }: { children?: ReactNode }) => (
-        <ul className="list-disc pl-6 my-4 space-y-2 text-gray-700">{children}</ul>
+        <ul className="list-disc pl-6 my-4 space-y-2 text-gray-700 dark:text-gray-300">{children}</ul>
       ),
       number: ({ children }: { children?: ReactNode }) => (
-        <ol className="list-decimal pl-6 my-4 space-y-2 text-gray-700">{children}</ol>
+        <ol className="list-decimal pl-6 my-4 space-y-2 text-gray-700 dark:text-gray-300">{children}</ol>
       ),
       checkmarks: ({ children }: { children?: ReactNode }) => (
-        <ul className="list-none pl-0 my-4 space-y-2 text-gray-700">{children}</ul>
+        <ul className="list-none pl-0 my-4 space-y-2 text-gray-700 dark:text-gray-300">{children}</ul>
       ),
     },
     listItem: {
@@ -53,7 +53,7 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
         <h4 className="text-[clamp(1.125rem,2.5vw,1.5rem)] font-bold text-[#06245F] mt-6 mb-3 font-serif">{children}</h4>
       ),
       blockquote: ({ children }: { children?: ReactNode }) => (
-        <blockquote className="border-l-4 border-[#E0A01C] pl-4 italic text-gray-600 my-6">
+        <blockquote className="border-l-4 border-[#E0A01C] pl-4 italic text-gray-600 my-6 dark:text-gray-300">
           {children}
         </blockquote>
       ),
@@ -81,7 +81,7 @@ function getPortableTextComponents(locale: Locale): PortableTextComponents {
 export function TextMediaSection({ block, locale }: Props) {
   const portableTextComponents = getPortableTextComponents(locale)
   const imageUrl = block.image ? getImageUrl(block.image, 1000, 85) : null
-  const titleFontClass = block.titleFont || 'font-caflisch'
+  const titleFontClass = headingFont(block.titleFont, block.title)
   const imageWidth = block.imageSize === 'sm' ? '70%' : block.imageSize === 'md' ? '85%' : '100%'
   
   // Nouvelles positions
@@ -136,14 +136,14 @@ export function TextMediaSection({ block, locale }: Props) {
               </h2>
             )}
             {block.content && block.content.length > 0 && (
-              <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed">
+              <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed dark:text-gray-300">
                 <PortableText value={block.content as never} components={portableTextComponents} />
               </div>
             )}
             {block.cta?.label && block.cta.link && (
               <Link
                 href={localizeInternalPath(block.cta.link, locale)}
-                className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
+                className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#c9870a] hover:shadow-lg active:translate-y-0"
               >
                 {block.cta.label}
               </Link>
@@ -202,14 +202,14 @@ export function TextMediaSection({ block, locale }: Props) {
             </h2>
           )}
           {block.content && block.content.length > 0 && (
-            <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed">
+            <div className="prose mt-6 max-w-none text-gray-700 leading-relaxed dark:text-gray-300">
               <PortableText value={block.content as never} onMissingComponent={false} components={portableTextComponents} />
             </div>
           )}
           {block.cta?.label && block.cta.link && (
             <Link
               href={localizeInternalPath(block.cta.link, locale)}
-              className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:opacity-90"
+              className="mt-6 inline-flex rounded-lg bg-[#E0A01C] px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#c9870a] hover:shadow-lg active:translate-y-0"
             >
               {block.cta.label}
             </Link>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { CtaBlock } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
 
 type Props = {
@@ -23,7 +23,7 @@ export function CtaSection({ block, locale }: Props) {
       >
         {block.title && (
           <h2
-            className={`${titleSizeClass(block.titleSize)} ${block.titleFont || 'font-caflisch'} ${block.titleWeight || 'font-normal'} ${
+            className={`${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'} ${
               secondary ? 'text-[#06245F]' : 'text-white'
             }`}
             style={{ color: brandTextColor(block.titleColor) }}
@@ -45,10 +45,10 @@ export function CtaSection({ block, locale }: Props) {
         {block.buttonLabel && block.buttonLink && (
           <Link
             href={localizeInternalPath(block.buttonLink, locale)}
-            className={`mt-7 inline-flex rounded-lg px-6 py-3 font-semibold transition ${
+            className={`mt-7 inline-flex rounded-lg px-6 py-3 font-semibold transition hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 ${
               secondary
-                ? 'bg-[#06245F] text-white hover:opacity-90'
-                : 'bg-[#E0A01C] text-white hover:opacity-90'
+                ? 'bg-[#06245F] text-white hover:bg-[#0b347d]'
+                : 'bg-[#E0A01C] text-white hover:bg-[#c9870a]'
             }`}
           >
             {block.buttonLabel}

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { CardsBlock } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
 import { getImageUrl } from '@/lib/sanity'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { localizeInternalPath } from '@/lib/localized-path'
 import { ImageFrame, imageContentStyle } from './ImageFrame'
 
@@ -84,7 +84,7 @@ export function CardsSection({
             return (
               <article
                 key={card._key || index}
-                className={`flex min-w-0 flex-col overflow-hidden rounded-xl ${cardStyle} ${background}`}
+                className={`group flex min-w-0 flex-col overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${cardStyle} ${background}`}
               >
                 {card.image && (
                   <div
@@ -102,7 +102,7 @@ export function CardsSection({
                           alt={card.image.alt || card.title || ''}
                           fill
                           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                          className="transition-transform duration-500 hover:scale-105"
+                          className="transition-transform duration-500 group-hover:scale-105"
                           style={imageContentStyle(card.image.presentation)}
                         />
                       )}
@@ -117,7 +117,7 @@ export function CardsSection({
                   {card.title && (
                     <h3
                       className={`mb-3 w-full ${titleSizeClass(card.titleSize || 'h3')} ${
-                        card.titleFont || 'font-caflisch'
+                        headingFont(card.titleFont, card.title)
                       } ${card.titleWeight || 'font-normal'}`}
                       style={{ color: brandTextColor(cardTitleColor) }}
                     >
@@ -132,7 +132,7 @@ export function CardsSection({
                   {card.cta?.label && card.cta.link && (
                     <Link
                       href={localizeInternalPath(card.cta.link, locale)}
-                      className={`mt-5 inline-flex rounded-lg px-5 py-2.5 font-semibold text-white transition hover:opacity-90 ${
+                      className={`mt-5 inline-flex rounded-lg px-5 py-2.5 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg hover:brightness-110 active:translate-y-0 ${
                         block.backgroundColor === 'navy'
                           ? 'bg-[#E0A01C]'
                           : 'bg-[#06245F]'

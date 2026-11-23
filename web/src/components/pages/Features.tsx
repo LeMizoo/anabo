@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import type { Locale } from '@/lib/i18n'
-import { brandTextColor, titleCase, titleSizeClass } from '@/lib/typography'
+import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 
 type Props = {
   block: {
@@ -24,7 +24,7 @@ export function Features({ block, locale, globalHeadingFont, globalHeadingWeight
   if (features.length === 0 && !block.title) return null
 
   // 👇 Logique de priorité : local > global > défaut 👇
-  const titleFont = block.titleFont || globalHeadingFont || 'font-caflisch'
+  const titleFont = headingFont(block.titleFont || globalHeadingFont, block.title)
   const titleWeight = block.titleWeight || globalHeadingWeight || 'font-normal'
 
   return (
@@ -51,9 +51,9 @@ export function Features({ block, locale, globalHeadingFont, globalHeadingWeight
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: Math.min(i, 6) * 0.08 }}
-              className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm"
+              className="group rounded-xl bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-[#E0A01C]/40 dark:bg-gray-900"
             >
-              <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#E0A01C] text-sm font-semibold text-white">
+              <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#E0A01C] text-sm font-semibold text-white transition-transform duration-300 group-hover:scale-110">
                 {i + 1}
               </span>
               <h3 className={`text-[clamp(1rem,2vw,1.25rem)] text-[#06245F] dark:text-white ${titleFont} ${titleWeight}`}>
