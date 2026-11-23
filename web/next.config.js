@@ -44,6 +44,8 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Les navigateurs utilisent toujours HTTPS pour ce site (1 an).
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           {
             key: 'Referrer-Policy',

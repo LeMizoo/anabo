@@ -83,12 +83,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // Conditions d'annulation : texte unique en français (URL canonique).
-  entries.push({
-    url: `${baseUrl}/fr/annulation`,
-    changeFrequency: 'yearly',
-    priority: 0.2,
-  })
+  // Conditions d'annulation : une page par langue, liées entre elles (hreflang).
+  for (const locale of locales) {
+    entries.push({
+      url: `${baseUrl}/${locale}/annulation`,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+      alternates: {
+        languages: Object.fromEntries(locales.map((code) => [code, `${baseUrl}/${code}/annulation`])),
+      },
+    })
+  }
 
   return entries
 }
