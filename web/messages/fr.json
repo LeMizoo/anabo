@@ -172,5 +172,29 @@
     "description": "Il semblerait que la page que vous cherchez ait été déplacée ou n'existe plus. Pas de panique, votre prochaine aventure vous attend.",
     "backHome": "Retour à l'accueil",
     "exploreTours": "Explorer les circuits"
+  },
+  "quoteEstimate": {
+    "title": "Estimation de votre voyage",
+    "depositNotice": "Un acompte de {percent} % du montant total sera demandé pour confirmer la réservation, après acceptation du devis.",
+    "vehicle": "Véhicule souhaité",
+    "vehiclePlaceholder": "Choisissez un véhicule",
+    "vehicleCount": "Nombre de véhicules",
+    "seats": "{count} places",
+    "needVehicle": "Choisissez un véhicule pour afficher l’estimation.",
+    "needDates": "Indiquez vos dates de départ et de retour pour calculer le montant.",
+    "calculating": "Calcul en cours…",
+    "unavailable": "Aucun tarif n’est encore configuré pour ce véhicule : le montant vous sera communiqué dans le devis.",
+    "error": "Estimation momentanément indisponible : le montant vous sera communiqué dans le devis.",
+    "days": "{days} jour(s)",
+    "total": "Montant total estimé",
+    "totalRange": "Montant total estimé (selon la durée du circuit)",
+    "deposit": "Acompte de {percent} %",
+    "indicative": "Estimation indicative pour le véhicule et la durée : le montant définitif figurera dans votre devis.",
+    "reviewTitle": "Vérifiez votre demande avant l’envoi",
+    "reviewNoAmount": "Le montant total vous sera communiqué dans le devis personnalisé.",
+    "reviewSteps": "Après l’envoi, nous vous adressons un devis personnalisé. La réservation est confirmée par le versement de l’acompte ({method}), une fois le devis accepté.",
+    "reviewNoCommitment": "L’envoi de cette demande est gratuit et sans engagement.",
+    "send": "Envoyer ma demande",
+    "cancel": "Annuler"
   }
 }

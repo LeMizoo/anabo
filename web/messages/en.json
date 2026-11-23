@@ -172,5 +172,29 @@
     "description": "It seems the page you are looking for has been moved or no longer exists. Don't worry, your next adventure is waiting for you.",
     "backHome": "Back to home",
     "exploreTours": "Explore tours"
+  },
+  "quoteEstimate": {
+    "title": "Your trip estimate",
+    "depositNotice": "A deposit of {percent}% of the total amount will be requested to confirm the booking, once the quote is accepted.",
+    "vehicle": "Preferred vehicle",
+    "vehiclePlaceholder": "Choose a vehicle",
+    "vehicleCount": "Number of vehicles",
+    "seats": "{count} seats",
+    "needVehicle": "Choose a vehicle to see the estimate.",
+    "needDates": "Enter your departure and return dates to calculate the amount.",
+    "calculating": "Calculating…",
+    "unavailable": "No rate is set for this vehicle yet: the amount will be given in your quote.",
+    "error": "Estimate temporarily unavailable: the amount will be given in your quote.",
+    "days": "{days} day(s)",
+    "total": "Estimated total",
+    "totalRange": "Estimated total (depending on tour length)",
+    "deposit": "{percent}% deposit",
+    "indicative": "Indicative estimate for the vehicle and duration: the final amount will be shown in your quote.",
+    "reviewTitle": "Check your request before sending",
+    "reviewNoAmount": "The total amount will be given in your personalised quote.",
+    "reviewSteps": "After sending, we will send you a personalised quote. The booking is confirmed by paying the deposit ({method}) once the quote is accepted.",
+    "reviewNoCommitment": "Sending this request is free and without commitment.",
+    "send": "Send my request",
+    "cancel": "Cancel"
   }
 }

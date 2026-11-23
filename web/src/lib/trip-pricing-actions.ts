@@ -1,6 +1,7 @@
 'use server'
 
-import { calculateTripVehiclePrice } from '@/lib/trip-pricing'
+import { calculateTripVehiclePrice, getPublicVehicleTypes } from '@/lib/trip-pricing'
+import { getPaymentSettings } from '@/lib/payment-settings'
 
 type CalculateTripVehiclePriceInput = {
   vehicleCode: string
@@ -53,4 +54,22 @@ export async function calculateTripVehiclePriceAction(
     days: result.days,
     vehicleName: result.vehicleName,
   }
+}
+
+export type PublicVehicleOption = { code: string; name: string; capacity: number }
+
+/** Véhicules actifs proposés dans les formulaires (sans aucun prix). */
+export async function listPublicVehiclesAction(): Promise<PublicVehicleOption[]> {
+  try {
+    const vehicles = await getPublicVehicleTypes()
+    return vehicles.map((v) => ({ code: v.code, name: v.name, capacity: v.capacity }))
+  } catch {
+    return []
+  }
+}
+
+/** Informations publiques sur l'acompte (pourcentage et moyen de paiement). */
+export async function getPublicDepositInfoAction(): Promise<{ percent: number; method: string }> {
+  const s = await getPaymentSettings()
+  return { percent: s.depositPercent, method: s.method }
 }

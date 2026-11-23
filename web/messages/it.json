@@ -172,5 +172,29 @@
     "description": "Sembra che la pagina che stai cercando sia stata spostata o non esista più. Non preoccuparti, la tua prossima avventura ti aspetta.",
     "backHome": "Torna alla home",
     "exploreTours": "Esplora i tour"
+  },
+  "quoteEstimate": {
+    "title": "Stima del tuo viaggio",
+    "depositNotice": "Per confermare la prenotazione sarà richiesto un acconto del {percent}% dell’importo totale, dopo l’accettazione del preventivo.",
+    "vehicle": "Veicolo preferito",
+    "vehiclePlaceholder": "Scegli un veicolo",
+    "vehicleCount": "Numero di veicoli",
+    "seats": "{count} posti",
+    "needVehicle": "Scegli un veicolo per vedere la stima.",
+    "needDates": "Indica le date di partenza e di ritorno per calcolare l’importo.",
+    "calculating": "Calcolo in corso…",
+    "unavailable": "Nessuna tariffa è ancora configurata per questo veicolo: l’importo ti sarà comunicato nel preventivo.",
+    "error": "Stima momentaneamente non disponibile: l’importo ti sarà comunicato nel preventivo.",
+    "days": "{days} giorno/i",
+    "total": "Importo totale stimato",
+    "totalRange": "Importo totale stimato (secondo la durata del tour)",
+    "deposit": "Acconto del {percent}%",
+    "indicative": "Stima indicativa per il veicolo e la durata: l’importo definitivo sarà indicato nel preventivo.",
+    "reviewTitle": "Controlla la tua richiesta prima dell’invio",
+    "reviewNoAmount": "L’importo totale ti sarà comunicato nel preventivo personalizzato.",
+    "reviewSteps": "Dopo l’invio ti invieremo un preventivo personalizzato. La prenotazione si conferma versando l’acconto ({method}), una volta accettato il preventivo.",
+    "reviewNoCommitment": "L’invio di questa richiesta è gratuito e senza impegno.",
+    "send": "Invia la mia richiesta",
+    "cancel": "Annulla"
   }
 }

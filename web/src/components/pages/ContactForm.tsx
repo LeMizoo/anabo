@@ -8,6 +8,8 @@ import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
 import { getPublicCircuitDurations } from '@/lib/circuit-duration-actions'
 import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
+import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
+import { QuoteReviewDialog } from './QuoteReviewDialog'
 
 type Circuit = {
   slug: string
@@ -140,6 +142,22 @@ export function ContactForm({ block, circuits = [] }: Props) {
   const [selectedCircuit, setSelectedCircuit] = useState('')
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
   const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [vehicleCode, setVehicleCode] = useState('')
+  const [vehicleLabel, setVehicleLabel] = useState('')
+  const [vehicleCount, setVehicleCount] = useState(1)
+  const [estimate, setEstimate] = useState<QuoteEstimate | null>(null)
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const pendingForm = useRef<HTMLFormElement | null>(null)
+
+  // Nombre de jours inclus (du 1er au 5 = 5 jours), comme le calcul du serveur.
+  const tripDays = (() => {
+    if (!startDate || !endDate) return null
+    const a = Date.parse(`${startDate}T00:00:00Z`)
+    const b = Date.parse(`${endDate}T00:00:00Z`)
+    if (!Number.isFinite(a) || !Number.isFinite(b) || b < a) return null
+    return Math.round((b - a) / 86_400_000) + 1
+  })()
   const [durationData, setDurationData] = useState<PublicCircuitDuration[]>([])
   const [durationLoading, setDurationLoading] = useState(false)
   const [durationLoadError, setDurationLoadError] = useState(false)
@@ -212,6 +230,14 @@ export function ContactForm({ block, circuits = [] }: Props) {
     ),
   }))
 
+  const completeSummaries = seasonSummaries.filter(({ summary }) => summary.complete && summary.minDays > 0)
+  const circuitDayRange = completeSummaries.length
+    ? {
+        min: Math.min(...completeSummaries.map(({ summary }) => summary.minDays)),
+        max: Math.max(...completeSummaries.map(({ summary }) => summary.maxDays)),
+      }
+    : null
+
   useEffect(() => {
     if (!activeModalForm) return
 
@@ -221,6 +247,8 @@ export function ContactForm({ block, circuits = [] }: Props) {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        // Échap dans le récapitulatif ne ferme que le récapitulatif.
+        if (document.getElementById('quote-review-title')) return
         setActiveModalForm(null)
         return
       }
@@ -266,9 +294,18 @@ export function ContactForm({ block, circuits = [] }: Props) {
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    const formElement = event.currentTarget
-
     event.preventDefault()
+    if (isQuote) {
+      // Demande de devis : le client voit d'abord le montant et l'acompte, puis envoie ou annule.
+      pendingForm.current = event.currentTarget
+      setError('')
+      setReviewOpen(true)
+      return
+    }
+    await sendRequest(event.currentTarget)
+  }
+
+  async function sendRequest(formElement: HTMLFormElement) {
     setError('')
     setReference('')
     setSending(true)
@@ -305,6 +342,7 @@ export function ContactForm({ block, circuits = [] }: Props) {
       children: Number(form.get('children') || 0),
       message: String(form.get('message') || '').trim(),
       website: String(form.get('website') || ''),
+      ...(isQuote && vehicleCode ? { vehicleCode, vehicleLabel, vehicleCount } : {}),
     }
 
     try {
@@ -329,8 +367,14 @@ export function ContactForm({ block, circuits = [] }: Props) {
       setSelectedCircuit('')
       setExtraCircuits([])
       setStartDate('')
+      setEndDate('')
+      setVehicleCode('')
+      setVehicleLabel('')
+      setVehicleCount(1)
+      setReviewOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('error'))
+      setReviewOpen(false)
     } finally {
       setSending(false)
     }
@@ -589,6 +633,8 @@ export function ContactForm({ block, circuits = [] }: Props) {
                     className={inputClass}
                     name="endDate"
                     type="date"
+                    value={endDate}
+                    onChange={e => setEndDate(e.target.value)}
                     disabled={sending}
                   />
                 </label>
@@ -621,6 +667,21 @@ export function ContactForm({ block, circuits = [] }: Props) {
                   />
                 </label>
               </div>
+            )}
+
+            {isQuote && (
+              <QuoteEstimatePanel
+                locale={locale}
+                vehicleCode={vehicleCode}
+                vehicleCount={vehicleCount}
+                days={tripDays}
+                dayRange={circuitDayRange}
+                withVehicleFields
+                onVehicleChange={(code, label) => { setVehicleCode(code); setVehicleLabel(label) }}
+                onVehicleCountChange={setVehicleCount}
+                onEstimateChange={setEstimate}
+                disabled={sending}
+              />
             )}
 
             {/* Champ piège anti-spam, invisible pour les visiteurs */}
@@ -675,6 +736,14 @@ export function ContactForm({ block, circuits = [] }: Props) {
             </button>
           </form>
         )}
+        <QuoteReviewDialog
+          open={reviewOpen}
+          locale={locale}
+          estimate={estimate}
+          sending={sending}
+          onCancel={() => setReviewOpen(false)}
+          onConfirm={() => { if (pendingForm.current) void sendRequest(pendingForm.current) }}
+        />
       </div>
     </div>
   )

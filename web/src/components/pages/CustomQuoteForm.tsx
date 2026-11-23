@@ -2,17 +2,15 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { getImageUrl } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import type { CustomQuoteBlock, CustomQuoteOption } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
-import {
-  calculateTripVehiclePriceAction,
-  type PublicTripVehicleEstimate,
-} from '@/lib/trip-pricing-actions'
+import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
+import { QuoteReviewDialog } from './QuoteReviewDialog'
 
 type Props = { block: CustomQuoteBlock; locale: Locale }
 
@@ -29,10 +27,9 @@ export function CustomQuoteForm({ block, locale }: Props) {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 
-  const [estimate, setEstimate] =
-    useState<PublicTripVehicleEstimate | null>(null)
-
-  const [estimating, setEstimating] = useState(false)
+  const [estimate, setEstimate] = useState<QuoteEstimate | null>(null)
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const pendingForm = useRef<HTMLFormElement | null>(null)
   const [consecutiveCircuits, setConsecutiveCircuits] = useState(1)
   const [vehicleCount, setVehicleCount] = useState(1)
 
@@ -156,55 +153,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
       setEndDate(value)
     }
 
-    // L'estimation précédente ne correspond plus nécessairement aux dates.
-    setEstimate(null)
     setError('')
-  }
-
-  async function updateEstimate(form?: HTMLFormElement) {
-    if (!form) return
-
-    setError('')
-
-    if (!startDate || !endDate || !vehicle) {
-      setError(labels.needDatesVehicle)
-      return
-    }
-
-    if (!datesAreValid || durationDays === null) {
-      setError(labels.checkDates)
-      setEstimate(null)
-      return
-    }
-
-    setEstimating(true)
-
-    try {
-      const result = await calculateTripVehiclePriceAction({
-        vehicleCode: vehicle,
-        days: durationDays,
-        vehicleCount,
-      })
-
-      if (!result) {
-        setError(labels.noRate)
-        setEstimate(null)
-        return
-      }
-
-      setEstimate({
-        total: result.total,
-        currency: result.currency,
-        indicativeOnly: result.indicativeOnly,
-        days: result.days,
-        vehicleName: result.vehicleName,
-      })
-    } catch {
-      setError(labels.estimateError)
-      setEstimate(null)
-    } finally {
-      setEstimating(false)
-    }
   }
 
   function toggleValue(
@@ -289,9 +238,6 @@ export function CustomQuoteForm({ block, locale }: Props) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-
-    const formElement = event.currentTarget
-
     setError('')
     setReference('')
 
@@ -300,6 +246,13 @@ export function CustomQuoteForm({ block, locale }: Props) {
       return
     }
 
+    // Le client voit d'abord le montant estimé et l'acompte, puis envoie ou annule.
+    pendingForm.current = event.currentTarget
+    setReviewOpen(true)
+  }
+
+  async function sendRequest(formElement: HTMLFormElement) {
+    setError('')
     setSending(true)
 
     const form = new FormData(formElement)
@@ -362,7 +315,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
         throw new Error(fieldErrors || result.error || t('error'))
       }
 
-      setEstimate(result.estimate || null)
+      setReviewOpen(false)
       setReference(result.reference || '')
 
       formElement.reset()
@@ -377,6 +330,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
       setError(
         submitError instanceof Error ? submitError.message : t('error')
       )
+      setReviewOpen(false)
     } finally {
       setSending(false)
     }
@@ -494,7 +448,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
                   )}
                 </div>
 
-                {vehicle && estimate?.indicativeOnly && (
+                {vehicle && (
                   <p className="mt-3 text-sm text-slate-600">
                     {labels.vehicleNote}
                   </p>
@@ -683,40 +637,14 @@ export function CustomQuoteForm({ block, locale }: Props) {
               </label>
             </div>
 
-            <div className="rounded-xl border border-blue-100 bg-white p-4">
-              <button
-                type="button"
-                onClick={(event) =>
-                  updateEstimate(event.currentTarget.form || undefined)
-                }
-                disabled={estimating || sending}
-                className="rounded-lg border border-[#06245F] px-4 py-2 font-semibold text-[#06245F] disabled:opacity-60"
-              >
-                {estimating ? labels.calculating : labels.calculate}
-              </button>
-
-              {estimate && (
-                <div className="mt-4 space-y-2" aria-live="polite">
-                  <p className="text-2xl font-bold text-slate-900">
-                    {new Intl.NumberFormat(locale, {
-                      style: 'currency',
-                      currency: estimate.currency,
-                      maximumFractionDigits: 0,
-                    }).format(estimate.total)}
-                  </p>
-
-                  {estimate.indicativeOnly && (
-                    <p className="text-sm text-amber-800">
-                      {labels.indicativeNote}
-                    </p>
-                  )}
-
-                  <p className="text-sm text-slate-600">
-                    {labels.estimateFor(estimate.days, estimate.vehicleName)}
-                  </p>
-                </div>
-              )}
-            </div>
+            <QuoteEstimatePanel
+              locale={locale}
+              vehicleCode={vehicle}
+              vehicleCount={vehicleCount}
+              days={durationDays}
+              onEstimateChange={setEstimate}
+              disabled={sending}
+            />
 
             {/* Champ piège anti-spam, invisible pour les visiteurs */}
             <div className="hidden" aria-hidden="true">
@@ -766,6 +694,14 @@ export function CustomQuoteForm({ block, locale }: Props) {
           </form>
         )}
       </div>
+      <QuoteReviewDialog
+        open={reviewOpen}
+        locale={locale}
+        estimate={estimate}
+        sending={sending}
+        onCancel={() => setReviewOpen(false)}
+        onConfirm={() => { if (pendingForm.current) void sendRequest(pendingForm.current) }}
+      />
     </section>
   )
 }
