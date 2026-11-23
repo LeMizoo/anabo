@@ -15,10 +15,9 @@
   },
   "home": {
     "eyebrow": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "fallbackTitle": "Découvrez Madagascar avec Vonjy, votre chauffeur-guide",
-    "fallbackDescription": "Voyagez à Madagascar avec Vonjy, chauffeur-guide malgache reconnu par des voyageurs du monde entier : circuits privés, road trips authentiques et voyages sur mesure.",
-    "vonjyBadge": "Avec Vonjy, chauffeur-guide reconnu par des voyageurs du monde entier",
-    "vonjyJobTitle": "Chauffeur-guide à Madagascar"
+    "fallbackTitle": "Découvrez Madagascar avec nous, chauffeurs-guides malgaches",
+    "fallbackDescription": "Voyagez à Madagascar avec nous, chauffeurs-guides malgaches reconnus par des voyageurs du monde entier : circuits privés, road trips authentiques et voyages sur mesure.",
+    "vonjyBadge": "Avec nous, chauffeurs-guides reconnus par des voyageurs du monde entier"
   },
   "footer": {
     "navigation": "Navigation",
@@ -35,22 +34,21 @@
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "description": "Voyagez à Madagascar avec Vonjy, chauffeur-guide malgache reconnu par des voyageurs du monde entier : circuits privés, road trips authentiques et voyages sur mesure."
+    "description": "Voyagez à Madagascar avec nous, chauffeurs-guides malgaches reconnus par des voyageurs du monde entier : circuits privés, road trips authentiques et voyages sur mesure."
   },
   "tourIdeas": {
     "title": "Idées de circuits à Madagascar",
     "subtitle": "Madagascar, terre de merveilles naturelles et de trésors culturels, vous invite à imaginer votre propre aventure.",
     "intro": "Avec ses paysages variés, sa faune singulière et sa culture riche, l’île offre mille façons de voyager. Les circuits présentés donnent un aperçu des possibilités et peuvent vous inspirer pour concevoir un itinéraire selon vos envies et vos centres d’intérêt. Je serai ravi de vous aider à choisir les étapes et le rythme qui vous conviennent.",
     "metaTitle": "Idées de circuits à Madagascar | Anabo Roadtrip",
-    "metaDescription": "Idées de circuits à Madagascar : RN7, Tsingy, baobabs, parcs, côte Est et Nosy Be, avec Vonjy, chauffeur-guide reconnu par des voyageurs du monde entier.",
+    "metaDescription": "Idées de circuits à Madagascar : RN7, Tsingy, baobabs, parcs, côte Est et Nosy Be, avec nos chauffeurs-guides reconnus par des voyageurs du monde entier.",
     "keywords": [
       "circuit Madagascar",
       "idées voyage Madagascar",
       "road trip Madagascar",
       "circuit RN7",
       "circuit Nosy Be",
-      "chauffeur-guide Madagascar",
-      "Vonjy chauffeur-guide Madagascar"
+      "chauffeur-guide Madagascar"
     ],
     "faqTitle": "Questions pour choisir un circuit à Madagascar",
     "faqs": [
@@ -60,7 +58,7 @@
       },
       {
         "question": "Comment choisir un itinéraire adapté à mon voyage ?",
-        "answer": "Tenez compte de la durée du séjour, des régions souhaitées, de la saison et des conditions routières. Les étapes peuvent être discutées avec Vonjy, votre chauffeur-guide."
+        "answer": "Tenez compte de la durée du séjour, des régions souhaitées, de la saison et des conditions routières. Les étapes peuvent être discutées avec nous, vos chauffeurs-guides."
       },
       {
         "question": "Les circuits proposés sont-ils personnalisables ?",
@@ -72,7 +70,7 @@
     "noImage": "Pas d'image",
     "itinerary": "Itinéraire",
     "viewRoute": "Voir le trajet",
-    "routeNotConfigured": "Itinéraire détaillé sur demande : Vonjy l’adapte à vos dates et à vos envies.",
+    "routeNotConfigured": "Itinéraire détaillé sur demande : nous l’adaptons à vos dates et à vos envies.",
     "suggestedRoute": "Parcours indicatif, à confirmer selon la durée du séjour, la saison et les conditions de route.",
     "routeRequest": "Demander l’itinéraire"
   },
@@ -141,7 +139,7 @@
     "durationSeasonRainy": "Saison des pluies (novembre à avril)",
     "durationCircuitRange": "{title} : {min} à {max} jours",
     "durationTotalRange": "Durée totale estimée : {min} à {max} jours",
-    "durationIncomplete": "Durée précisée sur demande : Vonjy vous l’indiquera avec votre devis personnalisé.",
+    "durationIncomplete": "Durée précisée sur demande : nous vous l’indiquerons avec votre devis personnalisé.",
     "firstName": "Prénom",
     "lastName": "Nom",
     "email": "Adresse e-mail",

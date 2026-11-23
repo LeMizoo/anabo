@@ -393,7 +393,7 @@ export default async function PricingPage() {
           <p className="mt-1 text-sm text-gray-500">
             Configurez une durée minimale et maximale pour chaque
             combinaison de saison et d’état des routes. Ces durées
-            sont indicatives ; Vonjy déterminera la durée finale
+            sont indicatives ; nous déterminerons la durée finale
             lors du traitement du devis.
           </p>
         </div>

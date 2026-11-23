@@ -140,7 +140,7 @@ export default async function PlanningPage({ searchParams }: Props) {
             {report.shortages.length === 1 ? 'Des voyages confirmés se chevauchent' : `${report.shortages.length} périodes où des voyages confirmés se chevauchent`}
           </p>
           <p className="mt-1">
-            Disponibles : {report.capacity} véhicule(s)/chauffeur(s) actif(s){report.activeDrivers === 0 ? ' (Vonjy seul, aucun chauffeur enregistré)' : ''}.
+            Disponibles : {report.capacity} véhicule(s)/chauffeur(s) actif(s){report.activeDrivers === 0 ? ' (aucun chauffeur enregistré : un seul véhicule compté)' : ''}.
             Pour honorer toutes les demandes, ajoutez temporairement des véhicules et chauffeurs.
           </p>
           <ul className="mt-3 list-disc space-y-1 pl-5">

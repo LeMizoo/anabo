@@ -151,7 +151,7 @@ export default async function DriversPage({ searchParams }: Props) {
 
       {drivers.length === 0 ? (
         <p className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-gray-500">
-          Aucun chauffeur enregistré. Tant que la liste est vide, le planning compte un seul véhicule disponible (Vonjy).
+          Aucun chauffeur enregistré. Tant que la liste est vide, le planning compte un seul véhicule disponible.
         </p>
       ) : (
         <ul className="space-y-3">

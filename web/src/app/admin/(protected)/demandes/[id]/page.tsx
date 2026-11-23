@@ -405,7 +405,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   htmlFor="selectedDurationDays"
                   className="mb-2 block text-sm font-medium text-gray-900"
                 >
-                  Durée définitive choisie par Vonjy (en jours)
+                  Durée définitive retenue (en jours)
                 </label>
                 <input
                   id="selectedDurationDays"
@@ -420,7 +420,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Cette durée reste libre : Vonjy peut choisir une valeur
+                  Cette durée reste libre : vous pouvez choisir une valeur
                   inférieure ou supérieure à la fourchette indicative.
                 </p>
               </div>

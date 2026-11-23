@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    'Circuits privés, road trips et voyages sur mesure à Madagascar avec Vonjy, chauffeur-guide reconnu par des voyageurs du monde entier.',
+    'Circuits privés, road trips et voyages sur mesure à Madagascar avec nos chauffeurs-guides, reconnus par des voyageurs du monde entier.',
   metadataBase: new URL(SITE_URL),
 }
 

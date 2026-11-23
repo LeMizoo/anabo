@@ -168,7 +168,7 @@ export async function saveQuoteDetails(
  * - Novembre à avril : RAINY
  *
  * La durée indicative dépend du circuit, de la saison et de l'état des routes.
- * La durée finale reste librement choisie par Vonjy.
+ * La durée finale reste librement choisie par l’équipe.
  */
 export async function saveTripPlanning(
   quoteId: string,

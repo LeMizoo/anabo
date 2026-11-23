@@ -15,10 +15,9 @@
   },
   "home": {
     "eyebrow": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "fallbackTitle": "Scopri il Madagascar con Vonjy, il tuo autista-guida",
-    "fallbackDescription": "Viaggia in Madagascar con Vonjy, autista-guida malgascio apprezzato da viaggiatori di tutto il mondo: tour privati, road trip autentici e viaggi su misura.",
-    "vonjyBadge": "Con Vonjy, autista-guida apprezzato da viaggiatori di tutto il mondo",
-    "vonjyJobTitle": "Autista-guida in Madagascar"
+    "fallbackTitle": "Scopri il Madagascar con noi, autisti-guida malgasci",
+    "fallbackDescription": "Viaggia in Madagascar con noi, autisti-guida malgasci apprezzati da viaggiatori di tutto il mondo: tour privati, road trip autentici e viaggi su misura.",
+    "vonjyBadge": "Con noi, autisti-guida apprezzati da viaggiatori di tutto il mondo"
   },
   "footer": {
     "navigation": "Navigazione",
@@ -35,22 +34,21 @@
   },
   "metadata": {
     "title": "Madagascar Car Rental with Driver-Guide - Malagasy Company",
-    "description": "Viaggia in Madagascar con Vonjy, autista-guida malgascio apprezzato da viaggiatori di tutto il mondo: tour privati, road trip autentici e viaggi su misura."
+    "description": "Viaggia in Madagascar con noi, autisti-guida malgasci apprezzati da viaggiatori di tutto il mondo: tour privati, road trip autentici e viaggi su misura."
   },
   "tourIdeas": {
     "title": "Idee di viaggio in Madagascar",
     "subtitle": "Il Madagascar, terra di meraviglie naturali e tesori culturali, ti invita a immaginare la tua avventura.",
     "intro": "Tra paesaggi vari, fauna particolare e una cultura ricca, l’isola offre molti modi di viaggiare. I circuiti presentati mostrano alcune possibilità e possono ispirare un itinerario secondo i tuoi interessi. Sarò felice di aiutarti a scegliere tappe e ritmo più adatti.",
     "metaTitle": "Idee di viaggio in Madagascar | Anabo Roadtrip",
-    "metaDescription": "Idee di viaggio in Madagascar: RN7, Tsingy, baobab, parchi, costa orientale e Nosy Be con Vonjy, autista-guida apprezzato da viaggiatori di tutto il mondo.",
+    "metaDescription": "Idee di viaggio in Madagascar: RN7, Tsingy, baobab, parchi, costa orientale e Nosy Be con i nostri autisti-guida, apprezzati in tutto il mondo.",
     "keywords": [
       "idee viaggio Madagascar",
       "itinerario Madagascar",
       "road trip Madagascar",
       "tour RN7 Madagascar",
       "tour Nosy Be",
-      "autista-guida Madagascar",
-      "Vonjy autista-guida Madagascar"
+      "autista-guida Madagascar"
     ],
     "faqTitle": "Domande per scegliere un circuito in Madagascar",
     "faqs": [
@@ -60,7 +58,7 @@
       },
       {
         "question": "Come scelgo un itinerario adatto al mio viaggio?",
-        "answer": "Considera la durata, le regioni desiderate, la stagione e le condizioni stradali. Puoi discutere il percorso e le tappe con Vonjy, il tuo autista-guida."
+        "answer": "Considera la durata, le regioni desiderate, la stagione e le condizioni stradali. Puoi discutere il percorso e le tappe con noi, i tuoi autisti-guida."
       },
       {
         "question": "I circuiti suggeriti si possono personalizzare?",
@@ -72,7 +70,7 @@
     "noImage": "Nessuna immagine",
     "itinerary": "Itinerario",
     "viewRoute": "Vedi percorso",
-    "routeNotConfigured": "Itinerario dettagliato su richiesta: Vonjy lo adatta alle tue date e ai tuoi desideri.",
+    "routeNotConfigured": "Itinerario dettagliato su richiesta: lo adattiamo alle tue date e ai tuoi desideri.",
     "suggestedRoute": "Itinerario indicativo, da confermare in base alla durata del viaggio, alla stagione e alle condizioni stradali.",
     "routeRequest": "Richiedi l’itinerario"
   },
@@ -141,7 +139,7 @@
     "durationSeasonRainy": "Stagione delle piogge (da novembre ad aprile)",
     "durationCircuitRange": "{title}: da {min} a {max} giorni",
     "durationTotalRange": "Durata totale stimata: da {min} a {max} giorni",
-    "durationIncomplete": "Durata su richiesta: Vonjy te la confermerà con il preventivo personalizzato.",
+    "durationIncomplete": "Durata su richiesta: te la confermeremo con il preventivo personalizzato.",
     "firstName": "Nome",
     "lastName": "Cognome",
     "email": "Indirizzo e-mail",

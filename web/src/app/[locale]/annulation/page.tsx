@@ -6,7 +6,7 @@ import { locales } from '@/lib/i18n'
 // /fr/annulation comme URL canonique pour éviter le contenu en double.
 export const metadata: Metadata = {
   title: 'Annulation et remboursement',
-  description: 'Conditions d’annulation et de remboursement des voyages ANABO Roadtrip Madagascar avec Vonjy, chauffeur-guide.',
+  description: 'Conditions d’annulation et de remboursement des voyages ANABO Roadtrip Madagascar, location de voiture avec chauffeur-guide.',
   alternates: { canonical: '/fr/annulation' },
 }
 

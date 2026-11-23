@@ -44,7 +44,7 @@ export function tripEnd(start: Date, end: Date | null, duration: number | null) 
 
 /**
  * Jour par jour, compare les véhicules nécessaires aux voyages confirmés
- * avec la capacité (chauffeurs actifs ; 1 au minimum : Vonjy).
+ * avec la capacité (chauffeurs actifs ; 1 au minimum).
  * Regroupe les jours consécutifs en périodes de manque.
  */
 export function computeShortages(trips: CapacityTrip[], capacity: number): Shortage[] {

@@ -146,7 +146,7 @@ function buildClientEmail(data: QuoteData) {
       <p><a href="${clientQuoteUrl(d, 'fr')}">Suivre votre demande</a> · <a href="${SITE_URL}/fr/annulation">Conditions d’annulation et de remboursement</a></p>
       ${d.circuitTitle ? `<p><strong>Itinéraire :</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Notre équipe vous répondra sous 24 à 48 heures ouvrées.</p>
-      <p>À très bientôt,<br />Vonjy, votre chauffeur-guide, et l'équipe ANABO Roadtrip Madagascar</p>
+      <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>
     `,
     en: (d) => `
       <p>Hello ${escapeHtml(d.firstName)},</p>
@@ -155,7 +155,7 @@ function buildClientEmail(data: QuoteData) {
       <p><a href="${clientQuoteUrl(d, 'en')}">Track your request</a> · <a href="${SITE_URL}/en/annulation">Cancellation and refund policy</a></p>
       ${d.circuitTitle ? `<p><strong>Itinerary:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Our team will reply within 24 to 48 business hours.</p>
-      <p>See you soon,<br />Vonjy, your driver-guide, and the ANABO Roadtrip Madagascar team</p>
+      <p>See you soon,<br />The ANABO Roadtrip Madagascar team</p>
     `,
     it: (d) => `
       <p>Ciao ${escapeHtml(d.firstName)},</p>
@@ -164,7 +164,7 @@ function buildClientEmail(data: QuoteData) {
       <p><a href="${clientQuoteUrl(d, 'it')}">Segui la tua richiesta</a> · <a href="${SITE_URL}/it/annulation">Condizioni di cancellazione e rimborso</a></p>
       ${d.circuitTitle ? `<p><strong>Itinerario:</strong> ${escapeHtml(d.circuitTitle)}</p>` : ''}
       <p>Il nostro team risponderà entro 24-48 ore lavorative.</p>
-      <p>A presto,<br />Vonjy, il tuo autista-guida, e il team ANABO Roadtrip Madagascar</p>
+      <p>A presto,<br />Il team ANABO Roadtrip Madagascar</p>
     `,
   }
 

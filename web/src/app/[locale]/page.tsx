@@ -94,7 +94,7 @@ export default async function HomePage({ params }: Props) {
   const siteUrl = SITE_URL
   const description = (await getTranslations('metadata'))('description')
 
-  // Données structurées : l'agence et son chauffeur-guide Vonjy.
+  // Données structurées : l'agence de location de voiture avec chauffeur-guide.
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'TravelAgency',
@@ -104,13 +104,6 @@ export default async function HomePage({ params }: Props) {
     description,
     areaServed: { '@type': 'Country', name: 'Madagascar' },
     knowsLanguage: ['mg', 'fr', 'en', 'it'],
-    employee: {
-      '@type': 'Person',
-      name: 'Vonjy',
-      jobTitle: t('vonjyJobTitle'),
-      description: t('vonjyBadge'),
-      worksFor: { '@id': `${siteUrl}/#organization` },
-    },
   }
 
   if (!hero) {
