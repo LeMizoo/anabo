@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import type { QuoteEstimateSnapshot } from '@/lib/pricing'
 import type { VehicleEstimateSnapshot } from '@/lib/trip-pricing'
 import { signQuoteToken } from '@/lib/quote-token'
+import { depositAmount, formatAmount, type PaymentSettingsData } from '@/lib/payment-settings'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -268,6 +269,49 @@ const STATUS_TEXTS: Record<
   },
 }
 
+type DepositInfo = {
+  settings: PaymentSettingsData
+  total?: number | null
+  currency?: string | null
+}
+
+const DEPOSIT_TEXTS = {
+  fr: {
+    required: (p: number, amount: string | null) => `Un acompte de ${p} % du montant total du devis${amount ? `, soit <strong>${amount}</strong>,` : ''} est requis pour confirmer votre réservation.`,
+    how: (method: string, phone: string, holder: string | null) => `Paiement par <strong>${method}</strong> au <strong>${phone}</strong>${holder ? ` (titulaire : <strong>${holder}</strong>)` : ''}.`,
+    ref: (r: string) => `Merci d’indiquer la référence <strong>${r}</strong> comme motif du paiement.`,
+    confirmed: 'Votre réservation devient définitive à réception de l’acompte.',
+  },
+  en: {
+    required: (p: number, amount: string | null) => `A deposit of ${p}% of the total quote${amount ? `, i.e. <strong>${amount}</strong>,` : ''} is required to confirm your booking.`,
+    how: (method: string, phone: string, holder: string | null) => `Payment by <strong>${method}</strong> to <strong>${phone}</strong>${holder ? ` (account holder: <strong>${holder}</strong>)` : ''}.`,
+    ref: (r: string) => `Please use the reference <strong>${r}</strong> as the payment description.`,
+    confirmed: 'Your booking becomes final once the deposit has been received.',
+  },
+  it: {
+    required: (p: number, amount: string | null) => `Per confermare la prenotazione è richiesto un acconto del ${p}% dell’importo totale del preventivo${amount ? `, pari a <strong>${amount}</strong>` : ''}.`,
+    how: (method: string, phone: string, holder: string | null) => `Pagamento tramite <strong>${method}</strong> al numero <strong>${phone}</strong>${holder ? ` (intestatario: <strong>${holder}</strong>)` : ''}.`,
+    ref: (r: string) => `Indicate il riferimento <strong>${r}</strong> come causale del pagamento.`,
+    confirmed: 'La prenotazione diventa definitiva al ricevimento dell’acconto.',
+  },
+}
+
+function depositHtml(lang: 'fr' | 'en' | 'it', reference: string, deposit?: DepositInfo, confirmed = false) {
+  if (!deposit || deposit.settings.depositPercent <= 0) return ''
+  const t = DEPOSIT_TEXTS[lang]
+  const s = deposit.settings
+  const amount = depositAmount(deposit.total, s.depositPercent)
+  const intl = lang === 'en' ? 'en-GB' : lang === 'it' ? 'it-IT' : 'fr-FR'
+  const amountText = amount ? formatAmount(amount, deposit.currency, intl) : null
+  return `
+      <div style="margin: 20px 0; padding: 14px 16px; border-radius: 8px; background: #eff6ff; color: #0c2d6b; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 0 0 6px;">${t.required(s.depositPercent, amountText)}</p>
+        <p style="margin: 0 0 6px;">${t.how(escapeHtml(s.method), escapeHtml(s.phoneNumber), s.accountHolder ? escapeHtml(s.accountHolder) : null)}</p>
+        <p style="margin: 0;">${t.ref(escapeHtml(reference))}${s.instructions ? `<br/>${escapeHtml(s.instructions)}` : ''}</p>
+        ${confirmed ? `<p style="margin: 6px 0 0;"><strong>${t.confirmed}</strong></p>` : ''}
+      </div>`
+}
+
 export async function sendQuoteStatusEmail(
   to: string,
   firstName: string,
@@ -275,6 +319,7 @@ export async function sendQuoteStatusEmail(
   reference: string,
   token?: string,
   locale: string = 'fr',
+  deposit?: DepositInfo,
 ) {
   const lang: StatusLocale = locale === 'en' || locale === 'it' ? locale : 'fr'
   const t = STATUS_TEXTS[lang]
@@ -295,6 +340,7 @@ export async function sendQuoteStatusEmail(
         </a>
       </p>
       <p>${t.quoteOutro}</p>
+      ${depositHtml(lang, reference, deposit)}
       <p style="font-size: 13px; color: #92400e; background: #fffbeb; padding: 12px; border-radius: 6px;">${t.cancellationNote}</p>
       <p>${t.bye}<br/>${t.team}</p>
     `
@@ -303,6 +349,7 @@ export async function sendQuoteStatusEmail(
     html = `
       <p>${t.hello} ${escapeHtml(firstName)},</p>
       <p>${t.confirmBody1}</p>
+      ${deposit?.settings && !deposit.settings.depositPercent ? '' : depositHtml(lang, reference, deposit, true)}
       <p>${t.confirmBody2}</p>
       <p>${t.bye}<br/>${t.team}</p>
     `

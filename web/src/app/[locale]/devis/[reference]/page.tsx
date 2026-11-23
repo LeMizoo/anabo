@@ -6,6 +6,7 @@ import { titleCase, titleSizeClass } from '@/lib/typography'
 import { locales, defaultLocale, type Locale } from '@/lib/i18n'
 import { verifyQuoteToken } from '@/lib/quote-token'
 import { calendarDaysBetween, getCancellationStatus } from '@/lib/cancellation'
+import { getPaymentSettings, depositAmount, formatAmount } from '@/lib/payment-settings'
 
 const REFERENCE_PATTERN = /^AR-[A-Z0-9]+-[A-F0-9]+$/
 
@@ -86,6 +87,24 @@ export default async function DevisPage({ params, searchParams }: Props) {
   const daysUntilDeparture = quote.startDate ? calendarDaysBetween(new Date(), quote.startDate) : null
   const acceptance = getCancellationStatus(quote.clientAcceptedAt, quote.acceptedStartDate || quote.startDate)
   const intlLocale = locale === 'en' ? 'en-GB' : locale === 'it' ? 'it-IT' : 'fr-FR'
+  const payment = await getPaymentSettings()
+  const deposit = depositAmount(quote.quoteTotalAmount, payment.depositPercent)
+
+  // Bloc « acompte » : montant, moyen de paiement, référence à indiquer.
+  const depositBlock = payment.depositPercent > 0 && (
+    <div className="space-y-1 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950">
+      <p className="font-semibold">{t('depositTitle')}</p>
+      <p>{t('depositRequired', { percent: payment.depositPercent })}</p>
+      {deposit !== null && (
+        <p className="font-semibold">{t('depositAmount', { amount: formatAmount(deposit, quote.quoteCurrency, intlLocale) })}</p>
+      )}
+      <p>{t('depositHow', { method: payment.method, phone: payment.phoneNumber })}</p>
+      {payment.accountHolder && <p>{t('depositHolder', { holder: payment.accountHolder })}</p>}
+      <p>{t('depositRef', { reference: quote.reference })}</p>
+      {payment.instructions && <p>{payment.instructions}</p>}
+      <p className="pt-1 text-xs text-blue-800">{t('depositFinal')}</p>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -124,6 +143,11 @@ export default async function DevisPage({ params, searchParams }: Props) {
                 })}
               </p>
             )}
+            {hasValidToken && quote.depositPaidAt && (
+              <p className="font-semibold">
+                {t('depositReceived', { date: quote.depositPaidAt.toLocaleDateString(intlLocale, { timeZone: 'Indian/Antananarivo' }) })}
+              </p>
+            )}
             {hasValidToken && acceptance && (
               <p>
                 {acceptance.cancellable
@@ -134,8 +158,11 @@ export default async function DevisPage({ params, searchParams }: Props) {
           </div>
         )}
 
+        {quote.status === 'CONFIRME' && hasValidToken && !quote.depositPaidAt && <div className="mt-4">{depositBlock}</div>}
+
         {quote.status !== 'CONFIRME' && canConfirm && (
           <form action={confirm} className="space-y-4">
+            {depositBlock}
             <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
               <p className="font-semibold">{t('conditionsTitle')}</p>
               {daysUntilDeparture === null ? (

@@ -120,7 +120,15 @@
     "acceptConditions": "I have read and accept the cancellation and early departure conditions.",
     "acceptedOn": "Quote accepted on {date} at {time}.",
     "notCancellableAccepted": "Accepted {days} day(s) before departure: the booking cannot be cancelled under the usual procedure.",
-    "cancellableAccepted": "Accepted {days} days before departure: cancellation remains possible under our conditions."
+    "cancellableAccepted": "Accepted {days} days before departure: cancellation remains possible under our conditions.",
+    "depositTitle": "Deposit to confirm",
+    "depositRequired": "A deposit of {percent}% of the total quote is required to confirm your booking.",
+    "depositAmount": "Deposit amount: {amount}",
+    "depositHow": "Payment by {method} to {phone}",
+    "depositHolder": "Account holder: {holder}",
+    "depositRef": "Please use the reference {reference} as the payment description.",
+    "depositFinal": "Your booking becomes final once the deposit has been received.",
+    "depositReceived": "Deposit received on {date}. Thank you, your booking is final."
   },
   "contactForm": {
     "openContact": "Contact us",

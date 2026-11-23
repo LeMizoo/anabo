@@ -15,6 +15,8 @@ import { auth } from '@/lib/auth'
 import { sendQuoteStatusEmail, sendNewUserEmail } from '@/lib/email'
 import { signQuoteToken } from '@/lib/quote-token'
 import { notifyIfShortage } from '@/lib/capacity-alerts'
+import { getPaymentSettings } from '@/lib/payment-settings'
+import { redirect } from 'next/navigation'
 
 const MAX_TEXT = 20000
 const ROLES = ['ADMIN', 'SUPER_ADMIN'] as const
@@ -110,6 +112,12 @@ export async function updateQuoteStatus(
         newStatus,
         updatedQuote.reference,
         token,
+        updatedQuote.locale,
+        {
+          settings: await getPaymentSettings(),
+          total: updatedQuote.quoteTotalAmount,
+          currency: updatedQuote.quoteCurrency,
+        },
       )
 
       emailSent = true
@@ -465,4 +473,45 @@ export async function deleteQuote(quoteId: string, confirmation: string) {
   revalidatePath('/admin/planning')
 
   return { success: true }
+}
+
+
+const CURRENCIES = ['EUR', 'MGA', 'USD'] as const
+
+/** Montant total du devis (sert au calcul de l'acompte affiché au client). */
+export async function saveQuotePayment(formData: FormData) {
+  await requireSession()
+  const quoteId = String(formData.get('quoteId') || '')
+  const raw = String(formData.get('quoteTotalAmount') || '').replace(/\s/g, '')
+  const currency = String(formData.get('quoteCurrency') || 'EUR').toUpperCase()
+  if (!quoteId) throw new Error('Demande introuvable.')
+
+  const total = raw ? Number(raw) : null
+  if (total !== null && (!Number.isSafeInteger(total) || total < 0 || total > 1_000_000_000)) {
+    throw new Error('Montant du devis invalide.')
+  }
+  if (!CURRENCIES.includes(currency as (typeof CURRENCIES)[number])) throw new Error('Devise invalide.')
+
+  await prisma.quoteRequest.update({
+    where: { id: quoteId },
+    data: { quoteTotalAmount: total, quoteCurrency: total === null ? null : currency },
+  })
+  revalidatePath(`/admin/demandes/${quoteId}`)
+  redirect(`/admin/demandes/${quoteId}`)
+}
+
+/** Marque l'acompte comme reçu (ou annule ce marquage). */
+export async function toggleDepositPaid(formData: FormData) {
+  await requireSession()
+  const quoteId = String(formData.get('quoteId') || '')
+  const quote = await prisma.quoteRequest.findUnique({ where: { id: quoteId }, select: { depositPaidAt: true } })
+  if (!quote) throw new Error('Demande introuvable.')
+  await prisma.quoteRequest.update({
+    where: { id: quoteId },
+    data: { depositPaidAt: quote.depositPaidAt ? null : new Date() },
+  })
+  revalidatePath(`/admin/demandes/${quoteId}`)
+  revalidatePath('/admin/demandes')
+  revalidatePath('/admin/planning')
+  redirect(`/admin/demandes/${quoteId}`)
 }

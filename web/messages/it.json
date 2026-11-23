@@ -120,7 +120,15 @@
     "acceptConditions": "Ho letto e accetto le condizioni di annullamento e di partenza anticipata.",
     "acceptedOn": "Preventivo accettato il {date} alle {time}.",
     "notCancellableAccepted": "Accettazione avvenuta {days} giorno/i prima della partenza: la prenotazione non può essere annullata secondo la procedura abituale.",
-    "cancellableAccepted": "Accettazione avvenuta {days} giorni prima della partenza: l'annullamento resta possibile secondo le nostre condizioni."
+    "cancellableAccepted": "Accettazione avvenuta {days} giorni prima della partenza: l'annullamento resta possibile secondo le nostre condizioni.",
+    "depositTitle": "Acconto per confermare",
+    "depositRequired": "Per confermare la prenotazione è richiesto un acconto del {percent}% dell’importo totale del preventivo.",
+    "depositAmount": "Importo dell’acconto: {amount}",
+    "depositHow": "Pagamento tramite {method} al numero {phone}",
+    "depositHolder": "Intestatario del conto: {holder}",
+    "depositRef": "Indicate il riferimento {reference} come causale del pagamento.",
+    "depositFinal": "La prenotazione diventa definitiva al ricevimento dell’acconto.",
+    "depositReceived": "Acconto ricevuto il {date}. Grazie, la prenotazione è definitiva."
   },
   "contactForm": {
     "openContact": "Contattaci",

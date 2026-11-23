@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import { locales, type Locale } from '@/lib/i18n'
 import { pageAlternates } from '@/lib/seo'
+import { getPaymentSettings } from '@/lib/payment-settings'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -10,6 +11,10 @@ type Content = {
   title: string
   description: string
   intro: string
+  depositTitle: string
+  deposit: (percent: number) => string
+  depositHow: (method: string, phone: string, holder: string | null) => string
+  depositFinal: string
   delaysTitle: string
   delays: [string, string][]
   noFlatFee: string
@@ -38,6 +43,10 @@ const CONTENT: Record<Locale, Content> = {
     title: 'Annulation et remboursement',
     description: 'Conditions d’annulation et de remboursement des voyages ANABO Roadtrip Madagascar : délai de 15 jours, départ anticipé, procédure et remboursements.',
     intro: 'Des conditions communiquées avant votre réservation, adaptées aux prestations réellement réservées.',
+    depositTitle: 'Acompte et paiement',
+    deposit: (p) => `Un acompte de ${p} % du montant total du devis est requis pour confirmer la réservation.`,
+    depositHow: (m, ph, h) => `Paiement par ${m} au ${ph}${h ? ` (titulaire : ${h})` : ''}, en indiquant la référence de votre devis comme motif.`,
+    depositFinal: 'La réservation devient définitive à réception de l’acompte. Le solde est réglé selon les modalités indiquées dans le devis accepté.',
     delaysTitle: 'Délais d’annulation',
     delays: [
       ['Avant l’acceptation du devis :', 'votre demande de devis est sans frais et peut être retirée à tout moment.'],
@@ -72,6 +81,10 @@ const CONTENT: Record<Locale, Content> = {
     title: 'Cancellation and refund',
     description: 'Cancellation and refund policy for ANABO Roadtrip Madagascar trips: 15-day rule, early departure, how to cancel and refunds.',
     intro: 'Conditions shared before you book, adapted to the services you actually book.',
+    depositTitle: 'Deposit and payment',
+    deposit: (p) => `A deposit of ${p}% of the total quote is required to confirm the booking.`,
+    depositHow: (m, ph, h) => `Payment by ${m} to ${ph}${h ? ` (account holder: ${h})` : ''}, using your quote reference as the payment description.`,
+    depositFinal: 'The booking becomes final once the deposit has been received. The balance is paid as set out in the accepted quote.',
     delaysTitle: 'Cancellation periods',
     delays: [
       ['Before the quote is accepted:', 'your quote request is free of charge and can be withdrawn at any time.'],
@@ -106,6 +119,10 @@ const CONTENT: Record<Locale, Content> = {
     title: 'Cancellazione e rimborso',
     description: 'Condizioni di cancellazione e rimborso dei viaggi ANABO Roadtrip Madagascar: regola dei 15 giorni, partenza anticipata, procedura e rimborsi.',
     intro: 'Condizioni comunicate prima della prenotazione, adattate ai servizi effettivamente prenotati.',
+    depositTitle: 'Acconto e pagamento',
+    deposit: (p) => `Per confermare la prenotazione è richiesto un acconto del ${p}% dell’importo totale del preventivo.`,
+    depositHow: (m, ph, h) => `Pagamento tramite ${m} al numero ${ph}${h ? ` (intestatario: ${h})` : ''}, indicando il riferimento del preventivo come causale.`,
+    depositFinal: 'La prenotazione diventa definitiva al ricevimento dell’acconto. Il saldo si paga secondo le modalità indicate nel preventivo accettato.',
     delaysTitle: 'Termini di cancellazione',
     delays: [
       ['Prima dell’accettazione del preventivo:', 'la richiesta di preventivo è gratuita e può essere ritirata in qualsiasi momento.'],
@@ -166,6 +183,7 @@ export default async function CancellationPage({ params }: Props) {
   const { locale } = await params
   const c = getContent(locale)
   if (!c) notFound()
+  const payment = await getPaymentSettings()
 
   const email = (
     <a className="font-semibold text-blue-800 underline" href={`mailto:contact@anabo.mg?subject=${encodeURIComponent(c.mailSubject)}`}>
@@ -180,6 +198,15 @@ export default async function CancellationPage({ params }: Props) {
         <h1 className="mt-2 text-4xl font-bold text-[#06245F]">{c.title}</h1>
         <p className="mt-4 text-lg text-slate-600 dark:text-slate-300">{c.intro}</p>
       </header>
+
+      {payment.depositPercent > 0 && (
+        <section className={card}>
+          <h2 className={h2}>{c.depositTitle}</h2>
+          <p className="mt-3 leading-7">{c.deposit(payment.depositPercent)}</p>
+          <p className="mt-2 leading-7">{c.depositHow(payment.method, payment.phoneNumber, payment.accountHolder)}</p>
+          <p className="mt-2 leading-7">{c.depositFinal}</p>
+        </section>
+      )}
 
       <section className={card}>
         <h2 className={h2}>{c.delaysTitle}</h2>

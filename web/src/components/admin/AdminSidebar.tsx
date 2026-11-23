@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, CalendarDays, Car, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, CalendarDays, Car, Wallet, type LucideIcon } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { AlertBell } from './AlertBell'
 import type { AdminAlerts } from '@/lib/admin-alerts'
@@ -21,6 +21,7 @@ export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: A
 
   const adminItems = userRole === 'SUPER_ADMIN' ? [
     { label: 'Prix et véhicules', href: '/admin/prix', icon: CircleDollarSign },
+    { label: 'Paiement et acompte', href: '/admin/paiement', icon: Wallet },
     { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users },
   ] : []
   const accountItems = [{ label: 'Mon compte', href: '/admin/mon-compte', icon: UserCircle }]

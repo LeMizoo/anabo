@@ -21,6 +21,8 @@ import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
 import { getCancellationStatus } from '@/lib/cancellation'
 import { assignDriver } from '@/app/admin/(protected)/chauffeurs/actions'
 import { shortageForTrip } from '@/lib/fleet-capacity'
+import { saveQuotePayment, toggleDepositPaid } from '@/app/admin/actions'
+import { getPaymentSettings, depositAmount, formatAmount } from '@/lib/payment-settings'
 
 export const dynamic = 'force-dynamic'
 
@@ -163,6 +165,9 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
     quote.status === 'CONFIRME' ? shortageForTrip(quote.id) : Promise.resolve(null),
   ])
   const assignedDriver = drivers.find((d) => d.id === quote.assignedDriverId) || null
+
+  const payment = await getPaymentSettings()
+  const deposit = depositAmount(quote.quoteTotalAmount, payment.depositPercent)
 
   const acceptance = getCancellationStatus(quote.clientAcceptedAt, quote.acceptedStartDate || quote.startDate)
   const mgDateTime = (d: Date) =>
@@ -681,6 +686,59 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
         </div>
 
         <aside className="space-y-4">
+          <section className={`rounded-xl border p-6 shadow-sm text-sm ${quote.depositPaidAt ? 'border-green-200 bg-green-50' : 'border-blue-200 bg-blue-50'}`}>
+            <h2 className="mb-1 text-lg font-semibold">Acompte ({payment.depositPercent} %)</h2>
+            <p className="mb-3 text-xs text-gray-600">
+              {payment.method} · {payment.phoneNumber}
+              {payment.accountHolder ? ` · ${payment.accountHolder}` : ' · titulaire à préciser'}
+            </p>
+            <form action={saveQuotePayment} className="flex flex-wrap items-end gap-2 print:hidden">
+              <input type="hidden" name="quoteId" value={quote.id} />
+              <label className="min-w-0 flex-1 text-xs font-medium text-gray-700">
+                Montant total du devis
+                <input
+                  name="quoteTotalAmount"
+                  type="number"
+                  min={0}
+                  step={1}
+                  defaultValue={quote.quoteTotalAmount ?? ''}
+                  className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm"
+                />
+              </label>
+              <select
+                name="quoteCurrency"
+                defaultValue={quote.quoteCurrency || 'EUR'}
+                aria-label="Devise"
+                className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm"
+              >
+                <option value="EUR">EUR</option>
+                <option value="MGA">MGA</option>
+                <option value="USD">USD</option>
+              </select>
+              <FormSubmitButton label="OK" pendingLabel="…" className="rounded-lg bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60" />
+            </form>
+            <p className="mt-3 text-gray-800">
+              {deposit !== null
+                ? <>Acompte demandé : <strong>{formatAmount(deposit, quote.quoteCurrency)}</strong></>
+                : 'Renseignez le montant total pour afficher le montant exact de l’acompte au client.'}
+            </p>
+            <form action={toggleDepositPaid} className="mt-3 print:hidden">
+              <input type="hidden" name="quoteId" value={quote.id} />
+              {quote.depositPaidAt ? (
+                <p className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                    Acompte reçu le {quote.depositPaidAt.toLocaleDateString('fr-FR')}
+                  </span>
+                  <button className="text-xs text-gray-600 underline">Annuler</button>
+                </p>
+              ) : (
+                <button className="rounded-lg border border-green-600 bg-white px-3 py-1.5 text-xs font-semibold text-green-800 hover:bg-green-50">
+                  Marquer l’acompte comme reçu
+                </button>
+              )}
+            </form>
+          </section>
+
           {quote.status === 'CONFIRME' && (
             <section
               className={`rounded-xl border p-6 shadow-sm text-sm ${
