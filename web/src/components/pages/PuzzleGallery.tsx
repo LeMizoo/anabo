@@ -60,10 +60,12 @@ export function PuzzleGallery({ block, locale }: Props) {
 
   const getItemClasses = (size: NonNullable<PuzzleItem['size']>) => {
     switch (size) {
-      case 'wide': return 'col-span-2 row-span-1 aspect-[2/1]'
-      case 'tall': return 'col-span-1 row-span-2 aspect-[1/2]'
-      case 'large': return 'col-span-2 row-span-2 aspect-square'
-      default: return 'col-span-1 row-span-1 aspect-square'
+      // Pas de ratio fixe : la tuile occupe exactement sa case de grille
+      // (sinon l'image déborde sur la ligne suivante et masque le bouton).
+      case 'wide': return 'col-span-2 row-span-1'
+      case 'tall': return 'col-span-1 row-span-2'
+      case 'large': return 'col-span-2 row-span-2'
+      default: return 'col-span-1 row-span-1'
     }
   }
 
@@ -88,7 +90,7 @@ export function PuzzleGallery({ block, locale }: Props) {
           </p>
         )}
 
-        <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[150px] md:auto-rows-[200px]">
+        <div className="relative z-0 grid grid-flow-dense grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[150px] md:auto-rows-[200px]">
           {visibleItems.map((item, index) => {
             const imageUrl = getImageUrl(
               item.image,
@@ -159,7 +161,7 @@ export function PuzzleGallery({ block, locale }: Props) {
         </div>
 
         {visibleCount < items.length && (
-          <div className="mt-8 flex justify-center">
+          <div className="relative z-20 mt-12 flex justify-center pb-2">
             <button
               type="button"
               onClick={() =>
@@ -167,7 +169,7 @@ export function PuzzleGallery({ block, locale }: Props) {
                   Math.min(count + visibleCountIncrement, items.length),
                 )
               }
-              className="rounded-full bg-[#06245F] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#0a347f] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#06245F] focus-visible:ring-offset-2"
+              className="rounded-full bg-[#06245F] px-6 py-3 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#0a347f] hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#06245F] focus-visible:ring-offset-2"
             >
               {showMoreLabel}
             </button>
