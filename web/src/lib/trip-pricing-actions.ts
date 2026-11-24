@@ -7,6 +7,10 @@ type CalculateTripVehiclePriceInput = {
   vehicleCode: string
   days: number
   vehicleCount: number
+  destination?: string | null
+  circuitSlug?: string | null
+  circuitTitle?: string | null
+  regions?: string[] | null
 }
 
 export type PublicTripVehicleEstimate = {
@@ -19,8 +23,9 @@ export type PublicTripVehicleEstimate = {
 
 /**
  * Action publique (appelable depuis le navigateur).
- * Ne renvoie que l'estimation finale : le prix journalier, l'identifiant
- * interne et la capacité du véhicule restent côté serveur.
+ * Ne renvoie que l'estimation finale : le prix journalier, l'indemnité chauffeur,
+ * le détail du retour à vide, l'identifiant interne et la capacité du véhicule
+ * restent côté serveur.
  */
 export async function calculateTripVehiclePriceAction(
   input: CalculateTripVehiclePriceInput,
@@ -39,10 +44,31 @@ export async function calculateTripVehiclePriceAction(
     return null
   }
 
+  const safeRegions = Array.isArray(input.regions)
+    ? input.regions
+        .filter((item): item is string => typeof item === 'string')
+        .map((item) => item.trim().slice(0, 120))
+        .filter(Boolean)
+        .slice(0, 20)
+    : null
+
   const result = await calculateTripVehiclePrice({
     vehicleCode: input.vehicleCode,
     days: input.days,
     vehicleCount: input.vehicleCount,
+    destination:
+      typeof input.destination === 'string'
+        ? input.destination.trim().slice(0, 191) || null
+        : null,
+    circuitSlug:
+      typeof input.circuitSlug === 'string'
+        ? input.circuitSlug.trim().slice(0, 191) || null
+        : null,
+    circuitTitle:
+      typeof input.circuitTitle === 'string'
+        ? input.circuitTitle.trim().slice(0, 191) || null
+        : null,
+    regions: safeRegions,
   })
 
   if (!result) return null

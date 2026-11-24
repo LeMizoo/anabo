@@ -1,18 +1,25 @@
-
 'use client'
 
-import Image from 'next/image'
 import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
-import { getImageUrl } from '@/lib/sanity'
+import { urlFor } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
-import type { CustomQuoteBlock, CustomQuoteOption } from '@/lib/types'
+import type { CustomQuoteBlock, CustomQuoteOption, SanityImage } from '@/lib/types'
 import type { Locale } from '@/lib/i18n'
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
 
 type Props = { block: CustomQuoteBlock; locale: Locale }
+
+function getOptionImageUrl(image?: SanityImage): string {
+  if (!image) return ''
+  try {
+    return urlFor(image).width(500).height(340).fit('crop').url()
+  } catch {
+    return ''
+  }
+}
 
 export function CustomQuoteForm({ block, locale }: Props) {
   const t = useTranslations('contactForm')
@@ -23,302 +30,140 @@ export function CustomQuoteForm({ block, locale }: Props) {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
-
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-
+  const [consecutiveCircuits, setConsecutiveCircuits] = useState(1)
+  const [vehicleCount, setVehicleCount] = useState(1)
   const [estimate, setEstimate] = useState<QuoteEstimate | null>(null)
   const [reviewOpen, setReviewOpen] = useState(false)
   const pendingForm = useRef<HTMLFormElement | null>(null)
-  const [consecutiveCircuits, setConsecutiveCircuits] = useState(1)
-  const [vehicleCount, setVehicleCount] = useState(1)
 
-  const regionNames = block.regions || []
-  const experienceNames = block.experiences || []
-  const vehicles = block.vehicles || []
+  const tripDays = (() => {
+    if (!startDate || !endDate) return null
+    const a = Date.parse(`${startDate}T00:00:00Z`)
+    const b = Date.parse(`${endDate}T00:00:00Z`)
+    if (!Number.isFinite(a) || !Number.isFinite(b) || b < a) return null
+    return Math.round((b - a) / 86_400_000) + 1
+  })()
+
+  const toggle = (list: string[], setList: (v: string[]) => void, val: string) =>
+    setList(list.includes(val) ? list.filter((x: string) => x !== val) : [...list, val])
 
   const labels = {
-    fr: {
-      requiredRegion: 'Choisissez au moins une région.',
-      vehicle: 'Véhicule préféré',
-      regions: 'Régions',
-      experiences: 'Expériences',
-      trip: 'Voyage sur mesure',
-      region: 'Régions souhaitées',
-      experience: 'Expériences souhaitées',
-      vehicleLabel: 'Véhicule',
-      multiple: '(plusieurs choix)',
-      selected: 'Sélectionné',
-      select: 'Sélectionner',
-      duration: 'Durée de votre séjour',
-      durationDay: 'jour',
-      durationDays: 'jours',
-      invalidDates: 'La date de retour doit être postérieure ou égale à la date de départ.',
-      needDatesVehicle: 'Indiquez les dates et choisissez un véhicule pour obtenir une estimation.',
-      checkDates: 'Vérifiez les dates de votre voyage.',
-      noRate: 'Aucun tarif n’est configuré pour ce véhicule. Contactez-nous pour un devis personnalisé.',
-      estimateError: 'Impossible de calculer le prix indicatif pour le moment.',
-      vehicleNote: 'Tarifs des véhicules à titre indicatif. Le prix final dépend de la disponibilité et de la saison ; il sera confirmé après votre demande.',
-      indicativeNote: 'Le tarif du véhicule est indicatif, sous réserve de disponibilité et de saison. Confirmation après étude de la demande.',
-      estimateFor: (days: number, vehicleName: string) => `Prix indicatif estimé pour ${days} jour${days > 1 ? 's' : ''} avec ${vehicleName}. Toute négociation est possible sur place à Madagascar, selon la durée de votre séjour.`,
-      consecutive: 'Circuits consécutifs',
-      vehiclesRequested: 'Véhicules demandés',
-      calculating: 'Calcul en cours…',
-      calculate: 'Calculer le prix indicatif',
-    },
-    en: {
-      requiredRegion: 'Choose at least one region.',
-      vehicle: 'Preferred vehicle',
-      regions: 'Regions',
-      experiences: 'Experiences',
-      trip: 'Tailor-made trip',
-      region: 'Preferred regions',
-      experience: 'Preferred experiences',
-      vehicleLabel: 'Vehicle',
-      multiple: '(choose all that apply)',
-      selected: 'Selected',
-      select: 'Select',
-      duration: 'Length of your stay',
-      durationDay: 'day',
-      durationDays: 'days',
-      invalidDates: 'The return date must be on or after the departure date.',
-      needDatesVehicle: 'Enter your dates and choose a vehicle to get an estimate.',
-      checkDates: 'Please check your travel dates.',
-      noRate: 'No rate is set for this vehicle yet. Contact us for a personalised quote.',
-      estimateError: 'The indicative price cannot be calculated right now.',
-      vehicleNote: 'Vehicle rates are indicative. The final price depends on availability and season and will be confirmed after your request.',
-      indicativeNote: 'The vehicle rate is indicative, subject to availability and season. Confirmed once your request has been reviewed.',
-      estimateFor: (days: number, vehicleName: string) => `Indicative price for ${days} day${days > 1 ? 's' : ''} with ${vehicleName}. Prices can be discussed in Madagascar depending on the length of your stay.`,
-      consecutive: 'Consecutive circuits',
-      vehiclesRequested: 'Vehicles requested',
-      calculating: 'Calculating…',
-      calculate: 'Calculate the indicative price',
-    },
-    it: {
-      requiredRegion: 'Scegli almeno una regione.',
-      vehicle: 'Veicolo preferito',
-      regions: 'Regioni',
-      experiences: 'Esperienze',
-      trip: 'Viaggio su misura',
-      region: 'Regioni desiderate',
-      experience: 'Esperienze desiderate',
-      vehicleLabel: 'Veicolo',
-      multiple: '(puoi scegliere più opzioni)',
-      selected: 'Selezionato',
-      select: 'Seleziona',
-      duration: 'Durata del soggiorno',
-      durationDay: 'giorno',
-      durationDays: 'giorni',
-      invalidDates: 'La data di ritorno deve essere uguale o successiva alla data di partenza.',
-      needDatesVehicle: 'Indica le date e scegli un veicolo per ottenere una stima.',
-      checkDates: 'Verifica le date del tuo viaggio.',
-      noRate: 'Nessuna tariffa è ancora configurata per questo veicolo. Contattaci per un preventivo personalizzato.',
-      estimateError: 'Al momento non è possibile calcolare il prezzo indicativo.',
-      vehicleNote: 'Le tariffe dei veicoli sono indicative. Il prezzo finale dipende da disponibilità e stagione e sarà confermato dopo la tua richiesta.',
-      indicativeNote: 'La tariffa del veicolo è indicativa, soggetta a disponibilità e stagione. Conferma dopo l’esame della richiesta.',
-      estimateFor: (days: number, vehicleName: string) => `Prezzo indicativo per ${days} giorn${days > 1 ? 'i' : 'o'} con ${vehicleName}. Il prezzo è trattabile in Madagascar in base alla durata del soggiorno.`,
-      consecutive: 'Circuiti consecutivi',
-      vehiclesRequested: 'Veicoli richiesti',
-      calculating: 'Calcolo in corso…',
-      calculate: 'Calcola il prezzo indicativo',
-    },
-  }[locale]
-
-  const inputClass =
-    'mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100'
-
-  // Même règle que l'estimation du prix (serveur) : jours inclus,
-  // du 1er au 5 = 5 jours ; une seule date = 1 jour.
-  const startTime = startDate
-    ? Date.parse(`${startDate}T00:00:00Z`)
-    : Number.NaN
-
-  const endTime = endDate
-    ? Date.parse(`${endDate}T00:00:00Z`)
-    : Number.NaN
-
-  const datesAreValid =
-    Number.isFinite(startTime) &&
-    Number.isFinite(endTime) &&
-    endTime >= startTime
-
-  const durationDays = datesAreValid
-    ? Math.round((endTime - startTime) / 86400000) + 1
-    : null
-
-  function handleDateChange(type: 'start' | 'end', value: string) {
-    if (type === 'start') {
-      setStartDate(value)
-    } else {
-      setEndDate(value)
-    }
-
-    setError('')
+    trip: locale === 'en' ? 'Tailor-made trip' : locale === 'it' ? 'Viaggio su misura' : 'Voyage sur mesure',
+    region: locale === 'en' ? 'Regions' : locale === 'it' ? 'Regioni' : 'Régions',
+    experience: locale === 'en' ? 'Experiences' : locale === 'it' ? 'Esperienze' : 'Expériences',
+    vehicleLabel: locale === 'en' ? 'Vehicle' : locale === 'it' ? 'Veicolo' : 'Véhicule',
+    dateStart: locale === 'en' ? 'Departure date' : locale === 'it' ? 'Data di partenza' : 'Date de départ',
+    dateEnd: locale === 'en' ? 'Return date' : locale === 'it' ? 'Data di ritorno' : 'Date de retour',
+    adults: locale === 'en' ? 'Adults' : locale === 'it' ? 'Adulti' : 'Adultes',
+    children: locale === 'en' ? 'Children' : locale === 'it' ? 'Bambini' : 'Enfants',
+    firstName: locale === 'en' ? 'First name' : locale === 'it' ? 'Nome' : 'Prénom',
+    lastName: locale === 'en' ? 'Last name' : locale === 'it' ? 'Cognome' : 'Nom',
+    email: 'E-mail',
+    phone: locale === 'en' ? 'Phone / WhatsApp' : locale === 'it' ? 'Telefono / WhatsApp' : 'Téléphone / WhatsApp',
+    country: locale === 'en' ? 'Country' : locale === 'it' ? 'Paese' : 'Pays',
+    message: locale === 'en' ? 'Your project & notes' : locale === 'it' ? 'Il tuo progetto e note' : 'Votre projet et remarques',
+    successTitle: locale === 'en' ? 'Quote request sent' : locale === 'it' ? 'Richiesta inviata' : 'Demande envoyée',
+    successRef: locale === 'en' ? 'Reference:' : locale === 'it' ? 'Riferimento:' : 'Référence :',
+    successNext:
+      locale === 'en'
+        ? 'We will get back to you quickly with a tailored proposal.'
+        : locale === 'it'
+          ? 'Ti ricontatteremo al più presto con una proposta su misura.'
+          : 'Nous vous recontacterons rapidement avec une proposition adaptée.',
+    another:
+      locale === 'en'
+        ? 'Send another request'
+        : locale === 'it'
+          ? 'Invia un’altra richiesta'
+          : 'Envoyer une autre demande',
+    required:
+      locale === 'en'
+        ? 'Please fill in your name, email and phone number.'
+        : locale === 'it'
+          ? 'Compila nome, email e telefono.'
+          : 'Merci de renseigner votre prénom, e-mail et téléphone.',
   }
 
-  function toggleValue(
-    value: string,
-    selected: string[],
-    update: (value: string[]) => void
-  ) {
-    update(
-      selected.includes(value)
-        ? selected.filter((item) => item !== value)
-        : [...selected, value]
-    )
-  }
+  const regionOptions = block.regions || []
+  const experienceOptions = block.experiences || []
+  const vehicleOptions = block.vehicles || []
 
-  function optionCard(
-    option: CustomQuoteOption,
-    active: boolean,
-    onClick: () => void,
-    mode: 'multi' | 'single'
-  ): ReactNode {
-    const imageUrl = option.image
-      ? getImageUrl(option.image, 360, 75)
-      : null
-
-    return (
-      <button
-        key={option._key || option.value}
-        type="button"
-        aria-pressed={active}
-        onClick={onClick}
-        className={`group relative flex min-h-24 w-full items-center gap-3 overflow-hidden rounded-xl border p-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#06245F] ${
-          active
-            ? 'border-[#E0A01C] bg-amber-50 ring-2 ring-[#E0A01C]'
-            : 'border-slate-200 bg-white hover:border-slate-400 hover:shadow-sm'
-        }`}
-      >
-        {imageUrl && option.image && (
-          <span className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-            <Image
-              src={imageUrl}
-              alt={option.image.alt || ''}
-              fill
-              sizes="80px"
-              className="object-cover transition-transform group-hover:scale-105"
-            />
-          </span>
-        )}
-
-        <span className="min-w-0 flex-1">
-          <span className="block font-semibold text-slate-900">
-            {option.title}
-          </span>
-
-          {option.description && (
-            <span className="mt-1 block text-sm leading-5 text-slate-600">
-              {option.description}
-            </span>
-          )}
-        </span>
-
-        <span
-          aria-hidden="true"
-          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
-            active
-              ? 'border-[#06245F] bg-[#06245F] text-white'
-              : 'border-slate-300 text-transparent'
-          }`}
-        >
-          <Check className="h-4 w-4" />
-        </span>
-
-        <span className="sr-only">
-          {mode === 'single'
-            ? labels.vehicle
-            : active
-              ? labels.selected
-              : labels.select}
-        </span>
-      </button>
-    )
-  }
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError('')
-    setReference('')
-
-    if (regions.length === 0) {
-      setError(labels.requiredRegion)
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!reviewOpen) {
+      pendingForm.current = e.currentTarget
+      setError('')
+      setReviewOpen(true)
       return
     }
-
-    // Le client voit d'abord le montant estimé et l'acompte, puis envoie ou annule.
-    pendingForm.current = event.currentTarget
-    setReviewOpen(true)
+    await sendRequest(e.currentTarget)
   }
 
   async function sendRequest(formElement: HTMLFormElement) {
     setError('')
+    const fd = new FormData(formElement)
+    const firstName = String(fd.get('firstName') || '').trim()
+    const lastName = String(fd.get('lastName') || '').trim()
+    const email = String(fd.get('email') || '').trim()
+    const phone = String(fd.get('phone') || '').trim()
+
+    if (!firstName || !lastName || !email || !phone) {
+      setError(labels.required)
+      setReviewOpen(false)
+      return
+    }
+
     setSending(true)
 
-    const form = new FormData(formElement)
+    const chosenTitles = (options: CustomQuoteOption[], values: string[]) =>
+      options.filter((o) => values.includes(o.value)).map((o) => o.title)
 
-    const chosenTitles = (
-      options: CustomQuoteOption[],
-      values: string[]
-    ) =>
-      options
-        .filter((option) => values.includes(option.value))
-        .map((option) => option.title)
-
-    const vehicleTitle =
-      vehicles.find((option) => option.value === vehicle)?.title || ''
+    const vehicleTitle = vehicleOptions.find((v) => v.value === vehicle)?.title || ''
 
     const details = [
-      `${labels.region}: ${chosenTitles(regionNames, regions).join(', ')}`,
-      `${labels.experience}: ${
-        chosenTitles(experienceNames, experiences).join(', ') || '—'
-      }`,
+      `${labels.region}: ${chosenTitles(regionOptions, regions).join(', ') || '—'}`,
+      `${labels.experience}: ${chosenTitles(experienceOptions, experiences).join(', ') || '—'}`,
       `${labels.vehicleLabel}: ${vehicleTitle || '—'}`,
-      String(form.get('message') || '').trim(),
+      String(fd.get('message') || '').trim(),
     ]
       .filter(Boolean)
       .join('\n')
 
     try {
-      const response = await fetch('/api/quotes', {
+      const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           locale,
           circuitSlug: 'sur-mesure',
           circuitTitle: labels.trip,
-          firstName: String(form.get('firstName') || '').trim(),
-          lastName: String(form.get('lastName') || '').trim(),
-          email: String(form.get('email') || '').trim(),
-          phone: String(form.get('phone') || '').trim(),
-          country: String(form.get('country') || '').trim(),
-          startDate: String(form.get('startDate') || ''),
-          endDate: String(form.get('endDate') || ''),
-          adults: Number(form.get('adults') || 2),
-          children: Number(form.get('children') || 0),
+          regions,
+          firstName,
+          lastName,
+          email,
+          phone,
+          country: String(fd.get('country') || '').trim(),
+          startDate: String(fd.get('startDate') || ''),
+          endDate: String(fd.get('endDate') || ''),
+          adults: Number(fd.get('adults') || 2),
+          children: Number(fd.get('children') || 0),
           vehicleCode: vehicle || '',
           vehicleLabel: vehicleTitle,
           consecutiveCircuits,
           vehicleCount,
           message: details,
-          website: String(form.get('website') || ''),
+          website: String(fd.get('website') || ''),
         }),
       })
 
-      const result = await response.json()
-
-      if (!response.ok) {
-        const fieldErrors = result.fields
-          ? Object.values(result.fields).flat().filter(Boolean).join(' ')
-          : ''
-
-        throw new Error(fieldErrors || result.error || t('error'))
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data.error || t('error'))
       }
 
-      setReviewOpen(false)
-      setReference(result.reference || '')
-
-      formElement.reset()
+      setReference(data.reference || 'OK')
       setRegions([])
       setExperiences([])
       setVehicle('')
@@ -326,369 +171,237 @@ export function CustomQuoteForm({ block, locale }: Props) {
       setEndDate('')
       setConsecutiveCircuits(1)
       setVehicleCount(1)
-    } catch (submitError) {
-      setError(
-        submitError instanceof Error ? submitError.message : t('error')
-      )
+      setEstimate(null)
+      setReviewOpen(false)
+      pendingForm.current = null
+      formElement.reset()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('error'))
       setReviewOpen(false)
     } finally {
       setSending(false)
     }
   }
 
+  const cardGrid = (
+    options: CustomQuoteOption[],
+    selected: string[],
+    onToggle: (val: string) => void,
+    mode: 'checkbox' | 'radio',
+    name: string,
+  ) => (
+    <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+      {options.map((opt) => {
+        const active = selected.includes(opt.value)
+        const imgUrl = getOptionImageUrl(opt.image)
+        return (
+          <label
+            key={opt.value}
+            className={`group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white transition ${
+              active
+                ? 'border-[#06245F] ring-2 ring-[#06245F]/25'
+                : 'border-gray-200 hover:border-[#06245F]/40'
+            }`}
+          >
+            <input
+              type={mode}
+              name={name}
+              value={opt.value}
+              checked={active}
+              onChange={() => onToggle(opt.value)}
+              className="sr-only"
+            />
+            {imgUrl && (
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-100">
+                <img
+                  src={imgUrl}
+                  alt={opt.title}
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                />
+                {active && (
+                  <span className="absolute top-2.5 right-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#06245F] text-white shadow">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                )}
+              </div>
+            )}
+            <div className="flex flex-1 flex-col justify-between p-3.5">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-semibold text-[#06245F]">{opt.title}</span>
+                {!imgUrl && active && (
+                  <Check className="h-4 w-4 shrink-0 text-[#06245F]" />
+                )}
+              </div>
+              {opt.description && (
+                <p className="mt-1 line-clamp-2 text-xs text-gray-500">{opt.description}</p>
+              )}
+            </div>
+          </label>
+        )
+      })}
+    </div>
+  )
+
+  const stepSection = (num: number, title: string | undefined, children: ReactNode) => {
+    if (!title) return null
+    return (
+      <fieldset className="space-y-4">
+        <legend className="flex items-center gap-3 text-lg font-semibold text-[#06245F]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E0A01C] text-xs font-bold text-white">
+            {num}
+          </span>
+          <span>{title}</span>
+        </legend>
+        {children}
+      </fieldset>
+    )
+  }
+
+  const inputCls =
+    'w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-[#06245F] focus:outline-none'
+
   return (
-    <section className="container-custom mx-auto max-w-6xl px-4">
-      <div className="rounded-3xl bg-[#F8F6F1] p-5 md:p-9">
-        <div className="mx-auto mb-8 max-w-3xl text-center">
+    <section className="container-custom mx-auto max-w-5xl px-4">
+      <div className="rounded-3xl bg-[#F8F6F1] p-6 shadow-sm md:p-10">
+        {block.title && (
           <h2
-            className={`${titleSizeClass(block.titleSize || 'h2')} ${
-              headingFont(block.titleFont, block.title)
-            } ${block.titleWeight || 'font-normal'} text-[#06245F]`}
+            className={`mb-3 text-center ${titleSizeClass(block.titleSize || 'h2')} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
             style={{ color: brandTextColor(block.titleColor) }}
           >
             {titleCase(block.title, locale)}
           </h2>
-
-          {block.description && (
-            <p className="mt-3 leading-relaxed text-slate-600">
-              {block.description}
-            </p>
-          )}
-        </div>
+        )}
+        {block.description && (
+          <p className="mx-auto mb-10 max-w-2xl text-center text-gray-600">{block.description}</p>
+        )}
 
         {reference ? (
-          <div
-            className="mx-auto flex max-w-2xl items-start gap-3 rounded-2xl border border-green-200 bg-green-50 p-5 text-green-900"
-            role="status"
-            aria-live="polite"
-          >
-            <Check
-              className="mt-0.5 h-5 w-5 shrink-0"
-              aria-hidden="true"
-            />
-            <p>
-              {t('success')} {t('reference')}:{' '}
-              <strong>{reference}</strong>
+          <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center">
+            <p className="text-lg font-semibold text-green-900">{labels.successTitle}</p>
+            <p className="mt-2 text-sm text-green-800">
+              {labels.successRef} <strong className="font-mono">{reference}</strong>
             </p>
+            <p className="mt-1 text-sm text-green-700">{labels.successNext}</p>
+            <button
+              type="button"
+              onClick={() => setReference('')}
+              className="mt-6 rounded-full bg-[#06245F] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#0b347d]"
+            >
+              {labels.another}
+            </button>
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="mx-auto max-w-4xl space-y-8"
-            aria-busy={sending}
-          >
-            {regionNames.length > 0 && (
-              <fieldset>
-                <legend className="mb-3 text-lg font-semibold text-[#06245F]">
-                  {block.regionHeading || labels.regions}{' '}
-                  <span className="text-sm font-normal text-slate-500">
-                    {labels.multiple}
-                  </span>
-                </legend>
+          <form onSubmit={onSubmit} className="space-y-10">
+            <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {regionNames.map((option) =>
-                    optionCard(
-                      option,
-                      regions.includes(option.value),
-                      () =>
-                        toggleValue(option.value, regions, setRegions),
-                      'multi'
-                    )
-                  )}
-                </div>
-              </fieldset>
-            )}
+            {regionOptions.length > 0 &&
+              stepSection(1, block.regionHeading || labels.region, cardGrid(regionOptions, regions, (v: string) => toggle(regions, setRegions, v), 'checkbox', 'regions'))}
 
-            {experienceNames.length > 0 && (
-              <fieldset>
-                <legend className="mb-3 text-lg font-semibold text-[#06245F]">
-                  {block.experienceHeading || labels.experiences}{' '}
-                  <span className="text-sm font-normal text-slate-500">
-                    {labels.multiple}
-                  </span>
-                </legend>
+            {experienceOptions.length > 0 &&
+              stepSection(2, block.experienceHeading || labels.experience, cardGrid(experienceOptions, experiences, (v: string) => toggle(experiences, setExperiences, v), 'checkbox', 'experiences'))}
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {experienceNames.map((option) =>
-                    optionCard(
-                      option,
-                      experiences.includes(option.value),
-                      () =>
-                        toggleValue(
-                          option.value,
-                          experiences,
-                          setExperiences
-                        ),
-                      'multi'
-                    )
-                  )}
-                </div>
-              </fieldset>
-            )}
-
-            {vehicles.length > 0 && (
-              <fieldset>
-                <legend className="mb-3 text-lg font-semibold text-[#06245F]">
-                  {block.vehicleHeading || labels.vehicle}
-                </legend>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {vehicles.map((option) =>
-                    optionCard(
-                      option,
-                      vehicle === option.value,
-                      () => {
-                        setVehicle(vehicle === option.value ? '' : option.value)
-                        setEstimate(null)
-                        setError('')
-                      },
-                      'single'
-                    )
-                  )}
-                </div>
-
-                {vehicle && (
-                  <p className="mt-3 text-sm text-slate-600">
-                    {labels.vehicleNote}
-                  </p>
-                )}
-              </fieldset>
-            )}
-
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="text-sm font-medium text-slate-700">
-                {t('startDate')}
-                <input
-                  className={inputClass}
-                  name="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(event) =>
-                    handleDateChange('start', event.target.value)
-                  }
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700">
-                {t('endDate')}
-                <input
-                  className={inputClass}
-                  name="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(event) =>
-                    handleDateChange('end', event.target.value)
-                  }
-                  disabled={sending}
-                />
-              </label>
-
-              {durationDays !== null && (
-                <div
-                  className="sm:col-span-2 rounded-xl border border-blue-100 bg-white px-4 py-3"
-                  role="status"
-                  aria-live="polite"
-                >
-                  <p className="text-sm font-medium text-slate-600">
-                    {labels.duration}
-                  </p>
-                  <p className="mt-1 text-xl font-bold text-[#06245F]">
-                    {durationDays}{' '}
-                    {durationDays > 1 ? labels.durationDays : labels.durationDay}
-                  </p>
-                </div>
+            {vehicleOptions.length > 0 &&
+              stepSection(
+                3,
+                block.vehicleHeading || labels.vehicleLabel,
+                cardGrid(vehicleOptions, vehicle ? [vehicle] : [], (v: string) => setVehicle(vehicle === v ? '' : v), 'radio', 'vehicle'),
               )}
 
-              {startDate && endDate && !datesAreValid && (
-                <p
-                  className="sm:col-span-2 text-sm text-red-700"
-                  role="alert"
-                >
-                  {labels.invalidDates}
-                </p>
-              )}
+            <fieldset className="space-y-4">
+              <legend className="flex items-center gap-3 text-lg font-semibold text-[#06245F]">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E0A01C] text-xs font-bold text-white">
+                  4
+                </span>
+                <span>{labels.message}</span>
+              </legend>
 
-              <label className="text-sm font-medium text-slate-700">
-                {t('adults')}
-                <input
-                  className={inputClass}
-                  name="adults"
-                  type="number"
-                  min={1}
-                  max={20}
-                  defaultValue={2}
-                  required
-                  disabled={sending}
-                />
-              </label>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.dateStart}</label>
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.dateEnd}</label>
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.adults}</label>
+                  <input type="number" name="adults" min={1} max={30} defaultValue={2} className={inputCls} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.children}</label>
+                  <input type="number" name="children" min={0} max={20} defaultValue={0} className={inputCls} />
+                </div>
+              </div>
 
-              <label className="text-sm font-medium text-slate-700">
-                {t('children')}
-                <input
-                  className={inputClass}
-                  name="children"
-                  type="number"
-                  min={0}
-                  max={20}
-                  defaultValue={0}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700">
-                {t('firstName')} *
-                <input
-                  className={inputClass}
-                  name="firstName"
-                  autoComplete="given-name"
-                  maxLength={100}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700">
-                {t('lastName')} *
-                <input
-                  className={inputClass}
-                  name="lastName"
-                  autoComplete="family-name"
-                  maxLength={100}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700">
-                {t('email')} *
-                <input
-                  className={inputClass}
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  maxLength={191}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700">
-                {t('phone')} *
-                <input
-                  className={inputClass}
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  maxLength={40}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700 sm:col-span-2">
-                {t('country')}
-                <input
-                  className={inputClass}
-                  name="country"
-                  autoComplete="country-name"
-                  maxLength={100}
-                  disabled={sending}
-                />
-              </label>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="text-sm font-medium text-slate-700">
-                {labels.consecutive}
-                <input
-                  className={inputClass}
-                  type="number"
-                  min={1}
-                  max={20}
-                  value={consecutiveCircuits}
-                  onChange={(event) =>
-                    setConsecutiveCircuits(
-                      Math.min(20, Math.max(1, Number(event.target.value) || 1))
-                    )
-                  }
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="text-sm font-medium text-slate-700">
-                {labels.vehiclesRequested}
-                <input
-                  className={inputClass}
-                  type="number"
-                  min={1}
-                  max={20}
-                  value={vehicleCount}
-                  onChange={(event) => {
-                    setVehicleCount(
-                      Math.min(20, Math.max(1, Number(event.target.value) || 1))
-                    )
-                    setEstimate(null)
-                  }}
-                  disabled={sending}
-                />
-              </label>
-            </div>
-
-            <QuoteEstimatePanel
-              locale={locale}
-              vehicleCode={vehicle}
-              vehicleCount={vehicleCount}
-              days={durationDays}
-              onEstimateChange={setEstimate}
-              disabled={sending}
-            />
-
-            {/* Champ piège anti-spam, invisible pour les visiteurs */}
-            <div className="hidden" aria-hidden="true">
-              <label>
-                Website
-                <input name="website" type="text" tabIndex={-1} autoComplete="off" />
-              </label>
-            </div>
-
-            <label className="block text-sm font-medium text-slate-700">
-              {t('message')}
-              <textarea
-                className={inputClass}
-                name="message"
-                rows={4}
-                maxLength={4000}
-                disabled={sending}
+              <QuoteEstimatePanel
+                locale={locale}
+                days={tripDays}
+                vehicleCode={vehicle}
+                vehicleLabel={vehicleOptions.find((v) => v.value === vehicle)?.title || ''}
+                vehicleCount={vehicleCount}
+                circuitSlug="sur-mesure"
+                circuitTitle={labels.trip}
+                regions={regions}
+                onVehicleCountChangeAction={setVehicleCount}
+                onEstimateChangeAction={setEstimate}
               />
-            </label>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.firstName} *</label>
+                  <input type="text" name="firstName" required className={inputCls} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.lastName} *</label>
+                  <input type="text" name="lastName" required className={inputCls} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.email} *</label>
+                  <input type="email" name="email" required className={inputCls} />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">{labels.phone} *</label>
+                  <input type="tel" name="phone" required className={inputCls} />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-600">{labels.country}</label>
+                <input type="text" name="country" className={inputCls} />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-600">{labels.message}</label>
+                <textarea name="message" rows={4} className={inputCls} />
+              </div>
+            </fieldset>
 
             {error && (
-              <p
-                className="flex items-start gap-2 text-sm text-red-700"
-                role="alert"
-              >
-                <AlertCircle
-                  className="mt-0.5 h-4 w-4 shrink-0"
-                  aria-hidden="true"
-                />
-                {error}
-              </p>
+              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
             )}
 
             <button
               type="submit"
               disabled={sending}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#06245F] px-8 py-3 font-semibold text-white transition hover:bg-[#0b347d] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#06245F] focus-visible:ring-offset-2 disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#06245F] px-8 py-3.5 text-sm font-semibold text-white shadow transition hover:bg-[#0b347d] disabled:opacity-50"
             >
-              {sending && (
-                <Loader2
-                  className="h-4 w-4 animate-spin"
-                  aria-hidden="true"
-                />
-              )}
+              {sending && <Loader2 className="h-4 w-4 animate-spin" />}
               {sending ? t('sending') : block.submitLabel || t('submitQuote')}
             </button>
           </form>
@@ -699,8 +412,8 @@ export function CustomQuoteForm({ block, locale }: Props) {
         locale={locale}
         estimate={estimate}
         sending={sending}
-        onCancel={() => setReviewOpen(false)}
-        onConfirm={() => { if (pendingForm.current) void sendRequest(pendingForm.current) }}
+        onCancelAction={() => setReviewOpen(false)}
+        onConfirmAction={() => { if (pendingForm.current) void sendRequest(pendingForm.current) }}
       />
     </section>
   )

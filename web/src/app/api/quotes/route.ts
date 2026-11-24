@@ -27,6 +27,7 @@ const quoteSchema = z.object({
   country: z.string().trim().max(100).optional().or(z.literal('')),
   circuitSlug: z.string().trim().max(191).optional().or(z.literal('')),
   circuitTitle: z.string().trim().max(191).optional().or(z.literal('')),
+  regions: z.array(z.string().trim().max(120)).max(20).optional(),
   startDate: optionalDate,
   endDate: optionalDate,
   adults: z.coerce.number().int().min(1).max(20).default(2),
@@ -120,8 +121,8 @@ export async function POST(request: Request) {
         ) + 1
       : 0
 
-  // Estimation indicative : prix journalier × durée × nombre de véhicules.
-  // Le snapshot complet (avec prix journalier) reste côté serveur.
+  // Estimation indicative complète calculée côté serveur (véhicule + chauffeur + retour à vide).
+  // Le snapshot détaillé reste côté serveur/admin/e-mail ; seul le total consolidé est exposé.
   let estimateSnapshot: VehicleEstimateSnapshot | null = null
 
   if (data.vehicleCode && rentalDays > 0) {
@@ -130,6 +131,9 @@ export async function POST(request: Request) {
         vehicleCode: data.vehicleCode,
         days: rentalDays,
         vehicleCount: data.vehicleCount,
+        circuitSlug: data.circuitSlug || null,
+        circuitTitle: data.circuitTitle || null,
+        regions: data.regions || null,
       })
 
       if (estimate) {

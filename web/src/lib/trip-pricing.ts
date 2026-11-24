@@ -1,4 +1,3 @@
-
 import { prisma } from '@/lib/prisma'
 import type { RoadCondition, TravelSeason } from '@/generated/prisma/enums'
 
@@ -8,6 +7,8 @@ import type { RoadCondition, TravelSeason } from '@/generated/prisma/enums'
  * Ce module est destiné aux traitements serveur.
  * Ne pas retourner ses instantanés tarifaires privés directement au navigateur.
  */
+
+export const DRIVER_DAILY_RATE_EUR = 30
 
 export type TripSeason = TravelSeason
 export type TripRoadCondition = RoadCondition
@@ -29,23 +30,36 @@ export type TripDurationEstimate = {
   maxDays: number
 }
 
+export type EmptyReturnBreakdown = {
+  destinationLabel: string | null
+  matchedSlug: string | null
+  returnDays: number
+  vehicleCost: number
+  driverCost: number
+  total: number
+}
+
 export type TripVehiclePriceSnapshot = {
   vehicleId: string
   vehicleCode: string
   vehicleName: string
   capacity: number
   pricePerDay: number
+  driverRatePerDay: number
   currency: string
   indicativeOnly: boolean
   days: number
   vehicleCount: number
+  vehicleCost: number
+  driverCost: number
+  emptyReturn: EmptyReturnBreakdown
   total: number
 }
 
 /**
  * Snapshot enregistré en base (QuoteRequest.estimateDetails) et transmis
- * à l'e-mail administrateur. Contient le prix journalier : usage serveur/admin
- * uniquement, jamais renvoyé au navigateur.
+ * à l'e-mail administrateur. Contient le prix journalier et le détail des postes :
+ * usage serveur/admin uniquement, jamais renvoyé au navigateur.
  */
 export type VehicleEstimateSnapshot = TripVehiclePriceSnapshot & {
   version: 3
@@ -66,6 +80,181 @@ export function parseVehicleEstimateSnapshot(
     typeof parsed.days === 'number'
     ? (parsed as VehicleEstimateSnapshot)
     : null
+}
+
+type EmptyReturnRule = {
+  slug: string
+  label: string
+  days: number
+  regionValues: string[]
+  fallbackPhrases: string[]
+}
+
+const EMPTY_RETURN_RULES: EmptyReturnRule[] = [
+  {
+    slug: 'sud-et-rn7',
+    label: 'Circuit Sud RN7',
+    days: 3,
+    regionValues: [
+      'sud-et-rn7',
+      'madagascar-sud-et-rn7',
+      'circuit-sud-rn7',
+      'rn7',
+    ],
+    fallbackPhrases: [
+      'sud et rn7',
+      'madagascar sud et rn7',
+      'circuit sud rn7',
+    ],
+  },
+  {
+    slug: 'circuit-nord-et-nosibe',
+    label: 'Diego-Suarez',
+    days: 3,
+    regionValues: [
+      'circuit-nord-et-nosibe',
+      'nord-de-madagascar-et-nosy-be',
+      'diego-suarez',
+      'nosy-be',
+      'nosibe',
+    ],
+    fallbackPhrases: [
+      'circuit nord et nosibe',
+      'nord de madagascar et nosy be',
+      'diego suarez',
+      'nosy be',
+    ],
+  },
+  {
+    slug: 'baobab-et-tsingy',
+    label: 'Morondava',
+    days: 2,
+    regionValues: [
+      'baobab-et-tsingy',
+      'morondava',
+      'baobab-tsingy',
+    ],
+    fallbackPhrases: [
+      'baobab et tsingy',
+      'morondava',
+    ],
+  },
+  {
+    slug: 'cote-est-et-lemuriens',
+    label: 'Tamatave (Toamasina)',
+    days: 2,
+    regionValues: [
+      'cote-est-et-lemuriens',
+      'cotes-est-et-lemuriens',
+      'tamatave',
+      'toamasina',
+    ],
+    fallbackPhrases: [
+      'cote est et lemuriens',
+      'cotes est et lemuriens',
+      'tamatave',
+      'toamasina',
+    ],
+  },
+]
+
+function normalizeSlug(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+function normalizePhrase(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+/**
+ * Détermine les jours de retour à vide vers Antananarivo en priorité à partir
+ * des identifiants stables (circuitSlug, puis valeurs de regions), avec repli
+ * uniquement sur des expressions normalisées explicites.
+ */
+export function resolveEmptyReturnDays(input?: {
+  destination?: string | null
+  circuitSlug?: string | null
+  circuitTitle?: string | null
+  regions?: string[] | null
+}): {
+  destinationLabel: string | null
+  matchedSlug: string | null
+  returnDays: number
+} {
+  let bestRule: EmptyReturnRule | null = null
+
+  const considerRule = (rule: EmptyReturnRule) => {
+    if (!bestRule || rule.days > bestRule.days) {
+      bestRule = rule
+    }
+  }
+
+  // 1. Priorité absolue : identifiant stable du circuit (slug)
+  const rawSlug = input?.circuitSlug ? normalizeSlug(input.circuitSlug) : ''
+  if (rawSlug) {
+    const bySlug = EMPTY_RETURN_RULES.find((r) => r.slug === rawSlug)
+    if (bySlug) {
+      considerRule(bySlug)
+    }
+  }
+
+  // 2. Deuxième priorité : identifiants/valeurs des régions sélectionnées
+  const regionSlugs = Array.isArray(input?.regions)
+    ? input.regions.map(normalizeSlug).filter(Boolean)
+    : []
+
+  for (const regionSlug of regionSlugs) {
+    const byRegion = EMPTY_RETURN_RULES.find(
+      (r) => r.slug === regionSlug || r.regionValues.includes(regionSlug),
+    )
+    if (byRegion) {
+      considerRule(byRegion)
+    }
+  }
+
+  // 3. Repli uniquement si aucun identifiant stable n'a matché : expressions explicites
+  if (!bestRule) {
+    const fallbackTexts = [
+      input?.circuitTitle || '',
+      input?.destination || '',
+    ]
+      .map(normalizePhrase)
+      .filter(Boolean)
+
+    for (const phrase of fallbackTexts) {
+      for (const rule of EMPTY_RETURN_RULES) {
+        if (rule.fallbackPhrases.some((target) => phrase.includes(target))) {
+          considerRule(rule)
+        }
+      }
+    }
+  }
+
+  if (!bestRule) {
+    return {
+      destinationLabel: null,
+      matchedSlug: null,
+      returnDays: 0,
+    }
+  }
+
+  const resolvedRule = bestRule as EmptyReturnRule
+
+  return {
+    destinationLabel: resolvedRule.label,
+    matchedSlug: resolvedRule.slug,
+    returnDays: resolvedRule.days,
+  }
 }
 
 /**
@@ -170,10 +359,11 @@ export async function getTripDurationEstimate(input: {
 }
 
 /**
- * Calcule le prix du véhicule côté serveur.
- *
- * Règle validée :
- * prix journalier × durée × nombre de véhicules demandé.
+ * Calcule le prix complet côté serveur :
+ * - vehicleCost = days * pricePerDay * vehicleCount
+ * - driverCost = days * 30 * vehicleCount
+ * - returnCost = (returnDays * pricePerDay + returnDays * 30) * vehicleCount
+ * - total = vehicleCost + driverCost + returnCost
  *
  * La capacité du véhicule est informative uniquement.
  * Le nombre de véhicules n'est jamais augmenté automatiquement.
@@ -182,6 +372,10 @@ export async function calculateTripVehiclePrice(input: {
   vehicleCode: string
   days: number
   vehicleCount: number
+  destination?: string | null
+  circuitSlug?: string | null
+  circuitTitle?: string | null
+  regions?: string[] | null
 }): Promise<TripVehiclePriceSnapshot | null> {
   const vehicleCode = input.vehicleCode.trim().toLowerCase()
 
@@ -221,9 +415,32 @@ export async function calculateTripVehiclePrice(input: {
     return null
   }
 
-  const total = vehicle.pricePerDay * input.days * input.vehicleCount
+  const returnInfo = resolveEmptyReturnDays({
+    destination: input.destination,
+    circuitSlug: input.circuitSlug,
+    circuitTitle: input.circuitTitle,
+    regions: input.regions,
+  })
 
-  if (!Number.isSafeInteger(total)) {
+  const vehicleCost = input.days * vehicle.pricePerDay * input.vehicleCount
+  const driverCost = input.days * DRIVER_DAILY_RATE_EUR * input.vehicleCount
+
+  const returnVehicleCost =
+    returnInfo.returnDays * vehicle.pricePerDay * input.vehicleCount
+  const returnDriverCost =
+    returnInfo.returnDays * DRIVER_DAILY_RATE_EUR * input.vehicleCount
+  const returnTotal = returnVehicleCost + returnDriverCost
+
+  const total = vehicleCost + driverCost + returnTotal
+
+  if (
+    !Number.isSafeInteger(vehicleCost) ||
+    !Number.isSafeInteger(driverCost) ||
+    !Number.isSafeInteger(returnVehicleCost) ||
+    !Number.isSafeInteger(returnDriverCost) ||
+    !Number.isSafeInteger(returnTotal) ||
+    !Number.isSafeInteger(total)
+  ) {
     throw new Error('Le montant calculé dépasse la limite autorisée.')
   }
 
@@ -233,10 +450,21 @@ export async function calculateTripVehiclePrice(input: {
     vehicleName: vehicle.name,
     capacity: vehicle.capacity,
     pricePerDay: vehicle.pricePerDay,
+    driverRatePerDay: DRIVER_DAILY_RATE_EUR,
     currency: vehicle.currency,
     indicativeOnly: vehicle.indicativeOnly,
     days: input.days,
     vehicleCount: input.vehicleCount,
+    vehicleCost,
+    driverCost,
+    emptyReturn: {
+      destinationLabel: returnInfo.destinationLabel,
+      matchedSlug: returnInfo.matchedSlug,
+      returnDays: returnInfo.returnDays,
+      vehicleCost: returnVehicleCost,
+      driverCost: returnDriverCost,
+      total: returnTotal,
+    },
     total,
   }
 }

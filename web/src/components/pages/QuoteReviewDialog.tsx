@@ -10,19 +10,28 @@ type Props = {
   locale: string
   estimate: QuoteEstimate | null
   sending: boolean
-  onConfirm: () => void
-  onCancel: () => void
+  onConfirmAction: () => void
+  onCancelAction: () => void
 }
 
 /** Récapitulatif avant l'envoi d'une demande de devis : montant, acompte, puis Envoyer / Annuler. */
-export function QuoteReviewDialog({ open, locale, estimate, sending, onConfirm, onCancel }: Props) {
+export function QuoteReviewDialog({
+  open,
+  locale,
+  estimate,
+  sending,
+  onConfirmAction,
+  onCancelAction,
+}: Props) {
   const t = useTranslations('quoteEstimate')
   const confirmRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!open) return
     confirmRef.current?.focus()
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !sending) onCancel() }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !sending) onCancelAction()
+    }
     document.addEventListener('keydown', onKey)
     const previous = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -30,7 +39,7 @@ export function QuoteReviewDialog({ open, locale, estimate, sending, onConfirm, 
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = previous
     }
-  }, [open, sending, onCancel])
+  }, [open, sending, onCancelAction])
 
   if (!open) return null
 
@@ -39,7 +48,11 @@ export function QuoteReviewDialog({ open, locale, estimate, sending, onConfirm, 
   const percent = estimate?.depositPercent ?? 30
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" role="presentation" onClick={() => !sending && onCancel()}>
+    <div
+      className="fixed inset-0 z-[200] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
+      role="presentation"
+      onClick={() => !sending && onCancelAction()}
+    >
       <div
         role="dialog"
         aria-modal="true"
@@ -82,7 +95,7 @@ export function QuoteReviewDialog({ open, locale, estimate, sending, onConfirm, 
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={onCancelAction}
             disabled={sending}
             className="rounded-full border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
           >
@@ -91,7 +104,7 @@ export function QuoteReviewDialog({ open, locale, estimate, sending, onConfirm, 
           <button
             ref={confirmRef}
             type="button"
-            onClick={onConfirm}
+            onClick={onConfirmAction}
             disabled={sending}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#06245F] px-6 py-3 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#0b347d] disabled:opacity-60"
           >

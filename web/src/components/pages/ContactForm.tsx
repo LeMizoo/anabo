@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
@@ -28,118 +27,120 @@ type PublicCircuitDuration = {
 }
 
 type CircuitRange = {
-  slug: string
-  title: string
+  circuitSlug: string
+  circuitTitle: string
   minDays: number
   maxDays: number
-}
-
-type SeasonSummary = {
-  circuits: CircuitRange[]
-  minDays: number
-  maxDays: number
-  complete: boolean
 }
 
 type Props = {
   block: ContactFormBlock
   circuits?: Circuit[]
+  defaultCircuitSlug?: string
+  defaultCircuitTitle?: string
+  locale?: string
 }
 
-const ROAD_CONDITIONS: RoadCondition[] = [
-  'GOOD',
-  'MEDIUM',
-  'DIFFICULT',
-]
+const inputClass =
+  'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 transition focus:border-[#06245F] focus:outline-none focus:ring-2 focus:ring-[#06245F]/15'
 
-function getSeasonSummary(
-  season: TravelSeason,
-  selectedSlugs: string[],
-  circuits: Circuit[],
-  durations: PublicCircuitDuration[],
-): SeasonSummary {
-  const circuitRanges: CircuitRange[] = []
-  let complete = true
+const labelClass = 'mb-1.5 block text-sm font-medium text-[#06245F]'
 
-  for (const slug of selectedSlugs) {
-    const circuit = circuits.find(item => item.slug === slug)
-
-    const entries = durations.filter(
-      item =>
-        item.circuitSlug === slug &&
-        item.season === season &&
-        ROAD_CONDITIONS.includes(item.roadCondition),
-    )
-
-    const hasAllConditions =
-      ROAD_CONDITIONS.every(condition =>
-        entries.some(item => item.roadCondition === condition),
-      ) && entries.length === ROAD_CONDITIONS.length
-
-    if (!circuit || !hasAllConditions) {
-      complete = false
-      continue
-    }
-
-    const validEntries = entries.every(
-      item =>
-        Number.isInteger(item.minDays) &&
-        Number.isInteger(item.maxDays) &&
-        item.minDays > 0 &&
-        item.maxDays >= item.minDays,
-    )
-
-    if (!validEntries) {
-      complete = false
-      continue
-    }
-
-    circuitRanges.push({
-      slug,
-      title: circuit.title,
-      minDays: Math.min(...entries.map(item => item.minDays)),
-      maxDays: Math.max(...entries.map(item => item.maxDays)),
-    })
-  }
-
-  if (circuitRanges.length !== selectedSlugs.length) {
-    complete = false
-  }
-
-  return {
-    circuits: circuitRanges,
-    minDays: complete
-      ? circuitRanges.reduce((sum, item) => sum + item.minDays, 0)
-      : 0,
-    maxDays: complete
-      ? circuitRanges.reduce((sum, item) => sum + item.maxDays, 0)
-      : 0,
-    complete,
-  }
+function detectSeasonFromDate(dateStr: string): TravelSeason | null {
+  const match = dateStr.match(/^\d{4}-(\d{2})-\d{2}$/)
+  if (!match) return null
+  const month = Number(match[1])
+  if (month < 1 || month > 12) return null
+  return month >= 5 && month <= 10 ? 'DRY' : 'RAINY'
 }
 
-export function ContactForm({ block, circuits = [] }: Props) {
-  const pathname = usePathname()
-  const firstSegment = pathname.split('/').filter(Boolean)[0]
-  const locale = ['fr', 'en', 'it'].includes(firstSegment) ? firstSegment : 'fr'
+function getSeasonLabel(season: TravelSeason | null, locale: string): string {
+  if (!season) return ''
 
+  if (locale === 'en') {
+    return season === 'DRY' ? 'Dry season (May–October)' : 'Rainy season (November–April)'
+  }
+
+  if (locale === 'it') {
+    return season === 'DRY' ? 'Stagione secca (maggio–ottobre)' : 'Stagione delle piogge (novembre–aprile)'
+  }
+
+  return season === 'DRY' ? 'Saison sèche (mai–octobre)' : 'Saison des pluies (novembre–avril)'
+}
+
+function getRoadConditionLabel(condition: RoadCondition, locale: string): string {
+  if (locale === 'en') {
+    if (condition === 'GOOD') return 'Good'
+    if (condition === 'MEDIUM') return 'Medium'
+    return 'Difficult'
+  }
+
+  if (locale === 'it') {
+    if (condition === 'GOOD') return 'Buono'
+    if (condition === 'MEDIUM') return 'Medio'
+    return 'Difficile'
+  }
+
+  if (condition === 'GOOD') return 'Bon'
+  if (condition === 'MEDIUM') return 'Moyen'
+  return 'Difficile'
+}
+
+export function ContactForm({
+  block,
+  circuits = [],
+  defaultCircuitSlug = '',
+  defaultCircuitTitle = '',
+  locale: propLocale,
+}: Props) {
   const t = useTranslations('contactForm')
+  const pathname = usePathname()
 
-  const isModalChoice = block.formType === 'both'
-  const [activeModalForm, setActiveModalForm] = useState<'contact' | 'quote' | null>(null)
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const dialogRef = useRef<HTMLDivElement>(null)
+  const locale = useMemo(() => {
+    if (propLocale) return propLocale
+    const seg = pathname?.split('/')[1]
+    return seg === 'en' || seg === 'it' ? seg : 'fr'
+  }, [propLocale, pathname])
 
-  const isQuote = isModalChoice
-    ? activeModalForm === 'quote'
-    : block.formType === 'quote'
+  const isQuote = block.formType === 'quote' || block.formType === 'both'
 
+  const matchedDefaultCircuit = useMemo(() => {
+    if (!defaultCircuitSlug && !defaultCircuitTitle) return null
+
+    if (defaultCircuitSlug) {
+      const bySlug = circuits.find(
+        (item) => item.slug.toLowerCase() === defaultCircuitSlug.toLowerCase(),
+      )
+      if (bySlug) return bySlug
+    }
+
+    if (defaultCircuitTitle) {
+      const normalizedTitle = defaultCircuitTitle.trim().toLowerCase()
+      const byTitle = circuits.find(
+        (item) => item.title.trim().toLowerCase() === normalizedTitle,
+      )
+      if (byTitle) return byTitle
+    }
+
+    return null
+  }, [circuits, defaultCircuitSlug, defaultCircuitTitle])
+
+  const initialCircuitSlug = matchedDefaultCircuit?.slug || defaultCircuitSlug || ''
+
+  const circuitOptions = useMemo(() => {
+    if (!defaultCircuitTitle || matchedDefaultCircuit) return circuits
+
+    const slug = initialCircuitSlug || defaultCircuitTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    if (circuits.some((item) => item.slug === slug)) return circuits
+
+    return [{ slug, title: defaultCircuitTitle }, ...circuits]
+  }, [circuits, defaultCircuitTitle, matchedDefaultCircuit, initialCircuitSlug])
+
+  const [modalOpen, setModalOpen] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
-
-  const [selectedCircuit, setSelectedCircuit] = useState('')
+  const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitSlug)
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -170,133 +171,133 @@ export function ContactForm({ block, circuits = [] }: Props) {
     [selectedCircuit, extraCircuits],
   )
 
-  const selectedSeason: TravelSeason | null = (() => {
-    if (!startDate) return null
-
-    const month = Number(startDate.split('-')[1])
-
-    if (!Number.isInteger(month) || month < 1 || month > 12) {
-      return null
+  useEffect(() => {
+    if (!selectedCircuit && initialCircuitSlug) {
+      setSelectedCircuit(initialCircuitSlug)
     }
-
-    return month >= 5 && month <= 10 ? 'DRY' : 'RAINY'
-  })()
+  }, [initialCircuitSlug, selectedCircuit])
 
   useEffect(() => {
-    let cancelled = false
+    if (!modalOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setModalOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [modalOpen])
+
+  useEffect(() => {
+    let active = true
 
     if (selectedCircuitSlugs.length === 0) {
       setDurationData([])
       setDurationLoading(false)
       setDurationLoadError(false)
-      return
+      return () => {
+        active = false
+      }
     }
 
     setDurationLoading(true)
     setDurationLoadError(false)
 
     getPublicCircuitDurations(selectedCircuitSlugs)
-      .then(data => {
-        if (cancelled) return
-        setDurationData(data)
+      .then((rows) => {
+        if (!active) return
+        setDurationData(rows)
+        setDurationLoading(false)
       })
       .catch(() => {
-        if (cancelled) return
+        if (!active) return
         setDurationData([])
+        setDurationLoading(false)
         setDurationLoadError(true)
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setDurationLoading(false)
-        }
       })
 
     return () => {
-      cancelled = true
+      active = false
     }
   }, [selectedCircuitSlugs])
 
-  const seasonsToDisplay: TravelSeason[] = selectedSeason
-    ? [selectedSeason]
-    : ['DRY', 'RAINY']
+  const detectedSeason = useMemo(
+    () => detectSeasonFromDate(startDate),
+    [startDate],
+  )
 
-  const seasonSummaries = seasonsToDisplay.map(season => ({
-    season,
-    summary: getSeasonSummary(
-      season,
-      selectedCircuitSlugs,
-      circuits,
-      durationData,
-    ),
-  }))
+  const circuitRanges = useMemo<CircuitRange[]>(() => {
+    if (!detectedSeason || selectedCircuitSlugs.length === 0) return []
 
-  const completeSummaries = seasonSummaries.filter(({ summary }) => summary.complete && summary.minDays > 0)
-  const circuitDayRange = completeSummaries.length
-    ? {
-        min: Math.min(...completeSummaries.map(({ summary }) => summary.minDays)),
-        max: Math.max(...completeSummaries.map(({ summary }) => summary.maxDays)),
-      }
-    : null
+    const ranges: CircuitRange[] = []
 
-  useEffect(() => {
-    if (!activeModalForm) return
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    closeButtonRef.current?.focus()
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        // Échap dans le récapitulatif ne ferme que le récapitulatif.
-        if (document.getElementById('quote-review-title')) return
-        setActiveModalForm(null)
-        return
-      }
-
-      if (event.key !== 'Tab') return
-
-      const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    for (const slug of selectedCircuitSlugs) {
+      const matchingRows = durationData.filter(
+        (row) => row.circuitSlug === slug && row.season === detectedSeason,
       )
 
-      if (!focusableElements?.length) {
-        event.preventDefault()
-        return
-      }
+      if (matchingRows.length === 0) continue
 
-      const firstElement = focusableElements[0]
-      const lastElement = focusableElements[focusableElements.length - 1]
+      const minDays = Math.min(...matchingRows.map((row) => row.minDays))
+      const maxDays = Math.max(...matchingRows.map((row) => row.maxDays))
+      const circuitTitle =
+        circuitOptions.find((item) => item.slug === slug)?.title || slug
 
-      if (event.shiftKey && document.activeElement === firstElement) {
-        event.preventDefault()
-        lastElement.focus()
-      } else if (!event.shiftKey && document.activeElement === lastElement) {
-        event.preventDefault()
-        firstElement.focus()
-      }
+      ranges.push({
+        circuitSlug: slug,
+        circuitTitle,
+        minDays,
+        maxDays,
+      })
     }
 
-    document.addEventListener('keydown', handleKeyDown)
+    return ranges
+  }, [detectedSeason, selectedCircuitSlugs, durationData, circuitOptions])
 
-    return () => {
-      document.body.style.overflow = previousOverflow
-      document.removeEventListener('keydown', handleKeyDown)
-      triggerRef.current?.focus()
+  const combinedRange = useMemo(() => {
+    if (circuitRanges.length === 0) return null
+
+    return {
+      minDays: circuitRanges.reduce((sum, item) => sum + item.minDays, 0),
+      maxDays: circuitRanges.reduce((sum, item) => sum + item.maxDays, 0),
     }
-  }, [activeModalForm])
+  }, [circuitRanges])
+
+  const availableRoadConditions = useMemo<RoadCondition[]>(() => {
+    if (!detectedSeason || selectedCircuitSlugs.length === 0) return []
+
+    const order: RoadCondition[] = ['GOOD', 'MEDIUM', 'DIFFICULT']
+    return order.filter((cond) =>
+      selectedCircuitSlugs.some((slug) =>
+        durationData.some(
+          (row) =>
+            row.circuitSlug === slug &&
+            row.season === detectedSeason &&
+            row.roadCondition === cond,
+        ),
+      ),
+    )
+  }, [detectedSeason, selectedCircuitSlugs, durationData])
+
+  const activeCircuitTitle = useMemo(() => {
+    if (!selectedCircuit) return ''
+    return circuitOptions.find((item) => item.slug === selectedCircuit)?.title || selectedCircuit
+  }, [circuitOptions, selectedCircuit])
 
   const toggleExtraCircuit = (slug: string) => {
     setExtraCircuits(prev =>
-      prev.includes(slug)
-        ? prev.filter(item => item !== slug)
-        : [...prev, slug],
+      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug],
     )
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const durationEstimateTitle =
+    locale === 'en'
+      ? 'Indicative duration estimate'
+      : locale === 'it'
+        ? 'Stima indicativa della durata'
+        : 'Estimation indicative de durée'
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (isQuote) {
-      // Demande de devis : le client voit d'abord le montant et l'acompte, puis envoie ou annule.
+    if (isQuote && !reviewOpen) {
       pendingForm.current = event.currentTarget
       setError('')
       setReviewOpen(true)
@@ -313,11 +314,11 @@ export function ContactForm({ block, circuits = [] }: Props) {
     const form = new FormData(formElement)
 
     const circuitSlug = String(form.get('circuitSlug') || '')
-    let circuitTitle = circuits.find(c => c.slug === circuitSlug)?.title || ''
+    let circuitTitle = circuitOptions.find(c => c.slug === circuitSlug)?.title || ''
 
     if (extraCircuits.length > 0) {
       const extraTitles = extraCircuits
-        .map(slug => circuits.find(c => c.slug === slug)?.title)
+        .map(slug => circuitOptions.find(c => c.slug === slug)?.title)
         .filter(Boolean)
 
       if (circuitTitle) {
@@ -363,15 +364,17 @@ export function ContactForm({ block, circuits = [] }: Props) {
       }
 
       setReference(result.reference || '')
-      formElement.reset()
-      setSelectedCircuit('')
+      setSelectedCircuit(initialCircuitSlug)
       setExtraCircuits([])
       setStartDate('')
       setEndDate('')
       setVehicleCode('')
       setVehicleLabel('')
       setVehicleCount(1)
+      setEstimate(null)
       setReviewOpen(false)
+      pendingForm.current = null
+      formElement.reset()
     } catch (err) {
       setError(err instanceof Error ? err.message : t('error'))
       setReviewOpen(false)
@@ -380,453 +383,397 @@ export function ContactForm({ block, circuits = [] }: Props) {
     }
   }
 
-  const inputClass =
-    'mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-gray-100'
+  const formContent = (
+    <div className="rounded-3xl bg-[#F8F6F1] p-6 shadow-sm md:p-10">
+      {block.title && (
+        <h2
+          className={`mb-3 text-center ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
+          style={{ color: brandTextColor(block.titleColor) }}
+        >
+          {titleCase(block.title, locale)}
+        </h2>
+      )}
 
-  const formCard = (
-    <div className="mx-auto max-w-3xl px-4">
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-        {block.title && (
-          <h2
-            className={`mb-3 text-gray-900 ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
-            style={{ color: brandTextColor(block.titleColor) }}
-          >
-            {titleCase(block.title, locale)}
-          </h2>
-        )}
+      {block.description && (
+        <p className="mx-auto mb-8 max-w-2xl text-center text-gray-600">
+          {block.description}
+        </p>
+      )}
 
-        {block.description && (
-          <p className="mb-6 text-gray-600">{block.description}</p>
-        )}
+      {reference ? (
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-6 text-center text-green-900">
+          <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-green-600" />
+          <h3 className="text-lg font-semibold">{t('successTitle')}</h3>
+          <p className="mt-1 text-sm">{t('successBody')}</p>
+          <p className="mt-3 inline-block rounded-lg bg-white px-4 py-2 font-mono text-sm font-semibold text-[#06245F] shadow-xs">
+            {t('referenceLabel')} : {reference}
+          </p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Champ anti-spam invisible pour les humains */}
+          <div className="hidden" aria-hidden="true">
+            <label htmlFor="website">Website</label>
+            <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+          </div>
 
-        {reference ? (
-          <div
-            className="flex gap-3 rounded-xl border border-green-200 bg-green-50 p-5 text-green-900"
-            role="status"
-            aria-live="polite"
-          >
-            <CheckCircle2
-              className="mt-0.5 h-5 w-5 shrink-0"
-              aria-hidden="true"
-            />
+          <div className="grid gap-5 sm:grid-cols-2">
             <div>
-              <p className="font-semibold">{t('success')}</p>
-              <p className="mt-2">
-                {t('reference')}: <strong>{reference}</strong>
-              </p>
+              <label htmlFor="firstName" className={labelClass}>
+                {t('firstName')} *
+              </label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                required
+                placeholder={t('firstNamePlaceholder')}
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className={labelClass}>
+                {t('lastName')} *
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                required
+                placeholder={t('lastNamePlaceholder')}
+                className={inputClass}
+              />
             </div>
           </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-            aria-busy={sending}
-          >
-            {isQuote && circuits.length > 0 && (
-              <div className="space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
-                <label
-                  htmlFor="circuitSlug"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  {t('circuit')}
-                  <select
-                    id="circuitSlug"
-                    className={inputClass}
-                    name="circuitSlug"
-                    value={selectedCircuit}
-                    onChange={e => {
-                      setSelectedCircuit(e.target.value)
-                      setExtraCircuits(prev =>
-                        prev.filter(slug => slug !== e.target.value),
-                      )
-                    }}
-                    disabled={sending}
-                  >
-                    <option value="">{t('circuitDefault')}</option>
-                    {circuits.map(c => (
-                      <option key={c.slug} value={c.slug}>
-                        {c.title}
-                      </option>
-                    ))}
-                  </select>
-                </label>
 
-                <div className="pt-2">
-                  <p className="mb-2 text-sm font-medium text-gray-700">
-                    {t('circuitExtras')}
-                  </p>
-
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {circuits.map(c => {
-                      if (c.slug === selectedCircuit) return null
-
-                      return (
-                        <label
-                          key={c.slug}
-                          className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-                        >
-                          <input
-                            type="checkbox"
-                            value={c.slug}
-                            checked={extraCircuits.includes(c.slug)}
-                            onChange={() => toggleExtraCircuit(c.slug)}
-                            disabled={sending}
-                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                          />
-                          {c.title}
-                        </label>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {isQuote && selectedCircuitSlugs.length > 0 && (
-              <div
-                className="space-y-4 rounded-xl border border-primary-200 bg-primary-50 px-5 py-4"
-                role="status"
-                aria-live="polite"
-              >
-                <p className="font-semibold text-gray-900">
-                  {t('durationEstimateTitle')}
-                </p>
-
-                {durationLoading ? (
-                  <p className="flex items-center gap-2 text-sm text-gray-600">
-                    <Loader2
-                      className="h-4 w-4 animate-spin"
-                      aria-hidden="true"
-                    />
-                    {t('durationLoading')}
-                  </p>
-                ) : durationLoadError ? (
-                  <p className="text-sm text-gray-700">
-                    {t('durationLoadError')}
-                  </p>
-                ) : (
-                  seasonSummaries.map(({ season, summary }) => (
-                    <div
-                      key={season}
-                      className="space-y-2 border-t border-primary-200 pt-3 first:border-0 first:pt-0"
-                    >
-                      <p className="text-sm font-semibold text-gray-800">
-                        {t(
-                          season === 'DRY'
-                            ? 'durationSeasonDry'
-                            : 'durationSeasonRainy',
-                        )}
-                      </p>
-
-                      {summary.complete ? (
-                        <>
-                          <ul className="space-y-1 text-sm text-gray-700">
-                            {summary.circuits.map(circuit => (
-                              <li key={circuit.slug}>
-                                {t('durationCircuitRange', {
-                                  title: circuit.title,
-                                  min: circuit.minDays,
-                                  max: circuit.maxDays,
-                                })}
-                              </li>
-                            ))}
-                          </ul>
-
-                          <p className="text-base font-bold text-gray-900">
-                            {t('durationTotalRange', {
-                              min: summary.minDays,
-                              max: summary.maxDays,
-                            })}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="text-sm text-gray-700">
-                          {t('durationIncomplete')}
-                        </p>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('firstName')} *
-                <input
-                  className={inputClass}
-                  name="firstName"
-                  autoComplete="given-name"
-                  maxLength={100}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="block text-sm font-medium text-gray-700">
-                {t('lastName')} *
-                <input
-                  className={inputClass}
-                  name="lastName"
-                  autoComplete="family-name"
-                  maxLength={100}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="block text-sm font-medium text-gray-700">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="email" className={labelClass}>
                 {t('email')} *
-                <input
-                  className={inputClass}
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  maxLength={191}
-                  required
-                  disabled={sending}
-                />
               </label>
-
-              <label className="block text-sm font-medium text-gray-700">
-                {t('phone')} *
-                <input
-                  className={inputClass}
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  maxLength={40}
-                  required
-                  disabled={sending}
-                />
-              </label>
-
-              <label className="block text-sm font-medium text-gray-700 sm:col-span-2">
-                {t('country')}
-                <input
-                  className={inputClass}
-                  name="country"
-                  autoComplete="country-name"
-                  maxLength={100}
-                  disabled={sending}
-                />
-              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder={t('emailPlaceholder')}
+                className={inputClass}
+              />
             </div>
 
-            {isQuote && (
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('startDate')}
-                  <input
-                    className={inputClass}
-                    name="startDate"
-                    type="date"
-                    value={startDate}
-                    onChange={e => setStartDate(e.target.value)}
-                    disabled={sending}
-                  />
-                </label>
+            <div>
+              <label htmlFor="phone" className={labelClass}>
+                {t('phone')} *
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                placeholder={t('phonePlaceholder')}
+                className={inputClass}
+              />
+            </div>
+          </div>
 
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('endDate')}
-                  <input
-                    className={inputClass}
-                    name="endDate"
-                    type="date"
-                    value={endDate}
-                    onChange={e => setEndDate(e.target.value)}
-                    disabled={sending}
-                  />
-                </label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="country" className={labelClass}>
+                {t('country')}
+              </label>
+              <input
+                id="country"
+                name="country"
+                type="text"
+                placeholder={t('countryPlaceholder')}
+                className={inputClass}
+              />
+            </div>
 
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('adults')}
-                  <input
-                    className={inputClass}
-                    name="adults"
-                    type="number"
-                    min={1}
-                    max={20}
-                    defaultValue={2}
-                    required
-                    disabled={sending}
-                  />
+            {circuitOptions.length > 0 && (
+              <div>
+                <label htmlFor="circuitSlug" className={labelClass}>
+                  {t('circuit')}
                 </label>
-
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('children')}
-                  <input
-                    className={inputClass}
-                    name="children"
-                    type="number"
-                    min={0}
-                    max={20}
-                    defaultValue={0}
-                    required
-                    disabled={sending}
-                  />
-                </label>
+                <select
+                  id="circuitSlug"
+                  name="circuitSlug"
+                  value={selectedCircuit}
+                  onChange={(e) => {
+                    const next = e.target.value
+                    setSelectedCircuit(next)
+                    setExtraCircuits(prev => prev.filter(s => s !== next))
+                  }}
+                  className={inputClass}
+                >
+                  <option value="">{t('circuitPlaceholder')}</option>
+                  {circuitOptions.map((c) => (
+                    <option key={c.slug} value={c.slug}>
+                      {c.title}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
+          </div>
 
-            {isQuote && (
-              <QuoteEstimatePanel
-                locale={locale}
-                vehicleCode={vehicleCode}
-                vehicleCount={vehicleCount}
-                days={tripDays}
-                dayRange={circuitDayRange}
-                withVehicleFields
-                onVehicleChange={(code, label) => { setVehicleCode(code); setVehicleLabel(label) }}
-                onVehicleCountChange={setVehicleCount}
-                onEstimateChange={setEstimate}
-                disabled={sending}
-              />
-            )}
+          {circuitOptions.length > 1 && (
+            <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
+              <p className="mb-2.5 text-sm font-medium text-[#06245F]">
+                {t('extraCircuits')}
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {circuitOptions.map((c) => {
+                  if (c.slug === selectedCircuit) return null
+                  const checked = extraCircuits.includes(c.slug)
+                  return (
+                    <label
+                      key={c.slug}
+                      className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 transition hover:border-[#06245F]/40"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleExtraCircuit(c.slug)}
+                        className="h-4 w-4 rounded border-gray-300 text-[#06245F] focus:ring-[#06245F]"
+                      />
+                      <span className="truncate">{c.title}</span>
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
-            {/* Champ piège anti-spam, invisible pour les visiteurs */}
-            <div className="hidden" aria-hidden="true">
-              <label>
-                Website
-                <input name="website" type="text" tabIndex={-1} autoComplete="off" />
+          {isQuote && selectedCircuitSlugs.length > 0 && (
+            <div className="rounded-2xl border border-[#06245F]/15 bg-white/80 p-4 text-sm text-gray-700">
+              <p className="font-semibold text-[#06245F]">{durationEstimateTitle}</p>
+
+              {!startDate ? (
+                <p className="mt-1 text-xs text-gray-500">
+                  {locale === 'en'
+                    ? 'Select a departure date to view the indicative duration for the corresponding season.'
+                    : locale === 'it'
+                      ? 'Seleziona una data di partenza per visualizzare la durata indicativa in base alla stagione.'
+                      : 'Indiquez une date de départ pour afficher la durée indicative selon la saison.'}
+                </p>
+              ) : durationLoading ? (
+                <p className="mt-1 text-xs text-gray-500">
+                  {locale === 'en'
+                    ? 'Loading indicative durations...'
+                    : locale === 'it'
+                      ? 'Caricamento delle durate indicative...'
+                      : 'Chargement des durées indicatives...'}
+                </p>
+              ) : durationLoadError ? (
+                <p className="mt-1 text-xs text-amber-700">
+                  {locale === 'en'
+                    ? 'Indicative durations are temporarily unavailable.'
+                    : locale === 'it'
+                      ? 'Le durate indicative non sono momentaneamente disponibili.'
+                      : 'Les durées indicatives sont momentanément indisponibles.'}
+                </p>
+              ) : !detectedSeason ? null : combinedRange ? (
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-gray-600">
+                    {getSeasonLabel(detectedSeason, locale)}
+                    {availableRoadConditions.length > 0 && (
+                      <>
+                        {' · '}
+                        {locale === 'en'
+                          ? 'Road conditions: '
+                          : locale === 'it'
+                            ? 'Condizioni stradali: '
+                            : 'État des routes : '}
+                        {availableRoadConditions
+                          .map((cond) => getRoadConditionLabel(cond, locale))
+                          .join(', ')}
+                      </>
+                    )}
+                  </p>
+                  <p className="text-sm font-semibold text-[#06245F]">
+                    {combinedRange.minDays === combinedRange.maxDays
+                      ? `${combinedRange.minDays} ${locale === 'en' ? 'days' : locale === 'it' ? 'giorni' : 'jours'}`
+                      : `${combinedRange.minDays} – ${combinedRange.maxDays} ${locale === 'en' ? 'days' : locale === 'it' ? 'giorni' : 'jours'}`}
+                  </p>
+                  {circuitRanges.length > 1 && (
+                    <ul className="mt-1 space-y-0.5 text-xs text-gray-600">
+                      {circuitRanges.map((item) => (
+                        <li key={item.circuitSlug}>
+                          {item.circuitTitle} : {item.minDays === item.maxDays ? `${item.minDays} j` : `${item.minDays}–${item.maxDays} j`}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <p className="mt-1 text-xs text-gray-500">
+                  {locale === 'en'
+                    ? 'No indicative duration is configured yet for this selection.'
+                    : locale === 'it'
+                      ? 'Nessuna durata indicativa è ancora configurata per questa selezione.'
+                      : 'Aucune durée indicative n’est encore configurée pour cette sélection.'}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="startDate" className={labelClass}>
+                {t('startDate')}
               </label>
+              <input
+                id="startDate"
+                name="startDate"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={inputClass}
+              />
             </div>
 
-            <label className="block text-sm font-medium text-gray-700">
-              {t('message')}
-              <textarea
+            <div>
+              <label htmlFor="endDate" className={labelClass}>
+                {t('endDate')}
+              </label>
+              <input
+                id="endDate"
+                name="endDate"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
                 className={inputClass}
-                name="message"
-                rows={5}
-                maxLength={5000}
-                disabled={sending}
               />
+            </div>
+          </div>
+
+          {isQuote && (
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="adults" className={labelClass}>
+                  {t('adults')}
+                </label>
+                <input
+                  id="adults"
+                  name="adults"
+                  type="number"
+                  min={1}
+                  max={20}
+                  defaultValue={2}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="children" className={labelClass}>
+                  {t('children')}
+                </label>
+                <input
+                  id="children"
+                  name="children"
+                  type="number"
+                  min={0}
+                  max={20}
+                  defaultValue={0}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          )}
+
+          {isQuote && (
+            <QuoteEstimatePanel
+              locale={locale}
+              days={tripDays}
+              minDays={tripDays ? null : combinedRange?.minDays ?? null}
+              maxDays={tripDays ? null : combinedRange?.maxDays ?? null}
+              vehicleCode={vehicleCode}
+              vehicleLabel={vehicleLabel}
+              vehicleCount={vehicleCount}
+              circuitSlug={selectedCircuit || null}
+              circuitTitle={activeCircuitTitle || null}
+              onVehicleChangeAction={(code, label) => {
+                setVehicleCode(code)
+                setVehicleLabel(label)
+              }}
+              onVehicleCountChangeAction={setVehicleCount}
+              onEstimateChangeAction={setEstimate}
+            />
+          )}
+
+          <div>
+            <label htmlFor="message" className={labelClass}>
+              {t('message')}
             </label>
+            <textarea
+              id="message"
+              name="message"
+              rows={4}
+              placeholder={isQuote ? t('quoteMessagePlaceholder') : t('messagePlaceholder')}
+              className={inputClass}
+            />
+          </div>
 
-            {error && (
-              <p
-                className="flex items-start gap-2 text-sm text-red-700"
-                role="alert"
-              >
-                <AlertCircle
-                  className="mt-0.5 h-4 w-4 shrink-0"
-                  aria-hidden="true"
-                />
-                {error || t('required')}
-              </p>
-            )}
+          {error && (
+            <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
 
-            <button
-              type="submit"
-              disabled={sending}
-              aria-live="polite"
-              className="inline-flex min-w-48 items-center justify-center gap-2 rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {sending && (
-                <Loader2
-                  className="h-4 w-4 animate-spin"
-                  aria-hidden="true"
-                />
-              )}
-              {sending
-                ? t('sending')
-                : isQuote
-                  ? t('submitQuote')
-                  : t('submit')}
-            </button>
-          </form>
-        )}
-        <QuoteReviewDialog
-          open={reviewOpen}
-          locale={locale}
-          estimate={estimate}
-          sending={sending}
-          onCancel={() => setReviewOpen(false)}
-          onConfirm={() => { if (pendingForm.current) void sendRequest(pendingForm.current) }}
-        />
-      </div>
+          <button
+            type="submit"
+            disabled={sending}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#06245F] px-8 py-3.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#0b347d] disabled:opacity-60 sm:w-auto"
+          >
+            {sending && <Loader2 className="h-4 w-4 animate-spin" />}
+            {sending
+              ? t('sending')
+              : isQuote
+                ? t('submitQuote')
+                : t('submit')}
+          </button>
+        </form>
+      )}
+      <QuoteReviewDialog
+        open={reviewOpen}
+        locale={locale}
+        estimate={estimate}
+        sending={sending}
+        onCancelAction={() => setReviewOpen(false)}
+        onConfirmAction={() => { if (pendingForm.current) void sendRequest(pendingForm.current) }}
+      />
     </div>
   )
 
-  if (isModalChoice) {
+  if (modalOpen) {
     return (
-      <section>
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          {block.title && (
-            <h2
-              className={`mb-3 ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
-              style={{ color: brandTextColor(block.titleColor) }}
-            >
-              {titleCase(block.title, locale)}
-            </h2>
-          )}
-
-          {block.description && (
-            <p className="mb-6 text-gray-600">{block.description}</p>
-          )}
-
-          <div className="flex flex-wrap justify-center gap-4">
-            <button
-              type="button"
-              aria-haspopup="dialog"
-              aria-expanded={activeModalForm === 'contact'}
-              className="rounded-full border border-primary-600 px-7 py-3 font-semibold text-primary-700 transition-colors hover:bg-primary-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
-              onClick={event => {
-                triggerRef.current = event.currentTarget
-                setActiveModalForm('contact')
-              }}
-            >
-              {t('openContact')}
-            </button>
-
-            <button
-              type="button"
-              aria-haspopup="dialog"
-              aria-expanded={activeModalForm === 'quote'}
-              className="rounded-full bg-primary-600 px-7 py-3 font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
-              onClick={event => {
-                triggerRef.current = event.currentTarget
-                setActiveModalForm('quote')
-              }}
-            >
-              {t('openQuote')}
-            </button>
-          </div>
-        </div>
-
-        {activeModalForm && (
-          <div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
-            onMouseDown={event => {
-              if (event.target === event.currentTarget) {
-                setActiveModalForm(null)
-              }
-            }}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setModalOpen(false)
+        }}
+      >
+        <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl">
+          <button
+            type="button"
+            onClick={() => setModalOpen(false)}
+            aria-label={t('closeModal')}
+            className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white text-gray-700 shadow-md transition hover:bg-gray-100"
           >
-            <div
-              ref={dialogRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label={t(isQuote ? 'quoteTitle' : 'contactTitle')}
-              className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl"
-            >
-              <button
-                ref={closeButtonRef}
-                type="button"
-                aria-label={t('close')}
-                className="absolute right-7 top-7 z-10 rounded-full bg-white p-2 text-gray-700 shadow transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
-                onClick={() => setActiveModalForm(null)}
-              >
-                <X className="h-5 w-5" aria-hidden="true" />
-              </button>
-
-              {formCard}
-            </div>
-          </div>
-        )}
-      </section>
+            <X className="h-5 w-5" />
+          </button>
+          {formContent}
+        </div>
+      </div>
     )
   }
 
-  return <section>{formCard}</section>
+  return (
+    <section className="container-custom mx-auto max-w-3xl px-4">
+      {formContent}
+    </section>
+  )
 }

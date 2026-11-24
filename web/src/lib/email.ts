@@ -78,13 +78,52 @@ async function sendMail(payload: {
 function buildAdminEmail(data: QuoteData) {
   const estimate = data.estimateDetails
   const vehicleEstimate = data.vehicleEstimate
+
+  const vehicleCost = vehicleEstimate
+    ? typeof vehicleEstimate.vehicleCost === 'number'
+      ? vehicleEstimate.vehicleCost
+      : vehicleEstimate.pricePerDay * vehicleEstimate.days * vehicleEstimate.vehicleCount
+    : 0
+
+  const driverRatePerDay = vehicleEstimate
+    ? typeof vehicleEstimate.driverRatePerDay === 'number'
+      ? vehicleEstimate.driverRatePerDay
+      : 30
+    : 30
+
+  const driverCost = vehicleEstimate
+    ? typeof vehicleEstimate.driverCost === 'number'
+      ? vehicleEstimate.driverCost
+      : vehicleEstimate.days * driverRatePerDay * vehicleEstimate.vehicleCount
+    : 0
+
+  const emptyReturnDays = vehicleEstimate?.emptyReturn?.returnDays ?? 0
+  const emptyReturnDestination = vehicleEstimate?.emptyReturn?.destinationLabel ?? null
+  const emptyReturnVehicleCost = vehicleEstimate
+    ? typeof vehicleEstimate.emptyReturn?.vehicleCost === 'number'
+      ? vehicleEstimate.emptyReturn.vehicleCost
+      : emptyReturnDays * vehicleEstimate.pricePerDay * vehicleEstimate.vehicleCount
+    : 0
+  const emptyReturnDriverCost = vehicleEstimate
+    ? typeof vehicleEstimate.emptyReturn?.driverCost === 'number'
+      ? vehicleEstimate.emptyReturn.driverCost
+      : emptyReturnDays * driverRatePerDay * vehicleEstimate.vehicleCount
+    : 0
+  const emptyReturnTotal = vehicleEstimate
+    ? typeof vehicleEstimate.emptyReturn?.total === 'number'
+      ? vehicleEstimate.emptyReturn.total
+      : emptyReturnVehicleCost + emptyReturnDriverCost
+    : 0
+
   const estimateSection = vehicleEstimate ? `
     <hr />
-    <h3>Estimation indicative (véhicule)</h3>
+    <h3>Estimation indicative (véhicule, chauffeur &amp; retour à vide)</h3>
     <p><strong>Total estimé :</strong> ${formatMoney(vehicleEstimate.total, vehicleEstimate.currency)}</p>
     <ul>
-      <li>Véhicule : ${escapeHtml(vehicleEstimate.vehicleName)} [${escapeHtml(vehicleEstimate.vehicleCode)}], capacité ${vehicleEstimate.capacity} pers.</li>
-      <li>Calcul : ${formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)} / jour × ${vehicleEstimate.days} jour(s) × ${vehicleEstimate.vehicleCount} véhicule(s)</li>
+      <li>Véhicule : ${escapeHtml(vehicleEstimate.vehicleName)} [${escapeHtml(vehicleEstimate.vehicleCode)}], capacité ${vehicleEstimate.capacity} pers., ${vehicleEstimate.vehicleCount} véhicule(s)</li>
+      <li>Location véhicule (${vehicleEstimate.days} j) : <strong>${formatMoney(vehicleCost, vehicleEstimate.currency)}</strong> (${formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)} / j × ${vehicleEstimate.days} j × ${vehicleEstimate.vehicleCount} véhicule(s))</li>
+      <li>Indemnité chauffeur (${vehicleEstimate.days} j) : <strong>${formatMoney(driverCost, vehicleEstimate.currency)}</strong> (${formatMoney(driverRatePerDay, vehicleEstimate.currency)} / j × ${vehicleEstimate.days} j × ${vehicleEstimate.vehicleCount} véhicule(s))</li>
+      <li>Retour à vide Antananarivo${emptyReturnDestination ? ` (${escapeHtml(emptyReturnDestination)})` : ''} — ${emptyReturnDays} j : <strong>${formatMoney(emptyReturnTotal, vehicleEstimate.currency)}</strong>${emptyReturnDays > 0 ? ` [Véhicule : ${formatMoney(emptyReturnVehicleCost, vehicleEstimate.currency)} · Chauffeur : ${formatMoney(emptyReturnDriverCost, vehicleEstimate.currency)}]` : ''}</li>
       ${vehicleEstimate.indicativeOnly ? '<li>Tarif indicatif : confirmer disponibilité et saison.</li>' : ''}
     </ul>
   ` : estimate ? `

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Calculator, Info, Loader2 } from 'lucide-react'
+import { Car, Info, Loader2 } from 'lucide-react'
 import {
   calculateTripVehiclePriceAction,
   getPublicDepositInfoAction,
@@ -11,201 +11,329 @@ import {
 } from '@/lib/trip-pricing-actions'
 
 export type QuoteEstimate = {
+  totalMin: number
+  totalMax: number
+  depositMin: number
+  depositMax: number
   depositPercent: number
   paymentMethod: string
-  currency: string | null
-  totalMin: number | null
-  totalMax: number | null
-  depositMin: number | null
-  depositMax: number | null
+  currency: string
+  indicativeOnly: boolean
   days: number | null
-  dayRange: { min: number; max: number } | null
   vehicleName: string | null
 }
 
 type Props = {
   locale: string
-  vehicleCode: string
-  vehicleCount: number
-  /** Nombre de jours exact (dates renseignées), sinon null */
+  /** Nombre de jours si les dates sont connues ; sinon une fourchette indicative peut être passée. */
   days: number | null
-  /** Fourchette de durée du circuit, utilisée tant que les dates ne sont pas connues */
-  dayRange?: { min: number; max: number } | null
-  /** Affiche le choix du véhicule et du nombre de véhicules dans le panneau */
-  withVehicleFields?: boolean
-  onVehicleChange?: (code: string, label: string) => void
-  onVehicleCountChange?: (count: number) => void
-  onEstimateChange?: (estimate: QuoteEstimate) => void
-  disabled?: boolean
+  minDays?: number | null
+  maxDays?: number | null
+  vehicleCode: string
+  vehicleLabel?: string
+  vehicleCount: number
+  destination?: string | null
+  circuitSlug?: string | null
+  circuitTitle?: string | null
+  regions?: string[] | null
+  onVehicleChangeAction?: (code: string, label: string) => void
+  onVehicleCountChangeAction?: (count: number) => void
+  onEstimateChangeAction?: (estimate: QuoteEstimate | null) => void
 }
 
-const intlLocale = (l: string) => (l === 'en' ? 'en-GB' : l === 'it' ? 'it-IT' : 'fr-FR')
-
-export function formatMoney(value: number, currency: string | null, locale: string) {
+function formatMoney(amount: number, currency: string, locale: string): string {
+  const intlLocale = locale === 'en' ? 'en-GB' : locale === 'it' ? 'it-IT' : 'fr-FR'
   try {
-    return new Intl.NumberFormat(intlLocale(locale), { style: 'currency', currency: currency || 'EUR', maximumFractionDigits: 0 }).format(value)
+    return new Intl.NumberFormat(intlLocale, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amount)
   } catch {
-    return `${value} ${currency || 'EUR'}`
+    return `${Math.round(amount).toLocaleString(intlLocale)} ${currency}`
   }
 }
 
-export function formatRange(min: number | null, max: number | null, currency: string | null, locale: string) {
-  if (min === null) return null
-  return max !== null && max !== min
-    ? `${formatMoney(min, currency, locale)} – ${formatMoney(max, currency, locale)}`
-    : formatMoney(min, currency, locale)
+export function formatRange(
+  min: number | null | undefined,
+  max: number | null | undefined,
+  currency: string,
+  locale: string,
+): string | null {
+  if (typeof min !== 'number' || typeof max !== 'number') return null
+  if (min === max) return formatMoney(min, currency, locale)
+  return `${formatMoney(min, currency, locale)} – ${formatMoney(max, currency, locale)}`
 }
 
 export function QuoteEstimatePanel({
-  locale, vehicleCode, vehicleCount, days, dayRange = null, withVehicleFields = false,
-  onVehicleChange, onVehicleCountChange, onEstimateChange, disabled,
+  locale,
+  days,
+  minDays,
+  maxDays,
+  vehicleCode,
+  vehicleLabel,
+  vehicleCount,
+  destination = null,
+  circuitSlug = null,
+  circuitTitle = null,
+  regions = null,
+  onVehicleChangeAction,
+  onVehicleCountChangeAction,
+  onEstimateChangeAction,
 }: Props) {
   const t = useTranslations('quoteEstimate')
-  const [deposit, setDeposit] = useState({ percent: 30, method: 'Mobile Money' })
   const [vehicles, setVehicles] = useState<PublicVehicleOption[]>([])
-  const [state, setState] = useState<'idle' | 'loading' | 'ready' | 'unavailable' | 'error'>('idle')
-  const [result, setResult] = useState<{ min: number; max: number; currency: string; vehicleName: string } | null>(null)
+  const [depositInfo, setDepositInfo] = useState<{ percent: number; method: string }>({
+    percent: 30,
+    method: 'Mobile Money',
+  })
+  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'unavailable' | 'error'>('idle')
+  const [estimate, setEstimate] = useState<QuoteEstimate | null>(null)
+
+  const regionsKey = Array.isArray(regions) ? regions.join('|') : ''
 
   useEffect(() => {
-    getPublicDepositInfoAction().then(setDeposit).catch(() => undefined)
-    if (withVehicleFields) listPublicVehiclesAction().then(setVehicles).catch(() => undefined)
-  }, [withVehicleFields])
+    let active = true
+    void listPublicVehiclesAction().then((list) => {
+      if (active) setVehicles(list)
+    })
+    void getPublicDepositInfoAction().then((info) => {
+      if (active) setDepositInfo(info)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
 
-  const minDays = days ?? dayRange?.min ?? null
-  const maxDays = days ?? dayRange?.max ?? null
-
-  // Calcul automatique (avec un petit délai pour ne pas solliciter le serveur à chaque frappe).
   useEffect(() => {
-    if (!vehicleCode || !minDays || !maxDays) {
-      setResult(null)
-      setState('idle')
+    let active = true
+    const publish = (next: QuoteEstimate | null) => {
+      if (!active) return
+      setEstimate(next)
+      onEstimateChangeAction?.(next)
+    }
+
+    if (!vehicleCode) {
+      setStatus('idle')
+      publish(null)
       return
     }
-    let cancelled = false
-    setState('loading')
-    const timer = setTimeout(async () => {
+
+    const safeCount = Number.isFinite(vehicleCount) && vehicleCount >= 1 ? Math.min(20, Math.floor(vehicleCount)) : 1
+    const normalizedRegions = Array.isArray(regions)
+      ? regions.map((r) => r.trim()).filter(Boolean)
+      : null
+
+    const runSingle = async (d: number) =>
+      calculateTripVehiclePriceAction({
+        vehicleCode,
+        days: d,
+        vehicleCount: safeCount,
+        destination,
+        circuitSlug,
+        circuitTitle,
+        regions: normalizedRegions,
+      })
+
+    const hasExactDays = typeof days === 'number' && Number.isInteger(days) && days >= 1
+    const hasRange =
+      typeof minDays === 'number' &&
+      typeof maxDays === 'number' &&
+      Number.isInteger(minDays) &&
+      Number.isInteger(maxDays) &&
+      minDays >= 1 &&
+      maxDays >= minDays
+
+    if (!hasExactDays && !hasRange) {
+      setStatus('idle')
+      publish(null)
+      return
+    }
+
+    setStatus('loading')
+
+    const compute = async () => {
       try {
-        const count = Math.min(20, Math.max(1, vehicleCount || 1))
-        const [a, b] = await Promise.all([
-          calculateTripVehiclePriceAction({ vehicleCode, days: minDays, vehicleCount: count }),
-          maxDays !== minDays ? calculateTripVehiclePriceAction({ vehicleCode, days: maxDays, vehicleCount: count }) : Promise.resolve(null),
-        ])
-        if (cancelled) return
-        if (!a) { setResult(null); setState('unavailable'); return }
-        setResult({ min: a.total, max: b?.total ?? a.total, currency: a.currency, vehicleName: a.vehicleName })
-        setState('ready')
+        if (hasExactDays) {
+          const res = await runSingle(days)
+          if (!active) return
+          if (!res) {
+            setStatus('unavailable')
+            publish(null)
+            return
+          }
+          const pct = depositInfo.percent
+          setStatus('ready')
+          publish({
+            totalMin: res.total,
+            totalMax: res.total,
+            depositMin: Math.round((res.total * pct) / 100),
+            depositMax: Math.round((res.total * pct) / 100),
+            depositPercent: pct,
+            paymentMethod: depositInfo.method,
+            currency: res.currency,
+            indicativeOnly: res.indicativeOnly,
+            days: res.days,
+            vehicleName: res.vehicleName,
+          })
+          return
+        }
+
+        const [low, high] = await Promise.all([runSingle(minDays!), runSingle(maxDays!)])
+        if (!active) return
+        if (!low || !high) {
+          setStatus('unavailable')
+          publish(null)
+          return
+        }
+        const pct = depositInfo.percent
+        const minTotal = Math.min(low.total, high.total)
+        const maxTotal = Math.max(low.total, high.total)
+        setStatus('ready')
+        publish({
+          totalMin: minTotal,
+          totalMax: maxTotal,
+          depositMin: Math.round((minTotal * pct) / 100),
+          depositMax: Math.round((maxTotal * pct) / 100),
+          depositPercent: pct,
+          paymentMethod: depositInfo.method,
+          currency: low.currency,
+          indicativeOnly: low.indicativeOnly || high.indicativeOnly,
+          days: null,
+          vehicleName: low.vehicleName,
+        })
       } catch {
-        if (!cancelled) { setResult(null); setState('error') }
+        if (!active) return
+        setStatus('error')
+        publish(null)
       }
-    }, 400)
-    return () => { cancelled = true; clearTimeout(timer) }
-  }, [vehicleCode, vehicleCount, minDays, maxDays])
+    }
 
-  // Remonte l'estimation au formulaire (utilisée dans le récapitulatif avant envoi).
-  useEffect(() => {
-    const dep = (v: number) => Math.ceil((v * deposit.percent) / 100)
-    onEstimateChange?.({
-      depositPercent: deposit.percent,
-      paymentMethod: deposit.method,
-      currency: result?.currency ?? null,
-      totalMin: result?.min ?? null,
-      totalMax: result?.max ?? null,
-      depositMin: result ? dep(result.min) : null,
-      depositMax: result ? dep(result.max) : null,
-      days,
-      dayRange: days ? null : dayRange,
-      vehicleName: result?.vehicleName ?? null,
-    })
+    void compute()
+    return () => {
+      active = false
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, deposit, days, dayRange?.min, dayRange?.max])
+  }, [
+    vehicleCode,
+    vehicleCount,
+    days,
+    minDays,
+    maxDays,
+    destination,
+    circuitSlug,
+    circuitTitle,
+    regionsKey,
+    depositInfo.percent,
+    depositInfo.method,
+  ])
 
-  const select =
-    'mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 disabled:bg-gray-100'
+  const totalText = estimate ? formatRange(estimate.totalMin, estimate.totalMax, estimate.currency, locale) : null
+  const depositText = estimate ? formatRange(estimate.depositMin, estimate.depositMax, estimate.currency, locale) : null
 
   return (
-    <div className="space-y-4 rounded-xl border border-blue-100 bg-white p-4 text-sm text-slate-800 md:p-5">
-      <p className="flex items-center gap-2 text-base font-semibold text-[#06245F]">
-        <Calculator className="h-5 w-5 text-[#E0A01C]" aria-hidden="true" />
-        {t('title')}
-      </p>
+    <div className="space-y-4 rounded-2xl border border-[#06245F]/15 bg-[#F8F6F1] p-5">
+      <div className="flex items-center gap-2 text-[#06245F]">
+        <Car className="h-5 w-5 text-[#E0A01C]" aria-hidden="true" />
+        <h3 className="font-sans text-base font-semibold">{t('title')}</h3>
+      </div>
 
-      {deposit.percent > 0 && (
-        <p className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-amber-950">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>{t('depositNotice', { percent: deposit.percent })}</span>
+      {depositInfo.percent > 0 && (
+        <p className="flex items-start gap-2 rounded-xl bg-white/80 p-3 text-xs leading-5 text-slate-600">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#06245F]" aria-hidden="true" />
+          <span>{t('depositNotice', { percent: depositInfo.percent })}</span>
         </p>
       )}
 
-      {withVehicleFields && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm font-medium text-gray-700">
-            {t('vehicle')}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {onVehicleChangeAction && (
+          <div>
+            <label htmlFor="quote-vehicle-select" className="mb-1.5 block text-sm font-medium text-[#06245F]">
+              {t('vehicle')}
+            </label>
             <select
-              className={select}
+              id="quote-vehicle-select"
               value={vehicleCode}
-              disabled={disabled}
               onChange={(e) => {
-                const v = vehicles.find((x) => x.code === e.target.value)
-                onVehicleChange?.(e.target.value, v?.name || '')
+                const code = e.target.value
+                const found = vehicles.find((v) => v.code === code)
+                onVehicleChangeAction(code, found?.name || '')
               }}
+              className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 focus:border-[#06245F] focus:outline-none"
             >
               <option value="">{t('vehiclePlaceholder')}</option>
               {vehicles.map((v) => (
                 <option key={v.code} value={v.code}>
-                  {v.name} — {t('seats', { count: v.capacity })}
+                  {v.name} ({t('seats', { count: v.capacity })})
                 </option>
               ))}
             </select>
-          </label>
-          <label className="block text-sm font-medium text-gray-700">
-            {t('vehicleCount')}
+            {vehicleCode && !vehicles.some((v) => v.code === vehicleCode) && vehicleLabel && (
+              <p className="mt-1 text-xs text-slate-500">{vehicleLabel}</p>
+            )}
+          </div>
+        )}
+
+        {onVehicleCountChangeAction && (
+          <div>
+            <label htmlFor="quote-vehicle-count" className="mb-1.5 block text-sm font-medium text-[#06245F]">
+              {t('vehicleCount')}
+            </label>
             <input
-              className={select}
+              id="quote-vehicle-count"
               type="number"
               min={1}
               max={20}
               value={vehicleCount}
-              disabled={disabled}
-              onChange={(e) => onVehicleCountChange?.(Math.min(20, Math.max(1, Number(e.target.value) || 1)))}
+              onChange={(e) => {
+                const n = parseInt(e.target.value, 10)
+                onVehicleCountChangeAction(Number.isFinite(n) && n >= 1 ? Math.min(20, n) : 1)
+              }}
+              className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 focus:border-[#06245F] focus:outline-none"
             />
-          </label>
-        </div>
+          </div>
+        )}
+      </div>
+
+      {status === 'idle' && !vehicleCode && (
+        <p className="text-sm text-slate-600">{t('needVehicle')}</p>
+      )}
+      {status === 'idle' && vehicleCode && (
+        <p className="text-sm text-slate-600">{t('needDates')}</p>
+      )}
+      {status === 'loading' && (
+        <p className="inline-flex items-center gap-2 text-sm text-slate-600">
+          <Loader2 className="h-4 w-4 animate-spin text-[#06245F]" aria-hidden="true" />
+          {t('calculating')}
+        </p>
+      )}
+      {status === 'unavailable' && (
+        <p className="text-sm text-amber-800">{t('unavailable')}</p>
+      )}
+      {status === 'error' && (
+        <p className="text-sm text-amber-800">{t('error')}</p>
       )}
 
-      <div aria-live="polite">
-        {!vehicleCode ? (
-          <p className="text-slate-500">{t('needVehicle')}</p>
-        ) : !minDays ? (
-          <p className="text-slate-500">{t('needDates')}</p>
-        ) : state === 'loading' ? (
-          <p className="flex items-center gap-2 text-slate-500"><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />{t('calculating')}</p>
-        ) : state === 'unavailable' ? (
-          <p className="text-slate-600">{t('unavailable')}</p>
-        ) : state === 'error' ? (
-          <p className="text-slate-600">{t('error')}</p>
-        ) : result ? (
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-100 pb-2">
-              <span className="text-slate-600">
-                {days ? t('total') : t('totalRange')}
-                <span className="block text-xs text-slate-400">
-                  {result.vehicleName} · {days ? t('days', { days }) : t('days', { days: `${dayRange?.min}–${dayRange?.max}` })}
-                </span>
-              </span>
-              <span className="text-xl font-bold text-[#06245F]">{formatRange(result.min, result.max, result.currency, locale)}</span>
-            </div>
-            {deposit.percent > 0 && (
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-slate-600">{t('deposit', { percent: deposit.percent })}</span>
-                <span className="text-lg font-semibold text-[#E0A01C]">
-                  {formatRange(Math.ceil((result.min * deposit.percent) / 100), Math.ceil((result.max * deposit.percent) / 100), result.currency, locale)}
-                </span>
-              </div>
-            )}
-            <p className="text-xs text-slate-500">{t('indicative')}</p>
+      {status === 'ready' && estimate && totalText && (
+        <div className="space-y-2 rounded-xl border border-[#06245F]/10 bg-white p-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="text-sm text-slate-600">
+              {estimate.days ? t('total') : t('totalRange')}
+              {estimate.days ? ` (${t('days', { days: estimate.days })})` : ''}
+            </span>
+            <strong className="text-lg font-bold text-[#06245F]">{totalText}</strong>
           </div>
-        ) : null}
-      </div>
+
+          {estimate.depositPercent > 0 && depositText && (
+            <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-slate-100 pt-2">
+              <span className="text-sm text-slate-600">{t('deposit', { percent: estimate.depositPercent })}</span>
+              <strong className="text-base font-semibold text-[#E0A01C]">{depositText}</strong>
+            </div>
+          )}
+
+          <p className="pt-1 text-xs text-slate-500">{t('indicative')}</p>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,3 @@
-
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect, notFound } from 'next/navigation'
@@ -180,6 +179,44 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
   const estimate = parseEstimate(quote.estimateDetails)
   const vehicleEstimate = parseVehicleEstimate(quote.estimateDetails)
   const season = getSeason(quote.startDate)
+
+  const vehicleCost =
+    typeof vehicleEstimate?.vehicleCost === 'number'
+      ? vehicleEstimate.vehicleCost
+      : vehicleEstimate
+        ? vehicleEstimate.pricePerDay * vehicleEstimate.days * vehicleEstimate.vehicleCount
+        : 0
+
+  const driverRatePerDay =
+    typeof vehicleEstimate?.driverRatePerDay === 'number'
+      ? vehicleEstimate.driverRatePerDay
+      : 30
+
+  const driverCost =
+    typeof vehicleEstimate?.driverCost === 'number'
+      ? vehicleEstimate.driverCost
+      : vehicleEstimate
+        ? vehicleEstimate.days * driverRatePerDay * vehicleEstimate.vehicleCount
+        : 0
+
+  const emptyReturnDays = vehicleEstimate?.emptyReturn?.returnDays ?? 0
+  const emptyReturnDestination = vehicleEstimate?.emptyReturn?.destinationLabel ?? null
+  const emptyReturnVehicleCost =
+    typeof vehicleEstimate?.emptyReturn?.vehicleCost === 'number'
+      ? vehicleEstimate.emptyReturn.vehicleCost
+      : vehicleEstimate && emptyReturnDays > 0
+        ? emptyReturnDays * vehicleEstimate.pricePerDay * vehicleEstimate.vehicleCount
+        : 0
+  const emptyReturnDriverCost =
+    typeof vehicleEstimate?.emptyReturn?.driverCost === 'number'
+      ? vehicleEstimate.emptyReturn.driverCost
+      : vehicleEstimate && emptyReturnDays > 0
+        ? emptyReturnDays * driverRatePerDay * vehicleEstimate.vehicleCount
+        : 0
+  const emptyReturnTotal =
+    typeof vehicleEstimate?.emptyReturn?.total === 'number'
+      ? vehicleEstimate.emptyReturn.total
+      : emptyReturnVehicleCost + emptyReturnDriverCost
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -445,7 +482,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-green-950">
-                    Estimation indicative reçue (véhicule)
+                    Estimation indicative reçue (véhicule, chauffeur &amp; retour à vide)
                   </h2>
                   <p className="mt-1 text-sm text-green-800">
                     Calculée côté serveur le{' '}
@@ -460,18 +497,59 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                 <div>
                   <dt className="text-green-800">Véhicule</dt>
-                  <dd className="mt-1 text-green-950">
+                  <dd className="mt-1 font-medium text-green-950">
                     {vehicleEstimate.vehicleName} [{vehicleEstimate.vehicleCode}]
-                    · {vehicleEstimate.capacity} pers.
+                    · {vehicleEstimate.capacity} pers. · {vehicleEstimate.vehicleCount} véhicule(s)
                   </dd>
                 </div>
+
                 <div>
-                  <dt className="text-green-800">Calcul</dt>
-                  <dd className="mt-1 text-green-950">
-                    {formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)}{' '}
-                    / jour × {vehicleEstimate.days} jour(s) ×{' '}
-                    {vehicleEstimate.vehicleCount} véhicule(s)
+                  <dt className="text-green-800">Tarifs journaliers</dt>
+                  <dd className="mt-1 font-medium text-green-950">
+                    Véhicule : {formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)} / j · Chauffeur : {formatMoney(driverRatePerDay, vehicleEstimate.currency)} / j
                   </dd>
+                </div>
+
+                <div>
+                  <dt className="text-green-800">Location véhicule ({vehicleEstimate.days} j)</dt>
+                  <dd className="mt-1 font-semibold text-green-950">
+                    {formatMoney(vehicleCost, vehicleEstimate.currency)}
+                    <span className="block text-xs font-normal text-green-800">
+                      {formatMoney(vehicleEstimate.pricePerDay, vehicleEstimate.currency)} × {vehicleEstimate.days} j × {vehicleEstimate.vehicleCount} véhicule(s)
+                    </span>
+                  </dd>
+                </div>
+
+                <div>
+                  <dt className="text-green-800">Indemnité chauffeur ({vehicleEstimate.days} j)</dt>
+                  <dd className="mt-1 font-semibold text-green-950">
+                    {formatMoney(driverCost, vehicleEstimate.currency)}
+                    <span className="block text-xs font-normal text-green-800">
+                      {formatMoney(driverRatePerDay, vehicleEstimate.currency)} × {vehicleEstimate.days} j × {vehicleEstimate.vehicleCount} véhicule(s)
+                    </span>
+                  </dd>
+                </div>
+
+                <div className="sm:col-span-2 rounded-lg border border-green-200 bg-white/80 p-3">
+                  <dt className="font-medium text-green-900">
+                    Retour à vide Antananarivo
+                    {emptyReturnDestination ? ` — ${emptyReturnDestination}` : ''}
+                    {' '}({emptyReturnDays} j)
+                  </dt>
+                  {emptyReturnDays > 0 ? (
+                    <dd className="mt-1.5 space-y-1 text-green-950">
+                      <p className="font-semibold">
+                        Total retour à vide : {formatMoney(emptyReturnTotal, vehicleEstimate.currency)}
+                      </p>
+                      <p className="text-xs text-green-800">
+                        Véhicule ({emptyReturnDays} j) : {formatMoney(emptyReturnVehicleCost, vehicleEstimate.currency)} · Chauffeur ({emptyReturnDays} j) : {formatMoney(emptyReturnDriverCost, vehicleEstimate.currency)}
+                      </p>
+                    </dd>
+                  ) : (
+                    <dd className="mt-1 text-xs text-green-800">
+                      Aucun jour de retour à vide appliqué (0 j — {formatMoney(0, vehicleEstimate.currency)}).
+                    </dd>
+                  )}
                 </div>
               </dl>
 
@@ -762,155 +840,151 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                       {quote.acceptedStartDate ? quote.acceptedStartDate.toLocaleDateString('fr-FR') : '—'} →{' '}
                       {quote.acceptedEndDate ? quote.acceptedEndDate.toLocaleDateString('fr-FR') : '—'}
                     </dd>
-                    {datesChanged && (
-                      <dd className="mt-1 text-xs font-semibold text-orange-700">
-                        Les dates actuelles diffèrent des dates acceptées.
-                      </dd>
-                    )}
                   </div>
-                  {acceptance ? (
-                    <p className={`rounded-lg px-3 py-2 font-semibold ${acceptance.cancellable ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900'}`}>
-                      {acceptance.cancellable
-                        ? `Annulable : acceptation ${acceptance.daysBeforeDeparture} jours avant le départ.`
-                        : `Non annulable (procédure habituelle) : acceptation ${Math.max(0, acceptance.daysBeforeDeparture)} jour(s) avant le départ.`}
+                  {datesChanged && (
+                    <p className="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900">
+                      Dates modifiées par rapport à la demande initiale
                     </p>
-                  ) : (
-                    <p className="text-xs text-gray-600">Date de départ non renseignée : délai non calculable.</p>
                   )}
-                  <p className="text-xs text-gray-500">Départ anticipé : aucun remboursement des jours non utilisés.</p>
+                  {acceptance && (
+                    <div>
+                      <dt className="text-xs text-gray-500">Délai d&apos;annulation</dt>
+                      <dd className={`font-semibold ${acceptance.cancellable ? 'text-green-800' : 'text-red-800'}`}>
+                        {acceptance.cancellable
+                          ? `${acceptance.daysBeforeDeparture} j avant départ — annulable`
+                          : acceptance.daysBeforeDeparture !== null
+                            ? `${acceptance.daysBeforeDeparture} j avant départ — hors délai (< 15 j)`
+                            : 'Date de départ non renseignée'}
+                      </dd>
+                    </div>
+                  )}
                 </dl>
               ) : (
-                <p className="text-xs text-gray-600">
-                  Statut confirmé par l’équipe, sans acceptation enregistrée via le lien client.
-                  Pour une preuve horodatée, demandez au client de confirmer depuis son lien.
-                </p>
+                <p className="text-gray-500">En attente de confirmation en ligne par le client.</p>
               )}
             </section>
           )}
 
           <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
-            <h2 className="mb-2 text-lg font-semibold">Chauffeur affecté</h2>
-            {shortage && (
-              <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-900">
-                Ce voyage chevauche {shortage.trips.length - 1} autre(s) voyage(s) confirmé(s) : il manque{' '}
-                {shortage.missing} véhicule(s)/chauffeur(s).{' '}
-                <Link href="/admin/chauffeurs?new=1&temporaire=1" className="font-semibold underline">Ajouter un renfort</Link>
-              </p>
-            )}
+            <h2 className="mb-3 text-lg font-semibold">Chauffeur assigné</h2>
             {assignedDriver && (
-              <p className="mb-3 text-gray-700">
-                <strong>{assignedDriver.name}</strong>
-                {assignedDriver.isTemporary ? ' (renfort)' : ''}
-                {assignedDriver.vehicleLabel ? ` · ${assignedDriver.vehicleLabel}` : ''}
-                {assignedDriver.vehicleSeats ? ` · ${assignedDriver.vehicleSeats} places` : ''}
-                {assignedDriver.phone ? ` · ${assignedDriver.phone}` : ''}
+              <div className="mb-3 rounded-lg bg-blue-50 p-3">
+                <p className="font-semibold text-blue-950">
+                  {assignedDriver.name}
+                  {assignedDriver.isTemporary && (
+                    <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-900">
+                      Renfort / temporaire
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-blue-900">
+                  {assignedDriver.vehicleLabel || 'Véhicule non précisé'}
+                  {assignedDriver.vehicleSeats ? ` · ${assignedDriver.vehicleSeats} places` : ''}
+                  {assignedDriver.phone ? ` · ${assignedDriver.phone}` : ''}
+                </p>
+              </div>
+            )}
+            {shortage && 'missing' in shortage && shortage.missing > 0 && (
+              <p className="mb-3 rounded-lg bg-red-50 p-2.5 text-xs font-medium text-red-800">
+                Capacité insuffisante sur ces dates : {shortage.required} véhicule(s) requis pour {shortage.capacity} place(s)/capacité ({shortage.missing} manquant(s)). Pensez à affecter un chauffeur temporaire.
               </p>
             )}
-            {drivers.length === 0 ? (
-              <p className="text-xs text-gray-500">
-                Aucun chauffeur enregistré. <Link href="/admin/chauffeurs?new=1" className="text-blue-600 hover:underline">Ajouter un chauffeur</Link>
-              </p>
-            ) : (
-              <form action={assignDriver} className="flex gap-2 print:hidden">
-                <input type="hidden" name="quoteId" value={quote.id} />
-                <select
-                  name="driverId"
-                  defaultValue={quote.assignedDriverId || ''}
-                  aria-label="Chauffeur affecté"
-                  className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm"
-                >
-                  <option value="">— Non affecté —</option>
-                  {drivers.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}{d.isTemporary ? ' (renfort)' : ''}{!d.active ? ' (inactif)' : ''}
-                    </option>
-                  ))}
-                </select>
-                <FormSubmitButton label="Affecter" pendingLabel="…" className="rounded-lg bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60" />
-              </form>
-            )}
+            <form action={assignDriver} className="space-y-2 print:hidden">
+              <input type="hidden" name="quoteId" value={quote.id} />
+              <select
+                name="driverId"
+                defaultValue={quote.assignedDriverId || ''}
+                aria-label="Chauffeur"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+              >
+                <option value="">— Aucun chauffeur —</option>
+                {drivers.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}{d.isTemporary ? ' (temporaire)' : ''}{d.vehicleSeats ? ` — ${d.vehicleSeats} pl.` : ''}
+                  </option>
+                ))}
+              </select>
+              <FormSubmitButton label="Enregistrer" pendingLabel="…" className="w-full rounded-lg bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60" />
+            </form>
           </section>
 
           <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
-            <h2 className="mb-4 text-lg font-semibold">Suivi de la demande</h2>
-            <ol className="relative space-y-4 border-l border-gray-200 pl-5">
+            <h2 className="mb-3 text-lg font-semibold">Suivi</h2>
+            <ol className="space-y-2.5">
               {timeline.map((step) => (
-                <li key={step.label} className="relative">
+                <li key={step.label} className="flex items-start gap-2.5">
                   <span
-                    aria-hidden="true"
-                    className={`absolute -left-[27px] top-0.5 h-3.5 w-3.5 rounded-full border-2 ${
-                      'lost' in step && step.lost
-                        ? 'border-red-600 bg-red-600'
-                        : step.done
-                          ? 'border-green-600 bg-green-600'
-                          : 'border-gray-300 bg-white'
+                    className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${
+                      step.lost ? 'bg-red-500' : step.done ? 'bg-green-600' : 'bg-gray-300'
                     }`}
                   />
-                  <p className={`font-medium ${step.done ? 'text-gray-900' : 'text-gray-400'}`}>{step.label}</p>
-                  <p className="text-xs text-gray-500">
-                    {step.date ? new Date(step.date).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }) : 'En attente'}
-                  </p>
+                  <div>
+                    <p className={step.done ? 'font-medium text-gray-900' : 'text-gray-400'}>{step.label}</p>
+                    {step.date && (
+                      <p className="text-xs text-gray-500">
+                        {new Date(step.date).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </p>
+                    )}
+                  </div>
                 </li>
               ))}
             </ol>
             {firstReplyHours !== null && (
-              <p className="mt-4 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
-                Délai de première réponse : <strong>{firstReplyHours < 1 ? 'moins d’1 h' : `${firstReplyHours} h`}</strong>
+              <p className="mt-3 border-t border-gray-100 pt-2.5 text-xs text-gray-500">
+                Première réponse : <strong>{firstReplyHours} h</strong> après réception
               </p>
             )}
           </section>
 
           {clientLink && (
             <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm print:hidden">
-              <h2 className="mb-2 text-lg font-semibold">Lien client</h2>
+              <h2 className="mb-1 text-lg font-semibold">Lien client</h2>
               <p className="mb-3 text-xs text-gray-500">
-                Lien personnel et sécurisé : le client y consulte son devis et le confirme en ligne.
+                Permet au client de consulter et confirmer son devis en ligne.
               </p>
-              <div className="flex flex-wrap gap-2">
-                <CopyButton value={clientLink} label="Copier le lien" />
-                <a
-                  href={`https://wa.me/${whatsappDigits(quote.phone)}?text=${encodeURIComponent(`Bonjour ${quote.firstName}, voici votre devis ${quote.reference} : ${clientLink}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-lg border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 hover:bg-green-100"
-                >
-                  Envoyer par WhatsApp
-                </a>
-                <a
-                  href={clientLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-                >
-                  Aperçu client
-                </a>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={clientLink}
+                  aria-label="Lien client"
+                  className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-700"
+                />
+                <CopyButton value={clientLink} />
               </div>
+              <Link
+                href={clientLink.replace(SITE_URL, '')}
+                target="_blank"
+                className="mt-2 inline-block text-xs font-medium text-blue-700 hover:underline"
+              >
+                Ouvrir l&apos;aperçu client ↗
+              </Link>
             </section>
           )}
 
-          <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm print:hidden">
-            <h2 className="mb-2 text-lg font-semibold">Autres demandes du client</h2>
-            {otherQuotes.length === 0 ? (
-              <p className="text-xs text-gray-500">Première demande de ce client.</p>
-            ) : (
-              <ul className="space-y-2">
-                {otherQuotes.map((other) => (
-                  <li key={other.id} className="flex items-center justify-between gap-2">
-                    <Link href={`/admin/demandes/${other.id}`} className="font-medium text-blue-600 hover:underline">
-                      {other.reference}
+          {otherQuotes.length > 0 && (
+            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm text-sm">
+              <h2 className="mb-2 text-lg font-semibold">Autres demandes ({quote.email})</h2>
+              <ul className="divide-y divide-gray-100">
+                {otherQuotes.map((oq) => (
+                  <li key={oq.id} className="py-2">
+                    <Link href={`/admin/demandes/${oq.id}`} className="font-medium text-blue-700 hover:underline">
+                      {oq.reference}
                     </Link>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${quoteStatusColor(other.status)}`}>
-                      {quoteStatusLabel(other.status)}
-                    </span>
+                    <span className="ml-2 text-xs text-gray-500">{quoteStatusLabel(oq.status)}</span>
+                    {oq.circuitTitle && <p className="truncate text-xs text-gray-500">{oq.circuitTitle}</p>}
                   </li>
                 ))}
               </ul>
-            )}
-          </section>
+            </section>
+          )}
 
           {isSuperAdmin && (
-            <section className="rounded-xl border border-red-200 bg-red-50/50 p-6 shadow-sm text-sm print:hidden">
-              <h2 className="mb-2 text-lg font-semibold text-red-900">Zone sensible</h2>
+            <section className="rounded-xl border border-red-200 bg-red-50/50 p-5 print:hidden">
+              <h2 className="mb-1 text-sm font-semibold text-red-900">Zone sensible</h2>
+              <p className="mb-3 text-xs text-red-700">
+                Supprime définitivement cette demande et son historique.
+              </p>
               <DeleteQuoteForm quoteId={quote.id} reference={quote.reference} />
             </section>
           )}
