@@ -520,7 +520,7 @@ export function ContactForm({
               />
             </div>
 
-            {circuitOptions.length > 0 && (
+            {isQuote && circuitOptions.length > 0 && (
               <div>
                 <label htmlFor="circuitSlug" className={labelClass}>
                   {t('circuit')}
@@ -547,7 +547,7 @@ export function ContactForm({
             )}
           </div>
 
-          {circuitOptions.length > 1 && (
+          {isQuote && circuitOptions.length > 1 && (
             <div className="rounded-2xl border border-gray-200 bg-white/70 p-4">
               <p className="mb-2.5 text-sm font-medium text-[#06245F]">
                 {t('extraCircuits')}
@@ -648,6 +648,8 @@ export function ContactForm({
             </div>
           )}
 
+          {/* Dates : uniquement pour une demande de devis. */}
+          {isQuote && (
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor="startDate" className={labelClass}>
@@ -677,6 +679,7 @@ export function ContactForm({
               />
             </div>
           </div>
+          )}
 
           {isQuote && (
             <div className="grid gap-5 sm:grid-cols-2">

@@ -381,8 +381,9 @@ export const tourIdeasQuery = `
   }
 `
 
+// Circuits proposés dans le formulaire de devis (le sur-mesure est déjà l'option par défaut).
 export const circuitsQuery = `
-  *[_type == "page" && (pageType == "circuit" || pageType == "custom-trip") && language == $locale] | order(title asc) {
+  *[_type == "page" && pageType == "circuit" && language == $locale && !(_id in path("drafts.**"))] | order(title asc) {
     "slug": slug.current,
     title,
     stopDays[] {
