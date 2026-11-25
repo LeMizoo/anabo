@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { AlertCircle, CheckCircle2, Loader2, X } from 'lucide-react'
+import { AlertCircle, CheckCircle2, FileText, Loader2, Mail, X } from 'lucide-react'
 import type { ContactFormBlock } from '@/lib/types'
 import { getPublicCircuitDurations } from '@/lib/circuit-duration-actions'
 import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
@@ -103,7 +103,11 @@ export function ContactForm({
     return seg === 'en' || seg === 'it' ? seg : 'fr'
   }, [propLocale, pathname])
 
-  const isQuote = block.formType === 'quote' || block.formType === 'both'
+  // « both » : deux boutons sur la page (Nous contacter / Demander un devis), chacun ouvre son formulaire.
+  const isChoice = block.formType === 'both'
+  const [activeForm, setActiveForm] = useState<'contact' | 'quote' | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const isQuote = isChoice ? activeForm === 'quote' : block.formType === 'quote'
 
   const matchedDefaultCircuit = useMemo(() => {
     if (!defaultCircuitSlug && !defaultCircuitTitle) return null
@@ -137,7 +141,8 @@ export function ContactForm({
     return [{ slug, title: defaultCircuitTitle }, ...circuits]
   }, [circuits, defaultCircuitTitle, matchedDefaultCircuit, initialCircuitSlug])
 
-  const [modalOpen, setModalOpen] = useState(false)
+  const modalOpen = isChoice && activeForm !== null
+  const closeModal = () => setActiveForm(null)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
@@ -181,12 +186,28 @@ export function ContactForm({
 
   useEffect(() => {
     if (!modalOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setModalOpen(false)
+      // Échap dans le récapitulatif ne ferme que le récapitulatif.
+      if (e.key === 'Escape' && !document.getElementById('quote-review-title')) setActiveForm(null)
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    const trigger = triggerRef.current
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKey)
+      trigger?.focus()
+    }
   }, [modalOpen])
+
+  const openForm = (kind: 'contact' | 'quote', button: HTMLButtonElement) => {
+    triggerRef.current = button
+    setReference('')
+    setReceivedAt(null)
+    setError('')
+    setActiveForm(kind)
+  }
 
   useEffect(() => {
     let active = true
@@ -386,18 +407,20 @@ export function ContactForm({
     }
   }
 
+  // Dans la fenêtre (mode « both »), le titre indique le formulaire ouvert.
+  const formHeading = isChoice ? t(isQuote ? 'quoteTitle' : 'contactTitle') : block.title
   const formContent = (
     <div className="rounded-3xl bg-[#F8F6F1] p-6 shadow-sm md:p-10">
-      {block.title && (
+      {formHeading && (
         <h2
-          className={`mb-3 text-center ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
+          className={`mb-3 pr-10 text-center ${titleSizeClass(isChoice ? 'h3' : block.titleSize)} ${headingFont(block.titleFont, formHeading)} ${block.titleWeight || 'font-normal'}`}
           style={{ color: brandTextColor(block.titleColor) }}
         >
-          {titleCase(block.title, locale)}
+          {titleCase(formHeading, locale)}
         </h2>
       )}
 
-      {block.description && (
+      {block.description && !isChoice && (
         <p className="mx-auto mb-8 max-w-2xl text-center text-gray-600">
           {block.description}
         </p>
@@ -754,19 +777,71 @@ export function ContactForm({
     </div>
   )
 
-  if (modalOpen) {
+  if (isChoice) {
+    return (
+      <section className="container-custom mx-auto max-w-3xl px-4">
+        <div className="rounded-3xl bg-[#F8F6F1] p-6 text-center shadow-sm md:p-10">
+          {block.title && (
+            <h2
+              className={`mb-3 ${titleSizeClass(block.titleSize)} ${headingFont(block.titleFont, block.title)} ${block.titleWeight || 'font-normal'}`}
+              style={{ color: brandTextColor(block.titleColor) }}
+            >
+              {titleCase(block.title, locale)}
+            </h2>
+          )}
+          {block.description && <p className="mx-auto mb-8 max-w-2xl text-gray-600">{block.description}</p>}
+          <div className="flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={activeForm === 'contact'}
+              onClick={(e) => openForm('contact', e.currentTarget)}
+              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#06245F] bg-white px-7 py-3 font-semibold text-[#06245F] transition hover:-translate-y-0.5 hover:bg-[#06245F]/5"
+            >
+              <Mail className="h-5 w-5" aria-hidden="true" />
+              {t('openContact')}
+            </button>
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={activeForm === 'quote'}
+              onClick={(e) => openForm('quote', e.currentTarget)}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#06245F] px-7 py-3 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-[#0b347d]"
+            >
+              <FileText className="h-5 w-5" aria-hidden="true" />
+              {t('openQuote')}
+            </button>
+          </div>
+        </div>
+        {modalOpen && renderModal()}
+      </section>
+    )
+  }
+
+  return (
+    <section className="container-custom mx-auto max-w-3xl px-4">
+      {formContent}
+    </section>
+  )
+
+  function renderModal() {
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) setModalOpen(false)
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) closeModal()
         }}
       >
-        <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t(isQuote ? 'quoteTitle' : 'contactTitle')}
+          className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl"
+        >
           <button
             type="button"
-            onClick={() => setModalOpen(false)}
-            aria-label={t('closeModal')}
+            onClick={closeModal}
+            aria-label={t('close')}
             className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white text-gray-700 shadow-md transition hover:bg-gray-100"
           >
             <X className="h-5 w-5" />
@@ -776,10 +851,4 @@ export function ContactForm({
       </div>
     )
   }
-
-  return (
-    <section className="container-custom mx-auto max-w-3xl px-4">
-      {formContent}
-    </section>
-  )
 }

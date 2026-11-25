@@ -173,7 +173,10 @@
     "success": "Your request has been saved.",
     "reference": "Your request reference",
     "error": "An error occurred. Please try again.",
-    "required": "Please complete the required fields."
+    "required": "Please complete the required fields.",
+    "successTitle": "Thank you, your request has been sent!",
+    "successBody": "We will reply within 24 to 48 business hours. A confirmation email has just been sent to you.",
+    "referenceLabel": "Reference"
   },
   "NotFound": {
     "badge": "ANABO ROADTRIP",

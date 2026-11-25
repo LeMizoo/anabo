@@ -173,7 +173,10 @@
     "success": "La tua richiesta è stata registrata.",
     "reference": "Riferimento della richiesta",
     "error": "Si è verificato un errore. Riprova.",
-    "required": "Compila i campi obbligatori."
+    "required": "Compila i campi obbligatori.",
+    "successTitle": "Grazie, la tua richiesta è stata inviata!",
+    "successBody": "Ti risponderemo entro 24-48 ore lavorative. Ti abbiamo appena inviato un’e-mail di conferma.",
+    "referenceLabel": "Riferimento"
   },
   "NotFound": {
     "badge": "ANABO ROADTRIP",
