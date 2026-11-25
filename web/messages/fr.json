@@ -39,7 +39,7 @@
   "tourIdeas": {
     "title": "Idées de circuits à Madagascar",
     "subtitle": "Madagascar, terre de merveilles naturelles et de trésors culturels, vous invite à imaginer votre propre aventure.",
-    "intro": "Avec ses paysages variés, sa faune singulière et sa culture riche, l’île offre mille façons de voyager. Les circuits présentés donnent un aperçu des possibilités et peuvent vous inspirer pour concevoir un itinéraire selon vos envies et vos centres d’intérêt. Je serai ravi de vous aider à choisir les étapes et le rythme qui vous conviennent.",
+    "intro": "Avec ses paysages variés, sa faune singulière et sa culture riche, l’île offre mille façons de voyager. Les circuits présentés donnent un aperçu des possibilités et peuvent vous inspirer pour concevoir un itinéraire selon vos envies et vos centres d’intérêt. Nous serons ravis de vous aider à choisir les étapes et le rythme qui vous conviennent.",
     "metaTitle": "Idées de circuits à Madagascar | Anabo Roadtrip",
     "metaDescription": "Idées de circuits à Madagascar : RN7, Tsingy, baobabs, parcs, côte Est et Nosy Be, avec nos chauffeurs-guides reconnus par des voyageurs du monde entier.",
     "keywords": [
@@ -71,7 +71,7 @@
     "itinerary": "Itinéraire",
     "viewRoute": "Voir le trajet",
     "routeNotConfigured": "Itinéraire détaillé sur demande : nous l’adaptons à vos dates et à vos envies.",
-    "suggestedRoute": "Parcours indicatif, à confirmer selon la durée du séjour, la saison et les conditions de route.",
+    "suggestedRoute": "Parcours indicatif, ajusté selon la durée du séjour, la saison et l’état des routes.",
     "routeRequest": "Demander l’itinéraire"
   },
   "slider": {
@@ -204,6 +204,10 @@
     "reviewSteps": "Après l’envoi, nous vous adressons un devis personnalisé. La réservation est confirmée par le versement de l’acompte ({method}), une fois le devis accepté.",
     "reviewNoCommitment": "L’envoi de cette demande est gratuit et sans engagement.",
     "send": "Envoyer ma demande",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "fuelNotice": "Les tarifs comprennent la location du véhicule et l’indemnité chauffeur. Le carburant reste à la charge du client pendant toute la durée du voyage, y compris les éventuels jours de retour à vide du véhicule vers Antananarivo.",
+    "includes": "Comprend la location du véhicule, l’indemnité chauffeur et, si le circuit se termine hors d’Antananarivo, les jours de retour à vide. Carburant non inclus.",
+    "timeNotice": "Les dates et heures sont indiquées à l’heure de Madagascar (GMT+3).",
+    "receivedAt": "Demande enregistrée le {date} à {time} (heure de Madagascar, GMT+3), soit {gmt} GMT."
   }
 }

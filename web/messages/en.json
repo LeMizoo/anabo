@@ -39,7 +39,7 @@
   "tourIdeas": {
     "title": "Tour Ideas in Madagascar",
     "subtitle": "Madagascar, a land of natural wonders and cultural treasures, invites you to imagine your own adventure.",
-    "intro": "With varied landscapes, distinctive wildlife and a rich culture, the island offers many ways to travel. These circuits give you a glimpse of what is possible and inspiration for an itinerary shaped around your interests. I would be happy to help you choose suitable stops and a comfortable pace.",
+    "intro": "With varied landscapes, distinctive wildlife and a rich culture, the island offers many ways to travel. These circuits give you a glimpse of what is possible and inspiration for an itinerary shaped around your interests. We would be happy to help you choose suitable stops and a comfortable pace.",
     "metaTitle": "Madagascar Tour Ideas | Anabo Roadtrip",
     "metaDescription": "Madagascar tour ideas: the RN7, Tsingy, baobabs, national parks, the East Coast and Nosy Be with our driver-guides, trusted by travellers worldwide.",
     "keywords": [
@@ -71,7 +71,7 @@
     "itinerary": "Route",
     "viewRoute": "View route",
     "routeNotConfigured": "Detailed route on request: we tailor it to your dates and wishes.",
-    "suggestedRoute": "Suggested route, to be confirmed according to trip length, season, and road conditions.",
+    "suggestedRoute": "Suggested route, adjusted to your trip length, the season and road conditions.",
     "routeRequest": "Request the route"
   },
   "slider": {
@@ -204,6 +204,10 @@
     "reviewSteps": "After sending, we will send you a personalised quote. The booking is confirmed by paying the deposit ({method}) once the quote is accepted.",
     "reviewNoCommitment": "Sending this request is free and without commitment.",
     "send": "Send my request",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "fuelNotice": "Rates include vehicle rental and the driver allowance. Fuel is paid by the client throughout the trip, including any empty-return days of the vehicle to Antananarivo.",
+    "includes": "Includes vehicle rental, the driver allowance and, if the tour ends outside Antananarivo, the empty-return days. Fuel not included.",
+    "timeNotice": "Dates and times are shown in Madagascar time (GMT+3).",
+    "receivedAt": "Request received on {date} at {time} (Madagascar time, GMT+3), i.e. {gmt} GMT."
   }
 }

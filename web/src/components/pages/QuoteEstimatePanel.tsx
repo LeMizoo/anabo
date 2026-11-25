@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Car, Info, Loader2 } from 'lucide-react'
+import { Car, Fuel, Info, Loader2 } from 'lucide-react'
 import {
   calculateTripVehiclePriceAction,
   getPublicDepositInfoAction,
@@ -238,12 +238,18 @@ export function QuoteEstimatePanel({
         <h3 className="font-sans text-base font-semibold">{t('title')}</h3>
       </div>
 
-      {depositInfo.percent > 0 && (
-        <p className="flex items-start gap-2 rounded-xl bg-white/80 p-3 text-xs leading-5 text-slate-600">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#06245F]" aria-hidden="true" />
-          <span>{t('depositNotice', { percent: depositInfo.percent })}</span>
+      <div className="space-y-2 rounded-xl bg-white/80 p-3 text-xs leading-5 text-slate-600">
+        {depositInfo.percent > 0 && (
+          <p className="flex items-start gap-2">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#06245F]" aria-hidden="true" />
+            <span>{t('depositNotice', { percent: depositInfo.percent })}</span>
+          </p>
+        )}
+        <p className="flex items-start gap-2" data-testid="fuel-notice">
+          <Fuel className="mt-0.5 h-4 w-4 shrink-0 text-[#E0A01C]" aria-hidden="true" />
+          <span>{t('fuelNotice')}</span>
         </p>
-      )}
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         {onVehicleChangeAction && (
@@ -331,7 +337,8 @@ export function QuoteEstimatePanel({
             </div>
           )}
 
-          <p className="pt-1 text-xs text-slate-500">{t('indicative')}</p>
+          <p className="pt-1 text-xs text-slate-500">{t('includes')}</p>
+          <p className="text-xs text-slate-500">{t('indicative')}</p>
         </div>
       )}
     </div>

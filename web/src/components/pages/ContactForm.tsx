@@ -9,6 +9,7 @@ import { getPublicCircuitDurations } from '@/lib/circuit-duration-actions'
 import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
+import { QuoteReceivedAt } from './QuoteReceivedAt'
 
 type Circuit = {
   slug: string
@@ -140,6 +141,7 @@ export function ContactForm({
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
+  const [receivedAt, setReceivedAt] = useState<string | null>(null)
   const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitSlug)
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
   const [startDate, setStartDate] = useState('')
@@ -364,6 +366,7 @@ export function ContactForm({
       }
 
       setReference(result.reference || '')
+      setReceivedAt(typeof result.createdAt === 'string' ? result.createdAt : null)
       setSelectedCircuit(initialCircuitSlug)
       setExtraCircuits([])
       setStartDate('')
@@ -408,6 +411,9 @@ export function ContactForm({
           <p className="mt-3 inline-block rounded-lg bg-white px-4 py-2 font-mono text-sm font-semibold text-[#06245F] shadow-xs">
             {t('referenceLabel')} : {reference}
           </p>
+          <div>
+            <QuoteReceivedAt iso={receivedAt} locale={locale} />
+          </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">

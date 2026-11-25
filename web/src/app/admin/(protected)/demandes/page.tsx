@@ -1,3 +1,4 @@
+import { formatMgDateTime, formatTimestamp, formatTripDate } from '@/lib/datetime'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
@@ -16,8 +17,9 @@ type Props = {
   searchParams: Promise<{ page?: string; q?: string; status?: string; sort?: string; suivi?: string }>
 }
 
+// Dates de voyage : calendaires (UTC) ; réception : heure de Madagascar.
 function formatDate(date: Date | null) {
-  return date ? new Date(date).toLocaleDateString('fr-FR') : '—'
+  return formatTripDate(date, 'fr')
 }
 
 export default async function AdminDemandesPage({ searchParams }: Props) {
@@ -170,7 +172,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
             <thead className="bg-gray-50 text-xs uppercase text-gray-700">
               <tr>
                 <th className="px-4 py-3 whitespace-nowrap">Référence</th>
-                <th className="px-4 py-3 whitespace-nowrap">Reçue le</th>
+                <th className="px-4 py-3 whitespace-nowrap" title="Heure de Madagascar (GMT+3)">Reçue le (GMT+3)</th>
                 <th className="px-4 py-3 whitespace-nowrap">Client</th>
                 <th className="px-4 py-3 whitespace-nowrap">Circuit</th>
                 <th className="px-4 py-3 whitespace-nowrap">Départ</th>
@@ -209,7 +211,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
                           <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-semibold text-red-800">+24 h</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">{formatDate(quote.createdAt)}</td>
+                      <td className="px-4 py-3 whitespace-nowrap" title={formatTimestamp(quote.createdAt, 'fr')}>{formatMgDateTime(quote.createdAt, 'fr')}</td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{quote.firstName} {quote.lastName}</div>
                         <div className="max-w-[170px] truncate text-xs text-gray-500" title={quote.email}>

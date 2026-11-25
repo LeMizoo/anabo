@@ -1,3 +1,4 @@
+import { formatTimestamp } from '@/lib/datetime'
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { getPaymentSettings, depositAmount, formatAmount } from '@/lib/payment-settings'
@@ -82,7 +83,7 @@ export default async function PaymentSettingsPage({ searchParams }: Props) {
         </p>
         {s.updatedAt && (
           <p className="mt-3 text-xs text-gray-400">
-            Dernière modification : {s.updatedAt.toLocaleString('fr-FR')}{s.updatedBy ? ` par ${s.updatedBy}` : ''}
+            Dernière modification : {formatTimestamp(s.updatedAt, 'fr')}{s.updatedBy ? ` par ${s.updatedBy}` : ''}
           </p>
         )}
       </section>

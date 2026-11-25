@@ -39,7 +39,7 @@
   "tourIdeas": {
     "title": "Idee di viaggio in Madagascar",
     "subtitle": "Il Madagascar, terra di meraviglie naturali e tesori culturali, ti invita a immaginare la tua avventura.",
-    "intro": "Tra paesaggi vari, fauna particolare e una cultura ricca, l’isola offre molti modi di viaggiare. I circuiti presentati mostrano alcune possibilità e possono ispirare un itinerario secondo i tuoi interessi. Sarò felice di aiutarti a scegliere tappe e ritmo più adatti.",
+    "intro": "Tra paesaggi vari, fauna particolare e una cultura ricca, l’isola offre molti modi di viaggiare. I circuiti presentati mostrano alcune possibilità e possono ispirare un itinerario secondo i tuoi interessi. Saremo felici di aiutarti a scegliere tappe e ritmo più adatti.",
     "metaTitle": "Idee di viaggio in Madagascar | Anabo Roadtrip",
     "metaDescription": "Idee di viaggio in Madagascar: RN7, Tsingy, baobab, parchi, costa orientale e Nosy Be con i nostri autisti-guida, apprezzati in tutto il mondo.",
     "keywords": [
@@ -71,7 +71,7 @@
     "itinerary": "Itinerario",
     "viewRoute": "Vedi percorso",
     "routeNotConfigured": "Itinerario dettagliato su richiesta: lo adattiamo alle tue date e ai tuoi desideri.",
-    "suggestedRoute": "Itinerario indicativo, da confermare in base alla durata del viaggio, alla stagione e alle condizioni stradali.",
+    "suggestedRoute": "Itinerario indicativo, adattato alla durata del viaggio, alla stagione e allo stato delle strade.",
     "routeRequest": "Richiedi l’itinerario"
   },
   "slider": {
@@ -204,6 +204,10 @@
     "reviewSteps": "Dopo l’invio ti invieremo un preventivo personalizzato. La prenotazione si conferma versando l’acconto ({method}), una volta accettato il preventivo.",
     "reviewNoCommitment": "L’invio di questa richiesta è gratuito e senza impegno.",
     "send": "Invia la mia richiesta",
-    "cancel": "Annulla"
+    "cancel": "Annulla",
+    "fuelNotice": "Le tariffe comprendono il noleggio del veicolo e l’indennità dell’autista. Il carburante è a carico del cliente per tutta la durata del viaggio, compresi gli eventuali giorni di rientro a vuoto del veicolo ad Antananarivo.",
+    "includes": "Comprende il noleggio del veicolo, l’indennità dell’autista e, se il tour termina fuori da Antananarivo, i giorni di rientro a vuoto. Carburante non incluso.",
+    "timeNotice": "Date e orari sono indicati nell’ora del Madagascar (GMT+3).",
+    "receivedAt": "Richiesta registrata il {date} alle {time} (ora del Madagascar, GMT+3), ossia alle {gmt} GMT."
   }
 }

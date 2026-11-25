@@ -1,3 +1,4 @@
+import { formatMgDateTime, formatTimestamp, formatTripDate } from '@/lib/datetime'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect, notFound } from 'next/navigation'
@@ -169,8 +170,8 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
   const deposit = depositAmount(quote.quoteTotalAmount, payment.depositPercent)
 
   const acceptance = getCancellationStatus(quote.clientAcceptedAt, quote.acceptedStartDate || quote.startDate)
-  const mgDateTime = (d: Date) =>
-    d.toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo', dateStyle: 'full', timeStyle: 'medium' })
+  // Horodatages : heure de Madagascar (GMT+3) + équivalent GMT. Dates de voyage : UTC.
+  const mgDateTime = (d: Date) => formatTimestamp(d, 'fr')
   const datesChanged =
     !!quote.acceptedStartDate &&
     (quote.acceptedStartDate.getTime() !== quote.startDate?.getTime() ||
@@ -300,13 +301,9 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               <div>
                 <dt className="text-gray-500">Dates</dt>
                 <dd className="mt-1 text-gray-900">
-                  {quote.startDate
-                    ? new Date(quote.startDate).toLocaleDateString('fr-FR')
-                    : '—'}
+                  {formatTripDate(quote.startDate)}
                   {' → '}
-                  {quote.endDate
-                    ? new Date(quote.endDate).toLocaleDateString('fr-FR')
-                    : '—'}
+                  {formatTripDate(quote.endDate)}
                 </dd>
               </div>
 
@@ -380,7 +377,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               {quote.startDate && (
                 <p className="mt-1 text-xs text-gray-500">
                   Départ le{' '}
-                  {new Date(quote.startDate).toLocaleDateString('fr-FR')}
+                  {formatTripDate(quote.startDate)}
                 </p>
               )}
             </div>
@@ -486,7 +483,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   </h2>
                   <p className="mt-1 text-sm text-green-800">
                     Calculée côté serveur le{' '}
-                    {new Date(vehicleEstimate.calculatedAt).toLocaleString('fr-FR')}
+                    {formatMgDateTime(vehicleEstimate.calculatedAt)} (GMT+3)
                   </p>
                 </div>
                 <p className="text-2xl font-bold text-green-950">
@@ -558,6 +555,10 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   Tarif indicatif : confirmer disponibilité et saison.
                 </p>
               )}
+              <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                ⛽ Carburant non inclus : à la charge du client pendant tout le voyage, y compris les
+                transferts et les jours de retour à vide. À rappeler dans le devis.
+              </p>
             </section>
           )}
 
@@ -570,7 +571,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   </h2>
                   <p className="mt-1 text-sm text-green-800">
                     Calculée côté serveur le{' '}
-                    {new Date(estimate.calculatedAt).toLocaleString('fr-FR')}
+                    {formatMgDateTime(estimate.calculatedAt)} (GMT+3)
                   </p>
                 </div>
 
@@ -805,7 +806,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               {quote.depositPaidAt ? (
                 <p className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-semibold text-white">
-                    Acompte reçu le {quote.depositPaidAt.toLocaleDateString('fr-FR')}
+                    Acompte reçu le {formatMgDateTime(quote.depositPaidAt)} (GMT+3)
                   </span>
                   <button className="text-xs text-gray-600 underline">Annuler</button>
                 </p>
@@ -837,8 +838,8 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                   <div>
                     <dt className="text-xs text-gray-500">Dates acceptées</dt>
                     <dd className="text-gray-900">
-                      {quote.acceptedStartDate ? quote.acceptedStartDate.toLocaleDateString('fr-FR') : '—'} →{' '}
-                      {quote.acceptedEndDate ? quote.acceptedEndDate.toLocaleDateString('fr-FR') : '—'}
+                      {formatTripDate(quote.acceptedStartDate)} →{' '}
+                      {formatTripDate(quote.acceptedEndDate)}
                     </dd>
                   </div>
                   {datesChanged && (
@@ -922,7 +923,7 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                     <p className={step.done ? 'font-medium text-gray-900' : 'text-gray-400'}>{step.label}</p>
                     {step.date && (
                       <p className="text-xs text-gray-500">
-                        {new Date(step.date).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}
+                        {formatTimestamp(step.date, 'fr')}
                       </p>
                     )}
                   </div>

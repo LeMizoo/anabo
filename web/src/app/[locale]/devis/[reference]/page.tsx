@@ -1,3 +1,4 @@
+import { formatTimestamp } from '@/lib/datetime'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
@@ -63,6 +64,7 @@ export default async function DevisPage({ params, searchParams }: Props) {
   const { locale, reference } = await params
   const { token, error } = await searchParams
   const t = await getTranslations({ locale, namespace: 'quotePage' })
+  const tq = await getTranslations({ locale, namespace: 'quoteEstimate' })
   const errorMessage = error ? decodeURIComponent(error) : ''
   const errorTranslations: Record<string, string> = {
     'Lien invalide.': t('invalidLink'),
@@ -115,6 +117,8 @@ export default async function DevisPage({ params, searchParams }: Props) {
         {hasValidToken && (
           <p className="text-sm text-gray-600 mb-6">
             {quote.firstName} {quote.lastName} — {quote.email}
+            <br />
+            <span className="text-xs text-gray-500">{formatTimestamp(quote.createdAt, locale)}</span>
           </p>
         )}
 
@@ -130,6 +134,10 @@ export default async function DevisPage({ params, searchParams }: Props) {
           <section className="mb-8 whitespace-pre-wrap text-sm text-gray-800">
             {quote.quoteDetails || t('notWritten')}
           </section>
+        )}
+
+        {hasValidToken && (
+          <p className="mb-6 rounded-lg bg-amber-50 p-4 text-sm text-amber-900">⛽ {tq('fuelNotice')}</p>
         )}
 
         {quote.status === 'CONFIRME' && (
@@ -210,6 +218,7 @@ export default async function DevisPage({ params, searchParams }: Props) {
         <p className="mt-3 text-xs text-gray-500">
           <Link href={`/${locale}/annulation`} className="underline">{t('cancellationLink')}</Link>
         </p>
+        <p className="mt-3 text-xs text-gray-400">{tq('timeNotice')}</p>
       </div>
     </div>
   )

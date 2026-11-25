@@ -29,7 +29,8 @@ function tripEnd(start: Date, end: Date | null, duration: number | null) {
   return start
 }
 
-const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+// Dates de voyage calendaires : UTC pour ne pas décaler d'un jour.
+const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', timeZone: 'UTC' })
 
 type Props = { searchParams: Promise<{ passes?: string }> }
 

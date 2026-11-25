@@ -217,6 +217,7 @@ export async function POST(request: Request) {
         vehicleCount: data.vehicleCount,
         consecutiveCircuits: data.consecutiveCircuits,
         vehicleEstimate: estimateSnapshot,
+        createdAt: quote.createdAt,
       })
     } catch (emailErr) {
       console.error(
@@ -238,6 +239,8 @@ export async function POST(request: Request) {
         success: true,
         message: 'Votre demande a bien été enregistrée.',
         reference: quote.reference,
+        // Horodatage UTC (GMT) : le formulaire l'affiche à l'heure de Madagascar et en GMT.
+        createdAt: quote.createdAt.toISOString(),
         estimate: publicEstimate,
       },
       { status: 201 }

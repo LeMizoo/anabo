@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, ShieldCheck } from 'lucide-react'
+import { Fuel, Loader2, ShieldCheck } from 'lucide-react'
 import { formatRange, type QuoteEstimate } from './QuoteEstimatePanel'
 
 type Props = {
@@ -78,12 +78,18 @@ export function QuoteReviewDialog({
                   <strong className="text-lg text-[#E0A01C]">{deposit}</strong>
                 </p>
               )}
+              <p className="text-xs text-slate-500">{t('includes')}</p>
               <p className="text-xs text-slate-500">{t('indicative')}</p>
             </>
           ) : (
             <p className="text-slate-700">{t('reviewNoAmount')}</p>
           )}
         </div>
+
+        <p className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 p-3 text-sm leading-6 text-amber-900">
+          <Fuel className="mt-1 h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{t('fuelNotice')}</span>
+        </p>
 
         {percent > 0 && (
           <p className="mt-4 text-sm leading-6 text-slate-700">

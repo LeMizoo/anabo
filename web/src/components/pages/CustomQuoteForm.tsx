@@ -9,6 +9,7 @@ import type { CustomQuoteBlock, CustomQuoteOption, SanityImage } from '@/lib/typ
 import type { Locale } from '@/lib/i18n'
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
+import { QuoteReceivedAt } from './QuoteReceivedAt'
 
 type Props = { block: CustomQuoteBlock; locale: Locale }
 
@@ -30,6 +31,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
+  const [receivedAt, setReceivedAt] = useState<string | null>(null)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [consecutiveCircuits, setConsecutiveCircuits] = useState(1)
@@ -164,6 +166,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
       }
 
       setReference(data.reference || 'OK')
+      setReceivedAt(typeof data.createdAt === 'string' ? data.createdAt : null)
       setRegions([])
       setExperiences([])
       setVehicle('')
@@ -282,6 +285,9 @@ export function CustomQuoteForm({ block, locale }: Props) {
               {labels.successRef} <strong className="font-mono">{reference}</strong>
             </p>
             <p className="mt-1 text-sm text-green-700">{labels.successNext}</p>
+            <div>
+              <QuoteReceivedAt iso={receivedAt} locale={locale} />
+            </div>
             <button
               type="button"
               onClick={() => setReference('')}

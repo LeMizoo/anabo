@@ -1,3 +1,4 @@
+import { formatMgDateTime, formatTripDate } from '@/lib/datetime'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { auth } from '@/lib/auth'
@@ -195,7 +196,7 @@ export default async function AdminDashboardPage() {
                       {q.firstName} {q.lastName}
                     </Link>
                     <p className="text-xs text-gray-500">
-                      {q.startDate?.toLocaleDateString('fr-FR')} · {q.adults + q.children} pers.
+                      {formatTripDate(q.startDate)} · {q.adults + q.children} pers.
                     </p>
                   </div>
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${quoteStatusColor(q.status)}`}>
@@ -240,7 +241,7 @@ export default async function AdminDashboardPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {new Date(quote.createdAt).toLocaleDateString('fr-FR')}
+                    {formatMgDateTime(quote.createdAt)}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Link

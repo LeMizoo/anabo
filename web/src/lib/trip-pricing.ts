@@ -107,6 +107,22 @@ const EMPTY_RETURN_RULES: EmptyReturnRule[] = [
       'circuit sud rn7',
     ],
   },
+  // Circuits qui se terminent dans le Sud (Ifaty / Tuléar, vol retour) :
+  // le véhicule rentre à vide par la RN7, comme pour le circuit Sud RN7.
+  {
+    slug: 'circuit-safari-en-voiture',
+    label: 'Sud – Ifaty (RN7)',
+    days: 3,
+    regionValues: ['circuit-safari-en-voiture'],
+    fallbackPhrases: ['circuit nature et faune', 'wildlife tour', 'tour naturalistico e fauna'],
+  },
+  {
+    slug: 'birding-tour',
+    label: 'Sud – Tuléar / Anakao (RN7)',
+    days: 3,
+    regionValues: ['birding-tour'],
+    fallbackPhrases: ['birding tour', 'observation des oiseaux', 'birdwatching in madagascar'],
+  },
   {
     slug: 'circuit-nord-et-nosibe',
     label: 'Diego-Suarez',
