@@ -37,6 +37,9 @@ export interface SiteSettings {
   contactEmail?: string
   contactPhone?: string
   whatsappNumber?: string
+  /** Vonjy, chauffeur-guide : nom et e-mail direct */
+  driverGuideName?: string
+  driverGuideEmail?: string
   showFloatingWhatsapp?: boolean
   address?: string
   socialLinks?: { platform?: string; url?: string }[]

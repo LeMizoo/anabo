@@ -4,6 +4,7 @@ import type { VehicleEstimateSnapshot } from '@/lib/trip-pricing'
 import { signQuoteToken } from '@/lib/quote-token'
 import { depositAmount, formatAmount, getPaymentSettings, type PaymentSettingsData } from '@/lib/payment-settings'
 import { formatTimestamp, formatTripDate } from '@/lib/datetime'
+import { OFFICIAL_CONTACT, phoneDigits } from '@/lib/contact'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -44,6 +45,25 @@ const FUEL_NOTICE: Record<'fr' | 'en' | 'it', string> = {
   fr: 'Les tarifs comprennent la location du véhicule et l’indemnité chauffeur. Le carburant reste à la charge du client pendant toute la durée du voyage, y compris les éventuels jours de retour à vide du véhicule vers Antananarivo.',
   en: 'Rates include vehicle rental and the driver allowance. Fuel is paid by the client throughout the trip, including any empty-return days of the vehicle to Antananarivo.',
   it: 'Le tariffe comprendono il noleggio del veicolo e l’indennità dell’autista. Il carburante è a carico del cliente per tutta la durata del viaggio, compresi gli eventuali giorni di rientro a vuoto del veicolo ad Antananarivo.',
+}
+
+// Coordonnées officielles en pied de chaque e-mail client (l'expéditeur Resend reste contact@anabo.mg).
+function contactFooterHtml(lang: 'fr' | 'en' | 'it') {
+  const c = OFFICIAL_CONTACT
+  const L = {
+    fr: { driver: `${c.driverGuideName}, votre chauffeur-guide`, phone: 'Téléphone direct' },
+    en: { driver: `${c.driverGuideName}, your driver-guide`, phone: 'Direct phone' },
+    it: { driver: `${c.driverGuideName}, il vostro autista-guida`, phone: 'Telefono diretto' },
+  }[lang]
+  const sep = lang === 'fr' ? ' : ' : ': '
+  return `
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0 12px;" />
+      <p style="font-size: 12px; color: #6b7280; line-height: 1.6; margin: 0;">
+        <strong>${c.companyName}</strong> · <a href="mailto:${c.companyEmail}" style="color: #6b7280;">${c.companyEmail}</a><br />
+        ${L.driver} · ${L.phone}${sep}<a href="tel:+${phoneDigits(c.driverGuidePhone)}" style="color: #6b7280;">${c.driverGuidePhone}</a>
+        · WhatsApp${sep}<a href="https://wa.me/${phoneDigits(c.whatsapp)}" style="color: #6b7280;">${c.whatsapp}</a>
+        · <a href="mailto:${c.driverGuideEmail}" style="color: #6b7280;">${c.driverGuideEmail}</a>
+      </p>`
 }
 
 function fuelHtml(lang: 'fr' | 'en' | 'it') {
@@ -208,6 +228,7 @@ function buildClientEmail(data: QuoteData, depositPercent = 0) {
       ${depositPercent > 0 ? `<p>Bon à savoir : la réservation se confirme avec un acompte de ${depositPercent} % du montant du devis.</p>` : ''}
       ${fuelHtml('fr')}
       <p>À très bientôt,<br />L'équipe ANABO Roadtrip Madagascar</p>
+      ${contactFooterHtml('fr')}
     `,
     en: (d) => `
       <p>Hello ${escapeHtml(d.firstName)},</p>
@@ -220,6 +241,7 @@ function buildClientEmail(data: QuoteData, depositPercent = 0) {
       ${depositPercent > 0 ? `<p>Good to know: your booking is confirmed with a deposit of ${depositPercent}% of the quote amount.</p>` : ''}
       ${fuelHtml('en')}
       <p>See you soon,<br />The ANABO Roadtrip Madagascar team</p>
+      ${contactFooterHtml('en')}
     `,
     it: (d) => `
       <p>Ciao ${escapeHtml(d.firstName)},</p>
@@ -232,6 +254,7 @@ function buildClientEmail(data: QuoteData, depositPercent = 0) {
       ${depositPercent > 0 ? `<p>Da sapere: la prenotazione si conferma con un acconto del ${depositPercent}% dell’importo del preventivo.</p>` : ''}
       ${fuelHtml('it')}
       <p>A presto,<br />Il team ANABO Roadtrip Madagascar</p>
+      ${contactFooterHtml('it')}
     `,
   }
 
@@ -410,6 +433,7 @@ export async function sendQuoteStatusEmail(
       ${fuelHtml(lang)}
       <p style="font-size: 13px; color: #92400e; background: #fffbeb; padding: 12px; border-radius: 6px;">${t.cancellationNote}</p>
       <p>${t.bye}<br/>${t.team}</p>
+      ${contactFooterHtml(lang)}
     `
   } else if (status === 'CONFIRME') {
     subject = t.confirmSubject(reference)
@@ -419,6 +443,7 @@ export async function sendQuoteStatusEmail(
       ${deposit?.settings && !deposit.settings.depositPercent ? '' : depositHtml(lang, reference, deposit, true)}
       <p>${t.confirmBody2}</p>
       <p>${t.bye}<br/>${t.team}</p>
+      ${contactFooterHtml(lang)}
     `
   }
 
@@ -474,6 +499,7 @@ export async function sendDepositReceivedEmail(to: string, firstName: string, re
       <p>${t.body}</p>
       <p>${t.next}</p>
       <p>${t.bye}<br/>${t.team}</p>
+      ${contactFooterHtml(lang)}
     `,
   })
 }

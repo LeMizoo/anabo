@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Facebook, Instagram, Mail, MapPin, Music2, Phone, Youtube } from 'lucide-react'
+import { Facebook, Instagram, Mail, MapPin, MessageCircle, Music2, Phone, Youtube } from 'lucide-react'
+import { OFFICIAL_CONTACT, telHref, whatsappHref } from '@/lib/contact'
 import { getLocale, getTranslations } from 'next-intl/server'
 import type { SiteSettings } from '@/lib/types'
 import { titleCase } from '@/lib/typography'
@@ -28,6 +29,13 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
     getTranslations('nav'),
     getLocale(),
   ])
+  const companyEmail = settings?.contactEmail || OFFICIAL_CONTACT.companyEmail
+  const phone = settings?.contactPhone || OFFICIAL_CONTACT.driverGuidePhone
+  const whatsapp = settings?.whatsappNumber || OFFICIAL_CONTACT.whatsapp
+  const driverEmail = settings?.driverGuideEmail || OFFICIAL_CONTACT.driverGuideEmail
+  const driverName = settings?.driverGuideName || OFFICIAL_CONTACT.driverGuideName
+  const driverLabel =
+    locale === 'en' ? `${driverName}, local driver-guide` : locale === 'it' ? `${driverName}, autista-guida locale` : `${driverName}, chauffeur-guide local`
 
   const localized = settings?.localized?.[locale as 'en' | 'fr' | 'it']
   const tagline = localized?.tagline || settings?.tagline
@@ -88,32 +96,31 @@ export async function Footer({ settings }: { settings?: SiteSettings | null }) {
             </h2>
 
             <div className="mt-4 space-y-4">
-              {settings?.contactEmail && (
-                <a
-                  href={`mailto:${settings.contactEmail}`}
-                  className="flex items-start gap-3 text-sm text-gray-400 hover:text-white"
-                >
-                  <Mail className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{settings.contactEmail}</span>
-                </a>
-              )}
+              {/* Entreprise */}
+              <a href={`mailto:${companyEmail}`} className="flex items-start gap-3 text-sm text-gray-400 hover:text-white">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{companyEmail}</span>
+              </a>
 
-              {settings?.contactPhone && (
-                <a
-                  href={`tel:${settings.contactPhone}`}
-                  className="flex items-start gap-3 text-sm text-gray-400 hover:text-white"
-                >
-                  <Phone className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{settings.contactPhone}</span>
-                </a>
-              )}
+              {/* Vonjy, chauffeur-guide : coordonnées directes */}
+              <p className="pt-1 text-xs font-semibold uppercase tracking-wider text-gray-500">{driverLabel}</p>
+              <a href={telHref(phone)} className="flex items-start gap-3 text-sm text-gray-400 hover:text-white">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{phone}</span>
+              </a>
+              <a href={whatsappHref(whatsapp)} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 text-sm text-gray-400 hover:text-white">
+                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>WhatsApp {whatsapp}</span>
+              </a>
+              <a href={`mailto:${driverEmail}`} className="flex items-start gap-3 text-sm text-gray-400 hover:text-white">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{driverEmail}</span>
+              </a>
 
-              {settings?.address && (
-                <div className="flex items-start gap-3 text-sm text-gray-400">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{settings.address}</span>
-                </div>
-              )}
+              <div className="flex items-start gap-3 text-sm text-gray-400">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{settings?.address || OFFICIAL_CONTACT.address}</span>
+              </div>
             </div>
           </div>}
         </div>

@@ -11,6 +11,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CookieBanner } from '@/components/layout/CookieBanner' // 👈 Import ajouté
 import { FloatingWhatsApp } from '@/components/layout/FloatingWhatsApp'
+import { OFFICIAL_CONTACT } from '@/lib/contact'
 import { locales, type Locale } from '@/lib/i18n'
 import { sanityClient } from '@/lib/sanity'
 import { siteSettingsQuery } from '@/lib/queries'
@@ -95,7 +96,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               <main className="flex-1">{children}</main>
               <Footer settings={settings} />
               <FloatingWhatsApp
-                phone={settings?.whatsappNumber || settings?.contactPhone}
+                phone={settings?.whatsappNumber || OFFICIAL_CONTACT.whatsapp}
                 enabled={settings?.showFloatingWhatsapp !== false}
                 locale={locale}
               />

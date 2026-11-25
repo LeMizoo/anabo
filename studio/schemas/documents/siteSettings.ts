@@ -196,6 +196,22 @@ export default {
       group: 'contact',
     },
     {
+      name: 'driverGuideName',
+      type: 'string',
+      title: 'Nom du chauffeur-guide',
+      description: 'Affiché avec ses coordonnées directes (ex. Vonjy).',
+      initialValue: 'Vonjy',
+      group: 'contact',
+    },
+    {
+      name: 'driverGuideEmail',
+      type: 'string',
+      title: 'E-mail direct du chauffeur-guide',
+      description: 'Adresse directe de Vonjy. L’e-mail de contact ci-dessus reste l’adresse générale de l’entreprise.',
+      initialValue: 'mytrip.mada@gmail.com',
+      group: 'contact',
+    },
+    {
       name: 'showFloatingWhatsapp',
       type: 'boolean',
       title: 'Afficher le bouton WhatsApp flottant',

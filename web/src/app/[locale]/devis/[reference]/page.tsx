@@ -1,4 +1,5 @@
 import { formatTimestamp } from '@/lib/datetime'
+import { OFFICIAL_CONTACT, whatsappHref } from '@/lib/contact'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
@@ -213,7 +214,10 @@ export default async function DevisPage({ params, searchParams }: Props) {
         )}
 
         <p className="mt-8 text-xs text-gray-500">
-          {t('questions')} contact@anabo.mg
+          {t('questions')}{' '}
+          <a href={`mailto:${OFFICIAL_CONTACT.companyEmail}`} className="underline">{OFFICIAL_CONTACT.companyEmail}</a>
+          {' · WhatsApp '}
+          <a href={whatsappHref(OFFICIAL_CONTACT.whatsapp)} target="_blank" rel="noopener noreferrer" className="underline">{OFFICIAL_CONTACT.whatsapp}</a>
         </p>
         <p className="mt-3 text-xs text-gray-500">
           <Link href={`/${locale}/annulation`} className="underline">{t('cancellationLink')}</Link>

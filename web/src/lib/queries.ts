@@ -36,6 +36,8 @@ export const siteSettingsQuery = `
     contactEmail,
     contactPhone,
     whatsappNumber,
+    driverGuideName,
+    driverGuideEmail,
     showFloatingWhatsapp,
     address,
     socialLinks[]{
