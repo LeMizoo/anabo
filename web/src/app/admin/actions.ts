@@ -17,6 +17,7 @@ import { signQuoteToken } from '@/lib/quote-token'
 import { notifyIfShortage } from '@/lib/capacity-alerts'
 import { getPaymentSettings } from '@/lib/payment-settings'
 import { redirect } from 'next/navigation'
+import { archiveRuleWhere, isArchiveRule } from '@/lib/quote-archive'
 
 const MAX_TEXT = 20000
 const ROLES = ['ADMIN', 'SUPER_ADMIN'] as const
@@ -523,4 +524,62 @@ export async function toggleDepositPaid(formData: FormData) {
   revalidatePath('/admin/demandes')
   revalidatePath('/admin/planning')
   redirect(`/admin/demandes/${quoteId}`)
+}
+
+
+// ---------------------------------------------------------------------------
+// Archivage des demandes (aucune suppression : désarchivage possible à tout moment)
+// ---------------------------------------------------------------------------
+
+/** Retour vers la liste en conservant les filtres (chemin interne uniquement). */
+function safeReturnTo(value: FormDataEntryValue | null, fallback = '/admin/demandes') {
+  const v = typeof value === 'string' ? value : ''
+  return v.startsWith('/admin/') && !v.startsWith('//') ? v : fallback
+}
+
+function revalidateQuoteLists(ids: string[] = []) {
+  revalidatePath('/admin/demandes')
+  revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/planning')
+  for (const id of ids) revalidatePath(`/admin/demandes/${id}`)
+}
+
+/**
+ * Archive une ou plusieurs demandes (champ « ids », répétable) ou toutes celles
+ * correspondant à une règle (champ « rule » : perdu, termine, sans-suite).
+ */
+export async function archiveQuotes(formData: FormData) {
+  const session = await requireSession()
+  const by = session.user?.email || session.user?.name || 'admin'
+  const rule = formData.get('rule')
+  const ids = formData
+    .getAll('ids')
+    .map(String)
+    .filter((id) => /^[a-z0-9]{10,40}$/i.test(id))
+    .slice(0, 500)
+
+  let where: Prisma.QuoteRequestWhereInput | null = null
+  if (isArchiveRule(rule)) where = archiveRuleWhere(rule)
+  else if (ids.length) where = { id: { in: ids }, archivedAt: null }
+
+  if (where) {
+    await prisma.quoteRequest.updateMany({ where, data: { archivedAt: new Date(), archivedBy: by } })
+  }
+  revalidateQuoteLists(ids)
+  redirect(safeReturnTo(formData.get('returnTo')))
+}
+
+/** Désarchive une ou plusieurs demandes. */
+export async function unarchiveQuotes(formData: FormData) {
+  await requireSession()
+  const ids = formData
+    .getAll('ids')
+    .map(String)
+    .filter((id) => /^[a-z0-9]{10,40}$/i.test(id))
+    .slice(0, 500)
+  if (ids.length) {
+    await prisma.quoteRequest.updateMany({ where: { id: { in: ids } }, data: { archivedAt: null, archivedBy: null } })
+  }
+  revalidateQuoteLists(ids)
+  redirect(safeReturnTo(formData.get('returnTo')))
 }

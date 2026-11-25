@@ -21,7 +21,7 @@ import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
 import { getCancellationStatus } from '@/lib/cancellation'
 import { assignDriver } from '@/app/admin/(protected)/chauffeurs/actions'
 import { shortageForTrip } from '@/lib/fleet-capacity'
-import { saveQuotePayment, toggleDepositPaid } from '@/app/admin/actions'
+import { archiveQuotes, saveQuotePayment, toggleDepositPaid, unarchiveQuotes } from '@/app/admin/actions'
 import { getPaymentSettings, depositAmount, formatAmount } from '@/lib/payment-settings'
 
 export const dynamic = 'force-dynamic'
@@ -253,14 +253,32 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
           >
             Appeler
           </a>
+          <form action={quote.archivedAt ? unarchiveQuotes : archiveQuotes}>
+            <input type="hidden" name="ids" value={quote.id} />
+            <input type="hidden" name="returnTo" value={`/admin/demandes/${quote.id}`} />
+            <button
+              type="submit"
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              {quote.archivedAt ? 'Désarchiver' : 'Archiver'}
+            </button>
+          </form>
           <Link
-            href="/admin/demandes"
+            href={quote.archivedAt ? '/admin/demandes?vue=archives' : '/admin/demandes'}
             className="ml-2 text-sm font-medium text-blue-600 hover:underline"
           >
             ← Retour à la liste
           </Link>
         </div>
       </div>
+
+      {quote.archivedAt && (
+        <div className="rounded-xl border border-gray-300 bg-gray-50 p-4 text-sm text-gray-700">
+          <strong>Demande archivée</strong> le {formatTimestamp(quote.archivedAt, 'fr')}
+          {quote.archivedBy ? ` par ${quote.archivedBy}` : ''}. Elle n’apparaît plus dans les listes de travail ni dans
+          les alertes ; elle redevient active si vous la désarchivez ou si le client accepte son devis.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

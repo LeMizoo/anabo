@@ -75,6 +75,9 @@ export async function confirmQuoteByClient(
         clientAcceptedAt: acceptedAt,
         acceptedStartDate: current?.startDate ?? null,
         acceptedEndDate: current?.endDate ?? null,
+        // Un devis accepté par le client redevient actif s'il avait été archivé.
+        archivedAt: null,
+        archivedBy: null,
       },
     })
 

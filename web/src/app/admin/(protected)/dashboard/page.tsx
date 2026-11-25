@@ -1,3 +1,4 @@
+import { NOT_ARCHIVED } from '@/lib/quote-archive'
 import { formatMgDateTime, formatTripDate } from '@/lib/datetime'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
@@ -27,29 +28,29 @@ export default async function AdminDashboardPage() {
     toReply, toFollowUp, upcoming, recentQuotes, lastYear, statusCounts,
   ] = await Promise.all([
     prisma.quoteRequest.count(),
-    prisma.quoteRequest.count({ where: { status: 'NOUVEAU' } }),
+    prisma.quoteRequest.count({ where: { ...NOT_ARCHIVED, status: 'NOUVEAU' } }),
     prisma.quoteRequest.count({ where: { createdAt: { gte: monthStart } } }),
     prisma.quoteRequest.count({ where: { status: 'CONFIRME' } }),
     prisma.quoteRequest.count({ where: { status: 'PERDU' } }),
     prisma.quoteRequest.findMany({
-      where: { status: 'NOUVEAU' },
+      where: { ...NOT_ARCHIVED, status: 'NOUVEAU' },
       orderBy: { createdAt: 'asc' },
       take: 5,
       select: { id: true, reference: true, firstName: true, lastName: true, createdAt: true },
     }),
     prisma.quoteRequest.findMany({
-      where: { status: 'DEVIS_ENVOYE', quoteSentAt: { lt: new Date(now.getTime() - 7 * DAY) } },
+      where: { ...NOT_ARCHIVED, status: 'DEVIS_ENVOYE', quoteSentAt: { lt: new Date(now.getTime() - 7 * DAY) } },
       orderBy: { quoteSentAt: 'asc' },
       take: 5,
       select: { id: true, reference: true, firstName: true, lastName: true, quoteSentAt: true },
     }),
     prisma.quoteRequest.findMany({
-      where: { status: { in: ['CONFIRME', 'DEVIS_ENVOYE'] }, startDate: { gte: today, lte: in60Days } },
+      where: { ...NOT_ARCHIVED, status: { in: ['CONFIRME', 'DEVIS_ENVOYE'] }, startDate: { gte: today, lte: in60Days } },
       orderBy: { startDate: 'asc' },
       take: 6,
       select: { id: true, reference: true, firstName: true, lastName: true, startDate: true, status: true, circuitTitle: true, adults: true, children: true },
     }),
-    prisma.quoteRequest.findMany({ take: 5, orderBy: { createdAt: 'desc' } }),
+    prisma.quoteRequest.findMany({ where: NOT_ARCHIVED, take: 5, orderBy: { createdAt: 'desc' } }),
     prisma.quoteRequest.findMany({ where: { createdAt: { gte: twelveMonthsAgo } }, select: { createdAt: true } }),
     prisma.quoteRequest.groupBy({ by: ['status'], _count: { status: true } }),
   ])

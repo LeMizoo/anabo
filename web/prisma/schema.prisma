@@ -111,6 +111,10 @@ model QuoteRequest {
   quoteCurrency    String?   @db.VarChar(3)
   depositPaidAt    DateTime?
 
+  // Archivage : la demande sort des listes de travail et des alertes, sans être supprimée.
+  archivedAt DateTime?
+  archivedBy String?   @db.VarChar(191)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -118,6 +122,7 @@ model QuoteRequest {
   @@index([email])
   @@index([circuitSlug])
   @@index([assignedDriverId])
+  @@index([archivedAt])
 }
 
 // Nouveau catalogue global de véhicules

@@ -1,3 +1,4 @@
+import { NOT_ARCHIVED } from '@/lib/quote-archive'
 import { prisma } from '@/lib/prisma'
 import { getCapacityReport } from '@/lib/fleet-capacity'
 
@@ -21,14 +22,14 @@ export type AdminAlerts = {
  */
 export async function getAdminAlerts(): Promise<AdminAlerts> {
   const [newRequests, quotesToSend, quotesToFollowUp, capacity, depositsPending] = await Promise.all([
-    prisma.quoteRequest.count({ where: { status: 'NOUVEAU' } }),
-    prisma.quoteRequest.count({ where: { status: 'CONTACTE' } }),
+    prisma.quoteRequest.count({ where: { ...NOT_ARCHIVED, status: 'NOUVEAU' } }),
+    prisma.quoteRequest.count({ where: { ...NOT_ARCHIVED, status: 'CONTACTE' } }),
     prisma.quoteRequest.count({
-      where: { status: 'DEVIS_ENVOYE', quoteSentAt: { lt: new Date(Date.now() - FOLLOW_UP_DAYS * DAY) } },
+      where: { ...NOT_ARCHIVED, status: 'DEVIS_ENVOYE', quoteSentAt: { lt: new Date(Date.now() - FOLLOW_UP_DAYS * DAY) } },
     }),
     getCapacityReport().catch(() => ({ shortages: [], driverConflicts: [] })),
     // Voyages confirmés dont l'acompte n'est pas encore reçu
-    prisma.quoteRequest.count({ where: { status: 'CONFIRME', depositPaidAt: null } }),
+    prisma.quoteRequest.count({ where: { ...NOT_ARCHIVED, status: 'CONFIRME', depositPaidAt: null } }),
   ])
   // Chevauchements sans assez de véhicules/chauffeurs + doubles affectations d'un chauffeur.
   const capacityIssues = capacity.shortages.length + capacity.driverConflicts.length

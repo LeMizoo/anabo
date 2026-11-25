@@ -37,6 +37,8 @@ export async function GET(request: Request) {
     ]
   }
   if (isQuoteStatus(status)) where.status = status
+  // Archives : exportées uniquement depuis l'onglet « Archivées ».
+  where.archivedAt = searchParams.get('archives') === '1' ? { not: null } : null
 
   const quotes = await prisma.quoteRequest.findMany({
     where,
