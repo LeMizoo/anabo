@@ -24,7 +24,8 @@
     "contact": "Contact",
     "country": "Madagascar",
     "socialLinks": "Social media",
-    "cancellation": "Cancellation and refund"
+    "cancellation": "Cancellation and refund",
+    "faq": "FAQ"
   },
   "cookieBanner": {
     "description": "We use cookies to improve your experience, analyse traffic and display our Tripadvisor reviews. In accordance with regulations, we ask for your consent.",
@@ -50,73 +51,6 @@
       "Nosy Be tour",
       "Madagascar driver-guide"
     ],
-    "faqTitle": "Questions about choosing a Madagascar tour",
-    "faqs": [
-    {
-      "question": "Which tours can you take in Madagascar?",
-      "answer": "The tour ideas presented include the RN7 and the South, the Tsingy and baobabs, the eastern national parks, the North and Nosy Be, as well as stays in the Central Highlands. Each itinerary offers the opportunity to discover different regions, landscapes and experiences in Madagascar."
-    },
-    {
-      "question": "How do I choose an itinerary that suits my trip?",
-      "answer": "Consider the length of your stay, the regions you would like to discover, the season and road conditions. We can discuss the stages and pace of your journey with you to suggest an itinerary suited to your preferences and constraints."
-    },
-    {
-      "question": "Can the suggested tours be customised?",
-      "answer": "Yes. The tours presented are suggestions that provide a starting point. Stages, destinations and the pace of the journey can be adapted to your wishes, subject to availability and local conditions. The final itinerary is specified in the accepted quotation."
-    },
-    {
-      "question": "What are empty return days?",
-      "answer": "Empty return days refer to the time needed for the vehicle and its driver-guide to return to Antananarivo after dropping travellers off at their final destination. They are not additional travel days for clients, but they are included when calculating the rental price. Their number depends on the destination and, for Nosy Be, on the chosen vehicle transport option. Fuel remains the client's responsibility, including during this return journey."
-    },
-    {
-      "question": "How are rental prices calculated?",
-      "answer": "The price depends in particular on the vehicle selected, the length of the tour, the number of vehicles and the destination. Any empty return days are also taken into account. The quotation sets out the total amount and the conditions applicable to your trip. Fuel is not included."
-    },
-    {
-      "question": "Is fuel included in the price?",
-      "answer": "No. Fuel is the client's responsibility throughout the service, including during any empty return days for the vehicle. This expense should therefore be budgeted for in addition to the rental price stated in the quotation."
-    },
-    {
-      "question": "How many people can travel in one vehicle?",
-      "answer": "Capacity depends on the vehicle selected. The 4x4 SUV can accommodate up to 4 travellers, while the Hyundai Grand Starex can accommodate up to 7. The choice of vehicle should also take into account the size and composition of your group, your luggage and availability at the time of booking."
-    },
-    {
-      "question": "How is vehicle transport to Nosy Be arranged?",
-      "answer": "For a tour that includes Nosy Be, two options may be offered. With the standard option, the vehicle stays on the mainland and does not cross over to the island. With the other option, the vehicle and its driver-guide accompany the travellers to Nosy Be by ferry. In this second case, the vehicle ferry crossing fees between Ankify and Nosy Be are payable by the client and are not included in the estimated price. The selected option is taken into account when calculating the empty return."
-    },
-    {
-      "question": "How can I request a quotation for my trip?",
-      "answer": "You can submit your request using the quotation form available on our website. Provide the information needed to organise your stay, including your dates, intended destinations, number of travellers and vehicle requirements. We will review your request and send you a suitable proposal, subject to availability and local conditions."
-    },
-    {
-      "question": "What deposit is required to confirm a booking?",
-      "answer": "A deposit of 30% of the total quotation amount is required to confirm your booking. The remaining balance is paid in accordance with the terms specified in the quotation you have accepted."
-    },
-    {
-      "question": "Which payment methods do you accept?",
-      "answer": "The deposit is paid via Mobile Money to +261 32 99 298 60, under the name Vonjy HARILANTO. Please use your quotation reference as the payment reason so that we can identify your payment easily."
-    },
-    {
-      "question": "When is my booking confirmed?",
-      "answer": "Your booking becomes final as soon as we receive the 30% deposit corresponding to the accepted quotation. The remaining balance is then paid according to the terms and deadlines stated in that quotation."
-    },
-    {
-      "question": "Can I cancel my booking?",
-      "answer": "A cancellation request may be submitted under the usual procedure when the quotation was accepted at least 15 calendar days before the intended departure date. If the quotation is accepted less than 15 calendar days before that date, the booking cannot be cancelled under this usual procedure. Any refundable amounts and applicable third-party provider fees are determined in accordance with the terms of the accepted quotation. This rule is a booking condition and not a general statutory withdrawal period for tourism services."
-    },
-    {
-      "question": "How is the 15-day period calculated?",
-      "answer": "The period is calculated between the date on which the client accepts the quotation and the intended departure date. The actual acceptance date is the reference point. The travel dates accepted at that time also remain the reference, even if they are subsequently changed by mutual agreement."
-    },
-    {
-      "question": "How do I request a cancellation and obtain a refund?",
-      "answer": "To request a cancellation, email contact@anabo.mg and include your quotation reference, the name of the lead traveller and the services concerned. We will acknowledge receipt of your request and explain the next steps, including the calculation of any refundable amounts, taking into account the accepted terms and any third-party provider fees. If a refund is due, its amount and payment method will be confirmed to you in writing. Wherever possible, the refund will be made using the original payment method within 30 days after written agreement on the amount, subject to the processing times of payment providers."
-    },
-    {
-      "question": "What happens in the event of force majeure or an early departure?",
-      "answer": "If a force majeure event or another situation prevents the trip from going ahead, please contact us as soon as possible. We will review the circumstances, the services concerned and the applicable contractual and legal conditions in order to seek an appropriate solution. Where a refund is due, a voucher cannot be substituted for it without your agreement. However, if you decide to leave the tour before the originally agreed return date, unused days are not refundable."
-    }
-  ],
     "createTrip": "Create my trip",
     "details": "More details",
     "noImage": "No image",
@@ -124,7 +58,10 @@
     "viewRoute": "View route",
     "routeNotConfigured": "Detailed route on request: we tailor it to your dates and wishes.",
     "suggestedRoute": "Suggested route, adjusted to your trip length, the season and road conditions.",
-    "routeRequest": "Request the route"
+    "routeRequest": "Request the route",
+    "faqCtaTitle": "Any questions?",
+    "faqCtaText": "Prices, vehicles, empty-return days, booking, payment, cancellation: all the answers are in our FAQ.",
+    "faqCtaLink": "Read the FAQ"
   },
   "slider": {
     "learnMore": "Learn more",

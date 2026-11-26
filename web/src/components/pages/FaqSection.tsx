@@ -27,7 +27,7 @@ export function FaqSection({ block, locale }: Props) {
         <div className="divide-y divide-gray-200 border-y border-gray-200">
           {items.map((item, index) => (
             <details key={item._key || index} className="group py-3">
-              <summary className={`cursor-pointer rounded-md pr-8 text-[clamp(1rem,2vw,1.25rem)] text-gray-900 transition-colors hover:text-[#06245F] group-open:text-[#06245F] dark:text-gray-100 dark:hover:text-[#F4C566] dark:group-open:text-[#F4C566] ${headingFont(block.titleFont, item.question, { long: 'font-serif' })} ${block.titleWeight || 'font-normal'}`}>
+              <summary className="cursor-pointer rounded-md pr-8 font-sans text-base font-medium text-gray-900 transition-colors hover:text-[#06245F] group-open:text-[#06245F] md:text-lg dark:text-gray-100 dark:hover:text-[#F4C566] dark:group-open:text-[#F4C566]">
                 {item.question}
               </summary>
               {item.answer && (

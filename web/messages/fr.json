@@ -24,7 +24,8 @@
     "contact": "Contact",
     "country": "Madagascar",
     "socialLinks": "Réseaux sociaux",
-    "cancellation": "Annulation et remboursement"
+    "cancellation": "Annulation et remboursement",
+    "faq": "FAQ"
   },
   "cookieBanner": {
     "description": "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et afficher nos avis Tripadvisor. Conformément à la réglementation, nous vous demandons votre autorisation.",
@@ -50,73 +51,6 @@
       "circuit Nosy Be",
       "chauffeur-guide Madagascar"
     ],
-    "faqTitle": "Questions pour choisir un circuit à Madagascar",
-    "faqs": [
-    {
-      "question": "Quels circuits peut-on faire à Madagascar ?",
-      "answer": "Les idées présentées incluent la RN7 et le Sud, les Tsingy et les baobabs, les parcs de l’Est, le Nord et Nosy Be, ainsi que des séjours dans les Hautes Terres. Chaque itinéraire permet de découvrir différentes régions, paysages et expériences de Madagascar."
-    },
-    {
-      "question": "Comment choisir un itinéraire adapté à mon voyage ?",
-      "answer": "Tenez compte de la durée de votre séjour, des régions que vous souhaitez découvrir, de la saison et des conditions routières. Nous pouvons discuter avec vous des étapes et du rythme du voyage afin de proposer un itinéraire adapté à vos envies et à vos contraintes."
-    },
-    {
-      "question": "Les circuits proposés sont-ils personnalisables ?",
-      "answer": "Oui. Les circuits présentés sont des suggestions qui servent de point de départ. Les étapes, les destinations et le rythme peuvent être adaptés à vos souhaits, sous réserve des disponibilités et des conditions locales. Le programme définitif est précisé dans le devis accepté."
-    },
-    {
-      "question": "Que sont les jours de retour à vide ?",
-      "answer": "Les jours de retour à vide correspondent au temps nécessaire au véhicule et à son chauffeur-guide pour revenir à Antananarivo après avoir déposé les voyageurs à leur destination finale. Ils ne représentent pas des jours de voyage supplémentaires pour les clients, mais sont pris en compte dans le calcul du tarif de location. Leur nombre dépend de la destination et, pour Nosy Be, de l’option de transport du véhicule choisie. Le carburant reste à la charge du client, y compris pendant ce retour."
-    },
-    {
-      "question": "Comment sont calculés les tarifs de location ?",
-      "answer": "Le tarif dépend notamment du véhicule choisi, de la durée du circuit, du nombre de véhicules et de la destination. Les éventuels jours de retour à vide sont également pris en compte. Le devis présente le montant total ainsi que les conditions applicables à votre voyage. Le carburant n’est pas inclus."
-    },
-    {
-      "question": "Le carburant est-il compris dans le tarif ?",
-      "answer": "Non. Le carburant est à la charge du client pendant toute la prestation, y compris durant les éventuels jours de retour à vide du véhicule. Cette dépense est donc à prévoir en complément du tarif de location indiqué dans le devis."
-    },
-    {
-      "question": "Combien de personnes peuvent voyager dans un véhicule ?",
-      "answer": "La capacité dépend du véhicule sélectionné. Le 4x4 SUV peut accueillir jusqu’à 4 voyageurs et le Hyundai Grand Starex jusqu’à 7 voyageurs. Le choix du véhicule doit également tenir compte de la composition du groupe, des bagages et des disponibilités au moment de la réservation."
-    },
-    {
-      "question": "Comment fonctionne le transport du véhicule vers Nosy Be ?",
-      "answer": "Pour un circuit incluant Nosy Be, deux possibilités peuvent être proposées. Avec l’option standard, le véhicule reste sur la Grande Terre et ne traverse pas vers l’île. Avec l’autre option, le véhicule et son chauffeur-guide accompagnent les voyageurs jusqu’à Nosy Be par ferry. Dans ce second cas, les frais de traversée du véhicule entre Ankify et Nosy Be sont à la charge du client et ne sont pas compris dans le tarif estimatif. Le choix de l’option est pris en compte dans le calcul du retour à vide."
-    },
-    {
-      "question": "Comment demander un devis pour mon voyage ?",
-      "answer": "Vous pouvez effectuer votre demande à partir du formulaire de devis disponible sur notre site. Indiquez les informations utiles à l’organisation de votre séjour, notamment vos dates, les destinations envisagées, le nombre de voyageurs et vos besoins en matière de véhicule. Nous étudierons votre demande et vous transmettrons une proposition adaptée, sous réserve des disponibilités et des conditions locales."
-    },
-    {
-      "question": "Quel acompte faut-il verser pour confirmer une réservation ?",
-      "answer": "Un acompte de 30 % du montant total du devis est demandé pour confirmer la réservation. Le montant restant est réglé conformément aux conditions précisées dans le devis que vous avez accepté."
-    },
-    {
-      "question": "Quels moyens de paiement acceptez-vous ?",
-      "answer": "Le règlement de l’acompte s’effectue par Mobile Money au numéro +261 32 99 298 60, au nom de Vonjy HARILANTO. Veuillez indiquer la référence de votre devis comme motif du paiement afin de faciliter son identification."
-    },
-    {
-      "question": "À quel moment ma réservation est-elle confirmée ?",
-      "answer": "Votre réservation devient définitive dès réception de l’acompte de 30 % correspondant au devis accepté. Le solde est ensuite réglé selon les modalités et les échéances indiquées dans ce devis."
-    },
-    {
-      "question": "Puis-je annuler ma réservation ?",
-      "answer": "Une demande d’annulation peut être présentée selon la procédure habituelle lorsque le devis a été accepté au moins 15 jours calendaires avant la date de départ souhaitée. Si le devis est accepté moins de 15 jours calendaires avant cette date, la réservation ne peut pas être annulée dans le cadre de cette procédure habituelle. Les éventuelles sommes remboursables et les frais applicables de prestataires tiers sont déterminés conformément aux conditions du devis accepté. Cette règle constitue une condition de réservation et non un délai légal général de rétractation pour les prestations touristiques."
-    },
-    {
-      "question": "Comment est calculé le délai de 15 jours ?",
-      "answer": "Le délai est calculé entre la date d’acceptation du devis par le client et la date de départ souhaitée. C’est la date effective d’acceptation qui sert de référence. Les dates de voyage acceptées à ce moment restent également la référence, même si elles sont ensuite modifiées d’un commun accord."
-    },
-    {
-      "question": "Comment demander une annulation et obtenir un remboursement ?",
-      "answer": "Pour demander une annulation, envoyez un e-mail à contact@anabo.mg, en indiquant la référence du devis, le nom du voyageur principal et les prestations concernées. Nous accuserons réception de votre demande et vous communiquerons les étapes à suivre ainsi que le calcul des éventuelles sommes remboursables, en tenant compte des conditions acceptées et des frais éventuels des prestataires tiers. Si un remboursement est dû, son montant et son mode de règlement vous seront confirmés par écrit. Dans la mesure du possible, le remboursement sera effectué par le moyen de paiement initial dans un délai de 30 jours après accord écrit sur le montant, sous réserve des délais propres aux opérateurs de paiement."
-    },
-    {
-      "question": "Que se passe-t-il en cas de force majeure ou de départ anticipé ?",
-      "answer": "En cas d’événement de force majeure ou de situation empêchant le voyage, contactez-nous dès que possible. Nous examinerons les circonstances, les prestations concernées et les conditions contractuelles et légales applicables afin de rechercher une solution adaptée. Lorsqu’un remboursement est dû, un avoir ne peut pas s’y substituer sans votre accord. En revanche, si vous décidez de quitter le circuit avant la date de retour initialement convenue, les journées non utilisées ne donnent pas lieu à remboursement."
-    }
-  ],
     "createTrip": "Créer mon voyage",
     "details": "Plus de détails",
     "noImage": "Pas d'image",
@@ -124,7 +58,10 @@
     "viewRoute": "Voir le trajet",
     "routeNotConfigured": "Itinéraire détaillé sur demande : nous l’adaptons à vos dates et à vos envies.",
     "suggestedRoute": "Parcours indicatif, ajusté selon la durée du séjour, la saison et l’état des routes.",
-    "routeRequest": "Demander l’itinéraire"
+    "routeRequest": "Demander l’itinéraire",
+    "faqCtaTitle": "Vous avez des questions ?",
+    "faqCtaText": "Tarifs, véhicules, retours à vide, réservation, paiement, annulation : toutes les réponses sont réunies dans notre FAQ.",
+    "faqCtaLink": "Consulter la FAQ"
   },
   "slider": {
     "learnMore": "En savoir plus",

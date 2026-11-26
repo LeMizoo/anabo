@@ -136,6 +136,20 @@ export default async function PageBySlug({ params }: Props) {
           ),
       )
     : page.modules
+  // Données structurées FAQPage : toutes les questions des blocs FAQ visibles de la page.
+  const faqEntities = (page.modules ?? [])
+    .flatMap((module) => (module._type === 'faqBlock' && !module.settings?.hidden ? module.items ?? [] : []))
+    .filter((item) => item.question && Array.isArray(item.answer))
+    .map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: (item.answer as { children?: { text?: string }[] }[])
+          .map((block) => (block.children ?? []).map((child) => child.text ?? '').join(''))
+          .join('\n'),
+      },
+    }))
   const hasGalleryBlock = page.modules?.some(
     (module) =>
       module._type === 'galleryBlock' || module._type === 'puzzleGalleryBlock',
@@ -172,6 +186,14 @@ export default async function PageBySlug({ params }: Props) {
         </section>
       )}
       <PageRenderer modules={remainingModules} circuits={circuits} locale={locale} sectionLinks={slug !== 'home'} />
+      {faqEntities.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities }).replace(/</g, '\\u003c'),
+          }}
+        />
+      )}
       {slug === 'gallery' && !hasGalleryBlock && (
         <ImagePlaceholderGallery locale={locale} />
       )}
