@@ -63,3 +63,4 @@ web/prisma/.env.backup-*
 .env.local.off
 *.bak
 *.ttf
+web/public/sary/
