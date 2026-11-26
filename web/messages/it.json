@@ -52,19 +52,71 @@
     ],
     "faqTitle": "Domande per scegliere un circuito in Madagascar",
     "faqs": [
-      {
-        "question": "Quali circuiti si possono fare in Madagascar?",
-        "answer": "Le proposte includono la RN7 e il Sud, gli Tsingy e i baobab, i parchi dell’Est, il Nord e Nosy Be, oltre agli Altipiani centrali."
-      },
-      {
-        "question": "Come scelgo un itinerario adatto al mio viaggio?",
-        "answer": "Considera la durata, le regioni desiderate, la stagione e le condizioni stradali. Puoi discutere il percorso e le tappe con noi, i tuoi autisti-guida."
-      },
-      {
-        "question": "I circuiti suggeriti si possono personalizzare?",
-        "answer": "Sì. Le proposte sono un punto di partenza: tappe e ritmo possono essere adattati e confermati in base alla disponibilità e alle condizioni locali."
-      }
-    ],
+    {
+      "question": "Quali itinerari puoi fare in Madagascar?",
+      "answer": "Le idee di viaggio presentate includono la RN7 e il Sud, gli Tsingy e i baobab, i parchi dell'Est, il Nord e Nosy Be, oltre a soggiorni sugli Altopiani. Ogni itinerario ti permette di scoprire diverse regioni, paesaggi ed esperienze del Madagascar."
+    },
+    {
+      "question": "Come scegliere un itinerario adatto al tuo viaggio?",
+      "answer": "Tieni conto della durata del soggiorno, delle regioni che desideri scoprire, della stagione e delle condizioni delle strade. Possiamo parlare insieme delle tappe e del ritmo del viaggio per proporti un itinerario adatto ai tuoi desideri e alle tue esigenze."
+    },
+    {
+      "question": "Gli itinerari proposti possono essere personalizzati?",
+      "answer": "Sì. Gli itinerari presentati sono suggerimenti da cui partire. Le tappe, le destinazioni e il ritmo del viaggio possono essere adattati alle tue preferenze, in base alla disponibilità e alle condizioni locali. Il programma definitivo viene specificato nel preventivo che accetti."
+    },
+    {
+      "question": "Che cosa sono i giorni di rientro a vuoto?",
+      "answer": "I giorni di rientro a vuoto corrispondono al tempo necessario al veicolo e al suo autista-guida per tornare ad Antananarivo dopo aver accompagnato i viaggiatori alla destinazione finale. Non sono giorni di viaggio aggiuntivi per i clienti, ma vengono considerati nel calcolo del prezzo del noleggio. Il loro numero dipende dalla destinazione e, per Nosy Be, dall'opzione scelta per il trasporto del veicolo. Il carburante resta a carico del cliente, anche durante questo rientro."
+    },
+    {
+      "question": "Come vengono calcolati i prezzi del noleggio?",
+      "answer": "Il prezzo dipende in particolare dal veicolo scelto, dalla durata dell'itinerario, dal numero di veicoli e dalla destinazione. Vengono considerati anche gli eventuali giorni di rientro a vuoto. Il preventivo indica l'importo totale e le condizioni applicabili al tuo viaggio. Il carburante non è incluso."
+    },
+    {
+      "question": "Il carburante è incluso nel prezzo?",
+      "answer": "No. Il carburante è a carico del cliente per tutta la durata del servizio, compresi gli eventuali giorni di rientro a vuoto del veicolo. Questa spesa va quindi prevista in aggiunta al prezzo del noleggio indicato nel preventivo."
+    },
+    {
+      "question": "Quante persone possono viaggiare in un veicolo?",
+      "answer": "La capacità dipende dal veicolo scelto. Il SUV 4x4 può ospitare fino a 4 viaggiatori, mentre il Hyundai Grand Starex può ospitarne fino a 7. Nella scelta del veicolo bisogna considerare anche la composizione del gruppo, i bagagli e la disponibilità al momento della prenotazione."
+    },
+    {
+      "question": "Come funziona il trasporto del veicolo a Nosy Be?",
+      "answer": "Per un itinerario che include Nosy Be possono essere proposte due possibilità. Con l'opzione standard, il veicolo rimane sulla terraferma e non raggiunge l'isola. Con l'altra opzione, il veicolo e il suo autista-guida accompagnano i viaggiatori fino a Nosy Be in traghetto. In questo secondo caso, le spese per il traghetto del veicolo tra Ankify e Nosy Be sono a carico del cliente e non sono incluse nel prezzo stimato. L'opzione scelta viene considerata nel calcolo del rientro a vuoto."
+    },
+    {
+      "question": "Come posso richiedere un preventivo per il mio viaggio?",
+      "answer": "Puoi inviare la tua richiesta tramite il modulo per i preventivi disponibile sul nostro sito. Inserisci le informazioni utili per organizzare il soggiorno, in particolare le date, le destinazioni previste, il numero di viaggiatori e le tue esigenze riguardo al veicolo. Esamineremo la richiesta e ti invieremo una proposta adatta, in base alla disponibilità e alle condizioni locali."
+    },
+    {
+      "question": "Quale acconto è necessario versare per confermare una prenotazione?",
+      "answer": "Per confermare la prenotazione è richiesto un acconto pari al 30% dell'importo totale del preventivo. Il saldo viene pagato secondo le condizioni indicate nel preventivo che hai accettato."
+    },
+    {
+      "question": "Quali metodi di pagamento accettate?",
+      "answer": "L'acconto viene versato tramite Mobile Money al numero +261 32 99 298 60, intestato a Vonjy HARILANTO. Per facilitare l'identificazione del pagamento, indica come causale il riferimento del tuo preventivo."
+    },
+    {
+      "question": "Quando viene confermata la mia prenotazione?",
+      "answer": "La prenotazione diventa definitiva non appena riceviamo l'acconto del 30% relativo al preventivo accettato. Il saldo viene poi pagato secondo le modalità e le scadenze indicate nel preventivo."
+    },
+    {
+      "question": "Posso annullare la mia prenotazione?",
+      "answer": "Puoi presentare una richiesta di annullamento secondo la procedura abituale se il preventivo è stato accettato almeno 15 giorni di calendario prima della data di partenza prevista. Se il preventivo viene accettato meno di 15 giorni di calendario prima di tale data, la prenotazione non può essere annullata nell'ambito di questa procedura abituale. Gli eventuali importi rimborsabili e i costi applicabili dei fornitori terzi sono determinati in base alle condizioni del preventivo accettato. Questa regola è una condizione di prenotazione e non un termine legale generale di recesso per i servizi turistici."
+    },
+    {
+      "question": "Come viene calcolato il termine di 15 giorni?",
+      "answer": "Il termine viene calcolato tra la data in cui il cliente accetta il preventivo e la data di partenza prevista. Il riferimento è la data effettiva di accettazione. Anche le date del viaggio accettate in quel momento restano il riferimento, anche se vengono successivamente modificate di comune accordo."
+    },
+    {
+      "question": "Come posso richiedere un annullamento e ottenere un rimborso?",
+      "answer": "Per richiedere un annullamento, invia un'e-mail a contact@anabo.mg indicando il riferimento del preventivo, il nome del viaggiatore principale e i servizi interessati. Confermeremo la ricezione della richiesta e ti comunicheremo i passaggi da seguire e il calcolo degli eventuali importi rimborsabili, tenendo conto delle condizioni accettate e degli eventuali costi dei fornitori terzi. Se è dovuto un rimborso, il relativo importo e la modalità di pagamento ti saranno confermati per iscritto. Ove possibile, il rimborso sarà effettuato con il metodo di pagamento iniziale entro 30 giorni dall'accordo scritto sull'importo, fatti salvi i tempi di elaborazione degli operatori di pagamento."
+    },
+    {
+      "question": "Che cosa succede in caso di forza maggiore o partenza anticipata?",
+      "answer": "In caso di evento di forza maggiore o di una situazione che impedisca lo svolgimento del viaggio, contattaci il prima possibile. Esamineremo le circostanze, i servizi interessati e le condizioni contrattuali e legali applicabili per cercare una soluzione adeguata. Quando è dovuto un rimborso, non può essere sostituito da un buono senza il tuo consenso. Se invece decidi di interrompere il viaggio prima della data di rientro inizialmente concordata, i giorni non utilizzati non danno diritto a un rimborso."
+    }
+  ],
     "createTrip": "Crea il mio viaggio",
     "details": "Maggiori dettagli",
     "noImage": "Nessuna immagine",
