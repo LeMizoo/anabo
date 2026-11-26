@@ -10,7 +10,7 @@ import type { Locale } from '@/lib/i18n'
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
 import { QuoteReceivedAt } from './QuoteReceivedAt'
-import { involvesNorth, NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
+import { NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
 
 type Props = { block: CustomQuoteBlock; locale: Locale }
 
@@ -34,6 +34,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
   const [reference, setReference] = useState('')
   const [receivedAt, setReceivedAt] = useState<string | null>(null)
   const [nosyBeOption, setNosyBeOption] = useState<NosyBeOption>(NOSY_BE_DEFAULT_OPTION)
+  const [shippingApplicable, setShippingApplicable] = useState(false)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [consecutiveCircuits, setConsecutiveCircuits] = useState(1)
@@ -157,7 +158,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
           vehicleLabel: vehicleTitle,
           consecutiveCircuits,
           vehicleCount,
-          ...(involvesNorth('sur-mesure', regions) ? { nosyBeOption } : {}),
+          ...(shippingApplicable ? { nosyBeOption } : {}),
           message: details,
           website: String(fd.get('website') || ''),
         }),
@@ -366,6 +367,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
                 regions={regions}
                 nosyBeOption={nosyBeOption}
                 onNosyBeOptionChangeAction={setNosyBeOption}
+                onShippingApplicableChangeAction={setShippingApplicable}
                 onVehicleCountChangeAction={setVehicleCount}
                 onEstimateChangeAction={setEstimate}
               />

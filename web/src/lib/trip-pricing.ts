@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import type { RoadCondition, TravelSeason } from '@/generated/prisma/enums'
-import { NORD_CIRCUIT_SLUG, NOSY_BE_FERRY_RETURN_DAYS, type NosyBeOption } from '@/lib/nosy-be-option'
+import type { NosyBeOption } from '@/lib/nosy-be-option'
 
 /**
  * Nouveau moteur tarifaire ANABO.
@@ -87,99 +87,98 @@ export function parseVehicleEstimateSnapshot(
     : null
 }
 
-type EmptyReturnRule = {
-  slug: string
+/** Règle de retour à vide (base de données, ou valeurs de secours ci-dessous). */
+export type EmptyReturnRuleConfig = {
+  id: string
   label: string
   days: number
+  /** Jours si le véhicule est embarqué (ex. Nosy Be) ; null = option non proposée. */
+  ferryDays: number | null
+  circuitSlugs: string[]
   regionValues: string[]
-  fallbackPhrases: string[]
+  keywords: string[]
 }
 
-const EMPTY_RETURN_RULES: EmptyReturnRule[] = [
+/**
+ * Valeurs de secours, identiques aux règles insérées par la migration 0009.
+ * Utilisées uniquement si la table EmptyReturnRule n'existe pas encore.
+ */
+export const DEFAULT_EMPTY_RETURN_RULES: EmptyReturnRuleConfig[] = [
   {
-    slug: 'sud-et-rn7',
-    label: 'Circuit Sud RN7',
+    id: 'er-sud',
+    label: 'Sud – RN7 (Tuléar, Ifaty, Anakao)',
     days: 3,
-    regionValues: [
-      'sud-et-rn7',
-      'madagascar-sud-et-rn7',
-      'circuit-sud-rn7',
-      'rn7',
-    ],
-    fallbackPhrases: [
-      'sud et rn7',
-      'madagascar sud et rn7',
-      'circuit sud rn7',
-    ],
-  },
-  // Circuits qui se terminent dans le Sud (Ifaty / Tuléar, vol retour) :
-  // le véhicule rentre à vide par la RN7, comme pour le circuit Sud RN7.
-  {
-    slug: 'circuit-safari-en-voiture',
-    label: 'Sud – Ifaty (RN7)',
-    days: 3,
-    regionValues: ['circuit-safari-en-voiture'],
-    fallbackPhrases: ['circuit nature et faune', 'wildlife tour', 'tour naturalistico e fauna'],
+    ferryDays: null,
+    circuitSlugs: ['sud-et-rn7', 'circuit-safari-en-voiture', 'birding-tour'],
+    regionValues: ['sud', 'south', 'rn7', 'madagascar-sud-et-rn7', 'circuit-sud-rn7'],
+    keywords: ['sud et rn7', 'madagascar sud et rn7', 'circuit sud rn7', 'circuit nature et faune', 'wildlife tour', 'tour naturalistico e fauna', 'birding tour', 'observation des oiseaux', 'birdwatching in madagascar'],
   },
   {
-    slug: 'birding-tour',
-    label: 'Sud – Tuléar / Anakao (RN7)',
-    days: 3,
-    regionValues: ['birding-tour'],
-    fallbackPhrases: ['birding tour', 'observation des oiseaux', 'birdwatching in madagascar'],
-  },
-  {
-    slug: 'circuit-nord-et-nosibe',
-    label: 'Diego-Suarez',
-    days: 3,
-    regionValues: [
-      'circuit-nord-et-nosibe',
-      'nord-de-madagascar-et-nosy-be',
-      'diego-suarez',
-      'nosy-be',
-      'nosibe',
-    ],
-    fallbackPhrases: [
-      'circuit nord et nosibe',
-      'nord de madagascar et nosy be',
-      'diego suarez',
-      'nosy be',
-    ],
-  },
-  {
-    slug: 'baobab-et-tsingy',
+    id: 'er-morondava',
     label: 'Morondava',
     days: 2,
-    regionValues: [
-      'baobab-et-tsingy',
-      'morondava',
-      'baobab-tsingy',
-    ],
-    fallbackPhrases: [
-      'baobab et tsingy',
-      'morondava',
-    ],
+    ferryDays: null,
+    circuitSlugs: ['baobab-et-tsingy'],
+    regionValues: ['ouest', 'west', 'ovest', 'morondava', 'baobab-tsingy'],
+    keywords: ['baobab et tsingy', 'morondava'],
   },
   {
-    slug: 'cote-est-et-lemuriens',
-    label: 'Tamatave (Toamasina)',
+    id: 'er-diego',
+    label: 'Diego-Suarez (Antsiranana)',
+    days: 3,
+    ferryDays: 5,
+    circuitSlugs: ['circuit-nord-et-nosibe'],
+    regionValues: ['nord', 'north', 'nord-de-madagascar-et-nosy-be', 'diego-suarez', 'nosy-be', 'nosibe'],
+    keywords: ['circuit nord et nosibe', 'nord de madagascar et nosy be', 'diego suarez', 'nosy be'],
+  },
+  {
+    id: 'er-toamasina',
+    label: 'Toamasina (Tamatave)',
     days: 2,
-    regionValues: [
-      'cote-est-et-lemuriens',
-      'cotes-est-et-lemuriens',
-      'tamatave',
-      'toamasina',
-    ],
-    fallbackPhrases: [
-      'cote est et lemuriens',
-      'cotes est et lemuriens',
-      'tamatave',
-      'toamasina',
-    ],
+    ferryDays: null,
+    circuitSlugs: ['cote-est-et-lemuriens'],
+    regionValues: ['est', 'east', 'cotes-est-et-lemuriens', 'tamatave', 'toamasina'],
+    keywords: ['cote est et lemuriens', 'cotes est et lemuriens', 'tamatave', 'toamasina'],
   },
 ]
 
-function normalizeSlug(value: string): string {
+export const splitList = (value: string | null | undefined) =>
+  (value || '')
+    .split(/[,\n;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+
+/**
+ * Règles actives, lues dans Admin > Prix et véhicules > Retours à vide.
+ * Repli sur les valeurs de secours si la table n'existe pas encore (migration 0009 non exécutée).
+ */
+let fallbackWarned = false
+
+export async function getEmptyReturnRules(): Promise<EmptyReturnRuleConfig[]> {
+  try {
+    const rows = await prisma.emptyReturnRule.findMany({
+      where: { active: true },
+      orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
+    })
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.label,
+      days: row.days,
+      ferryDays: row.ferryDays ?? null,
+      circuitSlugs: splitList(row.circuitSlugs).map(normalizeSlug),
+      regionValues: splitList(row.regionValues).map(normalizeSlug),
+      keywords: splitList(row.keywords).map(normalizePhrase),
+    }))
+  } catch {
+    if (!fallbackWarned) {
+      fallbackWarned = true
+      console.warn('[trip-pricing] Table EmptyReturnRule absente (migration 0009) : règles de retour à vide par défaut utilisées.')
+    }
+    return DEFAULT_EMPTY_RETURN_RULES
+  }
+}
+
+export function normalizeSlug(value: string): string {
   return value
     .toLowerCase()
     .normalize('NFD')
@@ -198,111 +197,74 @@ function normalizePhrase(value: string): string {
 }
 
 /**
- * Détermine les jours de retour à vide vers Antananarivo en priorité à partir
- * des identifiants stables (circuitSlug, puis valeurs de regions), avec repli
- * uniquement sur des expressions normalisées explicites.
+ * Détermine les jours de retour à vide vers Antananarivo :
+ * 1. circuit choisi (identifiant stable) ;
+ * 2. régions du voyage sur mesure ou circuits passés en régions ;
+ * 3. à défaut, mots-clés reconnus dans le titre ou la destination.
+ * Si plusieurs règles correspondent, la plus longue s'applique.
+ * Option « véhicule embarqué » : jours dédiés de la règle, transport du véhicule en sus.
  */
-export function resolveEmptyReturnDays(input?: {
-  destination?: string | null
-  circuitSlug?: string | null
-  circuitTitle?: string | null
-  regions?: string[] | null
-  nosyBeOption?: NosyBeOption | null
-}): {
+export function resolveEmptyReturnDays(
+  input?: {
+    destination?: string | null
+    circuitSlug?: string | null
+    circuitTitle?: string | null
+    regions?: string[] | null
+    nosyBeOption?: NosyBeOption | null
+  },
+  rules: EmptyReturnRuleConfig[] = DEFAULT_EMPTY_RETURN_RULES,
+): {
   destinationLabel: string | null
   matchedSlug: string | null
   returnDays: number
   nosyBeOption: NosyBeOption | null
   vehicleFerryNotIncluded: boolean
 } {
-  let bestRule: EmptyReturnRule | null = null
-
-  const considerRule = (rule: EmptyReturnRule) => {
-    if (!bestRule || rule.days > bestRule.days) {
-      bestRule = rule
-    }
+  let best: EmptyReturnRuleConfig | null = null
+  const consider = (rule: EmptyReturnRuleConfig) => {
+    if (!best || rule.days > best.days) best = rule
   }
 
-  // 1. Priorité absolue : identifiant stable du circuit (slug)
-  const rawSlug = input?.circuitSlug ? normalizeSlug(input.circuitSlug) : ''
-  if (rawSlug) {
-    const bySlug = EMPTY_RETURN_RULES.find((r) => r.slug === rawSlug)
-    if (bySlug) {
-      considerRule(bySlug)
-    }
+  const slug = input?.circuitSlug ? normalizeSlug(input.circuitSlug) : ''
+  if (slug) for (const rule of rules) if (rule.circuitSlugs.includes(slug)) consider(rule)
+
+  const regionSlugs = Array.isArray(input?.regions) ? input.regions.map(normalizeSlug).filter(Boolean) : []
+  for (const region of regionSlugs) {
+    for (const rule of rules) if (rule.circuitSlugs.includes(region) || rule.regionValues.includes(region)) consider(rule)
   }
 
-  // 2. Deuxième priorité : identifiants/valeurs des régions sélectionnées
-  const regionSlugs = Array.isArray(input?.regions)
-    ? input.regions.map(normalizeSlug).filter(Boolean)
-    : []
-
-  for (const regionSlug of regionSlugs) {
-    const byRegion = EMPTY_RETURN_RULES.find(
-      (r) => r.slug === regionSlug || r.regionValues.includes(regionSlug),
-    )
-    if (byRegion) {
-      considerRule(byRegion)
-    }
+  if (!best) {
+    const phrases = [input?.circuitTitle || '', input?.destination || ''].map(normalizePhrase).filter(Boolean)
+    for (const phrase of phrases) for (const rule of rules) if (rule.keywords.some((k) => k && phrase.includes(k))) consider(rule)
   }
 
-  // 3. Repli uniquement si aucun identifiant stable n'a matché : expressions explicites
-  if (!bestRule) {
-    const fallbackTexts = [
-      input?.circuitTitle || '',
-      input?.destination || '',
-    ]
-      .map(normalizePhrase)
-      .filter(Boolean)
-
-    for (const phrase of fallbackTexts) {
-      for (const rule of EMPTY_RETURN_RULES) {
-        if (rule.fallbackPhrases.some((target) => phrase.includes(target))) {
-          considerRule(rule)
-        }
-      }
-    }
+  if (!best) {
+    return { destinationLabel: null, matchedSlug: null, returnDays: 0, nosyBeOption: null, vehicleFerryNotIncluded: false }
   }
 
-  if (!bestRule) {
-    return {
-      destinationLabel: null,
-      matchedSlug: null,
-      returnDays: 0,
-      nosyBeOption: null,
-      vehicleFerryNotIncluded: false,
-    }
-  }
-
-  const resolvedRule = bestRule as EmptyReturnRule
-
-  // Nord et Nosy Be, formule « véhicule embarqué » : retour à vide de 5 jours,
-  // transport du véhicule en bac (Nosy Be ↔ Ankify) facturé en sus au client.
-  if (resolvedRule.slug === NORD_CIRCUIT_SLUG) {
+  const rule = best as EmptyReturnRuleConfig
+  const matchedSlug = rule.circuitSlugs[0] || rule.id
+  if (rule.ferryDays !== null) {
     if (input?.nosyBeOption === 'ferry') {
       return {
-        destinationLabel: 'Nosy Be – véhicule embarqué (bac Nosy Be ↔ Ankify en sus)',
-        matchedSlug: resolvedRule.slug,
-        returnDays: NOSY_BE_FERRY_RETURN_DAYS,
+        destinationLabel: `${rule.label} – véhicule embarqué (transport du véhicule en sus)`,
+        matchedSlug,
+        returnDays: rule.ferryDays,
         nosyBeOption: 'ferry',
         vehicleFerryNotIncluded: true,
       }
     }
-    return {
-      destinationLabel: resolvedRule.label,
-      matchedSlug: resolvedRule.slug,
-      returnDays: resolvedRule.days,
-      nosyBeOption: 'diego',
-      vehicleFerryNotIncluded: false,
-    }
+    return { destinationLabel: rule.label, matchedSlug, returnDays: rule.days, nosyBeOption: 'diego', vehicleFerryNotIncluded: false }
   }
+  return { destinationLabel: rule.label, matchedSlug, returnDays: rule.days, nosyBeOption: null, vehicleFerryNotIncluded: false }
+}
 
+/** Informations publiques : où proposer l'option « véhicule embarqué » (aucun prix). */
+export async function getVehicleShippingContext(): Promise<{ circuitSlugs: string[]; regionValues: string[] }> {
+  const rules = (await getEmptyReturnRules()).filter((rule) => rule.ferryDays !== null)
   return {
-    destinationLabel: resolvedRule.label,
-    matchedSlug: resolvedRule.slug,
-    returnDays: resolvedRule.days,
-    nosyBeOption: null,
-    vehicleFerryNotIncluded: false,
+    circuitSlugs: [...new Set(rules.flatMap((rule) => rule.circuitSlugs))],
+    regionValues: [...new Set(rules.flatMap((rule) => rule.regionValues))],
   }
 }
 
@@ -465,13 +427,16 @@ export async function calculateTripVehiclePrice(input: {
     return null
   }
 
-  const returnInfo = resolveEmptyReturnDays({
-    destination: input.destination,
-    circuitSlug: input.circuitSlug,
-    circuitTitle: input.circuitTitle,
-    regions: input.regions,
-    nosyBeOption: input.nosyBeOption,
-  })
+  const returnInfo = resolveEmptyReturnDays(
+    {
+      destination: input.destination,
+      circuitSlug: input.circuitSlug,
+      circuitTitle: input.circuitTitle,
+      regions: input.regions,
+      nosyBeOption: input.nosyBeOption,
+    },
+    await getEmptyReturnRules(),
+  )
 
   const vehicleCost = input.days * vehicle.pricePerDay * input.vehicleCount
   const driverCost = input.days * DRIVER_DAILY_RATE_EUR * input.vehicleCount

@@ -26,8 +26,14 @@ const slugify = (v: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-/** Le voyage passe-t-il par le Nord / Nosy Be (circuit choisi ou régions du sur-mesure) ? */
-export function involvesNorth(circuitSlug?: string | null, regions?: string[] | null): boolean {
+export type VehicleShippingContext = { circuitSlugs: string[]; regionValues: string[] }
+
+/**
+ * Le voyage est-il concerné par l'option « véhicule embarqué » ?
+ * Le contexte vient des règles de retour à vide (Admin > Prix) ; à défaut, circuit Nord.
+ */
+export function involvesNorth(circuitSlug?: string | null, regions?: string[] | null, context?: VehicleShippingContext | null): boolean {
   const values = [circuitSlug || '', ...(regions || [])].map(slugify).filter(Boolean)
-  return values.some((v) => NORD_VALUES.includes(v))
+  const allowed = context ? [...context.circuitSlugs, ...context.regionValues] : NORD_VALUES
+  return values.some((v) => allowed.includes(v))
 }

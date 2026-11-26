@@ -1,8 +1,8 @@
 'use server'
 
-import { calculateTripVehiclePrice, getPublicVehicleTypes } from '@/lib/trip-pricing'
+import { calculateTripVehiclePrice, getPublicVehicleTypes, getVehicleShippingContext } from '@/lib/trip-pricing'
 import { getPaymentSettings } from '@/lib/payment-settings'
-import { isNosyBeOption, type NosyBeOption } from '@/lib/nosy-be-option'
+import { isNosyBeOption, type NosyBeOption, type VehicleShippingContext } from '@/lib/nosy-be-option'
 
 type CalculateTripVehiclePriceInput = {
   vehicleCode: string
@@ -104,4 +104,12 @@ export async function listPublicVehiclesAction(): Promise<PublicVehicleOption[]>
 export async function getPublicDepositInfoAction(): Promise<{ percent: number; method: string }> {
   const s = await getPaymentSettings()
   return { percent: s.depositPercent, method: s.method }
+}
+/** Où proposer l'option « véhicule embarqué » (d'après les règles de retour à vide, sans aucun prix). */
+export async function getVehicleShippingContextAction(): Promise<VehicleShippingContext> {
+  try {
+    return await getVehicleShippingContext()
+  } catch {
+    return { circuitSlugs: [], regionValues: [] }
+  }
 }

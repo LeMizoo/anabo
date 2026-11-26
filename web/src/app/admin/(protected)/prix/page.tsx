@@ -5,9 +5,12 @@ import { prisma } from '@/lib/prisma'
 import { sanityClient } from '@/lib/sanity'
 import {
   deactivateVehicleType,
+  deleteEmptyReturnRule,
   saveCircuitDurations,
+  saveEmptyReturnRule,
   saveVehicleType,
 } from './actions'
+import { DEFAULT_EMPTY_RETURN_RULES, splitList } from '@/lib/trip-pricing'
 
 export const dynamic = 'force-dynamic'
 
@@ -111,6 +114,34 @@ export default async function PricingPage() {
   const circuits = [...circuitMap.values()].sort((a, b) =>
     a.title.localeCompare(b.title),
   )
+
+  // ---------- Retours à vide ----------
+  type RuleRow = { id: string; label: string; days: number; ferryDays: number | null; circuitSlugs: string; regionValues: string; keywords: string | null; active: boolean; sortOrder: number }
+  let emptyReturnRules: RuleRow[] | null = null
+  try {
+    emptyReturnRules = await prisma.emptyReturnRule.findMany({ orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }] })
+  } catch {
+    emptyReturnRules = null // table absente : migration 0009 à exécuter
+  }
+
+  // Régions proposées dans le formulaire « voyage sur mesure » (valeurs par langue).
+  const regionOptions = new Map<string, string[]>()
+  try {
+    const trips = await sanityClient.fetch<{ language?: string; regions?: { value?: string; title?: string }[] }[]>(
+      `*[_type == "page" && pageType == "custom-trip" && !(_id in path("drafts.**"))]{ language, "regions": modules[_type == "customQuoteBlock"][0].regions[]{ value, title } }`,
+    )
+    for (const trip of trips) {
+      for (const r of trip.regions || []) {
+        if (!r.value) continue
+        const list = regionOptions.get(r.value) || []
+        list.push(`${(trip.language || '').toUpperCase()} : ${r.title || r.value}`)
+        regionOptions.set(r.value, list)
+      }
+    }
+  } catch (error) {
+    console.error('[admin/prix] Régions du sur-mesure indisponibles :', error)
+  }
+  const circuitOptions = circuits.filter((c) => c.slug !== 'sur-mesure')
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
@@ -510,6 +541,129 @@ export default async function PricingPage() {
                 </form>
               </article>
             ))}
+          </div>
+        )}
+      </section>
+
+      {/* SECTION 3 : RETOURS À VIDE */}
+      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" id="retours-a-vide">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900">3. Retours à vide</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Quand un voyage se termine hors d’Antananarivo, le client prend en charge les jours de retour du véhicule et du
+            chauffeur (location + indemnité chauffeur). Une règle s’applique au circuit choisi, aux régions cochées dans le
+            voyage sur mesure ou, à défaut, aux mots-clés reconnus. Si plusieurs règles correspondent, la plus longue
+            s’applique.
+          </p>
+        </div>
+
+        {emptyReturnRules === null ? (
+          <div className="space-y-3 rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
+            <p>
+              <strong>Migration à exécuter :</strong> la table des retours à vide n’existe pas encore. Exécutez{' '}
+              <code>prisma/deploy/0009_empty_return_rules_phpmyadmin.sql</code> dans phpMyAdmin. En attendant, le site
+              applique les règles par défaut ci-dessous.
+            </p>
+            <ul className="list-disc pl-5">
+              {DEFAULT_EMPTY_RETURN_RULES.map((r) => (
+                <li key={r.id}>
+                  {r.label} : {r.days} j{r.ferryDays !== null ? ` (véhicule embarqué : ${r.ferryDays} j)` : ''} —{' '}
+                  {r.circuitSlugs.join(', ')} · régions : {r.regionValues.join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {[...emptyReturnRules, null].map((rule) => {
+              const ruleCircuits = splitList(rule?.circuitSlugs)
+              const ruleRegions = splitList(rule?.regionValues)
+              const extraCircuits = ruleCircuits.filter((c) => !circuitOptions.some((o) => o.slug === c))
+              const extraRegions = ruleRegions.filter((r) => !regionOptions.has(r))
+              return (
+                <article
+                  key={rule?.id || 'new'}
+                  className={`rounded-xl border p-5 ${rule ? (rule.active ? 'border-gray-200' : 'border-gray-200 bg-gray-50 opacity-80') : 'border-dashed border-blue-300 bg-blue-50/40'}`}
+                >
+                  <form action={saveEmptyReturnRule} className="space-y-4">
+                    {rule && <input type="hidden" name="id" value={rule.id} />}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="font-semibold text-gray-900">{rule ? rule.label : 'Ajouter une règle'}</h3>
+                      <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="active" defaultChecked={rule ? rule.active : true} className="h-4 w-4" /> Active
+                      </label>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-4">
+                      <label className="text-sm font-medium text-gray-700 sm:col-span-2">
+                        Nom (fin du voyage)
+                        <input name="label" required maxLength={120} defaultValue={rule?.label || ''} placeholder="Ex. Sud – RN7 (Tuléar)" className={input} />
+                      </label>
+                      <label className="text-sm font-medium text-gray-700">
+                        Jours de retour à vide
+                        <input name="days" type="number" min={0} max={60} required defaultValue={rule?.days ?? ''} className={input} />
+                      </label>
+                      <label className="text-sm font-medium text-gray-700">
+                        Jours si véhicule embarqué
+                        <input name="ferryDays" type="number" min={0} max={60} defaultValue={rule?.ferryDays ?? ''} placeholder="Vide = non proposé" className={input} />
+                      </label>
+                    </div>
+
+                    <fieldset>
+                      <legend className="text-sm font-medium text-gray-700">Circuits concernés</legend>
+                      <div className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+                        {circuitOptions.map((c) => (
+                          <label key={c.slug} className="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <input type="checkbox" name="circuitSlugs" value={c.slug} defaultChecked={ruleCircuits.includes(c.slug)} className="h-4 w-4" />
+                            <span>{c.title}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <input name="circuitSlugsExtra" defaultValue={extraCircuits.join(', ')} placeholder="Autres identifiants de circuit (séparés par des virgules)" className={input} />
+                    </fieldset>
+
+                    <fieldset>
+                      <legend className="text-sm font-medium text-gray-700">Régions du voyage sur mesure</legend>
+                      <div className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+                        {[...regionOptions.entries()].map(([value, labels]) => (
+                          <label key={value} className="inline-flex items-start gap-2 text-sm text-gray-700" title={labels.join(' · ')}>
+                            <input type="checkbox" name="regionValues" value={value} defaultChecked={ruleRegions.includes(value)} className="mt-0.5 h-4 w-4" />
+                            <span>
+                              <code className="text-xs">{value}</code> <span className="text-xs text-gray-500">{labels.join(' · ')}</span>
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                      <input name="regionValuesExtra" defaultValue={extraRegions.join(', ')} placeholder="Autres valeurs reconnues (séparées par des virgules)" className={input} />
+                    </fieldset>
+
+                    <div className="grid gap-4 sm:grid-cols-4">
+                      <label className="text-sm font-medium text-gray-700 sm:col-span-3">
+                        Mots-clés de secours (titre ou destination, séparés par des virgules)
+                        <input name="keywords" defaultValue={rule?.keywords || ''} className={input} />
+                      </label>
+                      <label className="text-sm font-medium text-gray-700">
+                        Ordre d’affichage
+                        <input name="sortOrder" type="number" min={0} max={999} defaultValue={rule?.sortOrder ?? ''} className={input} />
+                      </label>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                      <button className={button}>{rule ? 'Enregistrer la règle' : 'Ajouter la règle'}</button>
+                    </div>
+                  </form>
+                  {rule && (
+                    <form action={deleteEmptyReturnRule} className="mt-2 text-right">
+                      <input type="hidden" name="id" value={rule.id} />
+                      <button className="text-xs font-medium text-red-700 hover:underline">Supprimer cette règle</button>
+                    </form>
+                  )}
+                </article>
+              )
+            })}
+            <p className="text-xs text-gray-500">
+              Pensez à mettre à jour la FAQ (« Que sont les jours de retour à vide ? ») dans Sanity si vous modifiez ces règles.
+            </p>
           </div>
         )}
       </section>

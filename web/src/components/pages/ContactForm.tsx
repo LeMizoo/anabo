@@ -10,7 +10,7 @@ import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/ty
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
 import { QuoteReceivedAt } from './QuoteReceivedAt'
-import { involvesNorth, NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
+import { NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
 
 type Circuit = {
   slug: string
@@ -149,6 +149,7 @@ export function ContactForm({
   const [reference, setReference] = useState('')
   const [receivedAt, setReceivedAt] = useState<string | null>(null)
   const [nosyBeOption, setNosyBeOption] = useState<NosyBeOption>(NOSY_BE_DEFAULT_OPTION)
+  const [shippingApplicable, setShippingApplicable] = useState(false)
   const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitSlug)
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
   const [startDate, setStartDate] = useState('')
@@ -369,7 +370,7 @@ export function ContactForm({
       message: String(form.get('message') || '').trim(),
       website: String(form.get('website') || ''),
       ...(isQuote && vehicleCode ? { vehicleCode, vehicleLabel, vehicleCount } : {}),
-      ...(isQuote && involvesNorth(circuitSlug) ? { nosyBeOption } : {}),
+      ...(isQuote && shippingApplicable ? { nosyBeOption } : {}),
     }
 
     try {
@@ -731,6 +732,7 @@ export function ContactForm({
               circuitTitle={activeCircuitTitle || null}
               nosyBeOption={nosyBeOption}
               onNosyBeOptionChangeAction={setNosyBeOption}
+              onShippingApplicableChangeAction={setShippingApplicable}
               onVehicleChangeAction={(code, label) => {
                 setVehicleCode(code)
                 setVehicleLabel(label)

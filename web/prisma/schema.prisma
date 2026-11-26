@@ -142,6 +142,25 @@ model VehicleType {
 }
 
 // Durées configurées pour chaque circuit, saison et état des routes
+// Règles de retour à vide vers Antananarivo, paramétrables dans Admin > Prix et véhicules.
+// Listes stockées en texte, valeurs séparées par des virgules.
+model EmptyReturnRule {
+  id           String   @id @default(cuid()) @db.VarChar(30)
+  label        String   @db.VarChar(120)
+  days         Int
+  /// Jours si le véhicule est embarqué (ex. vers Nosy Be) ; vide = option non proposée.
+  ferryDays    Int?
+  circuitSlugs String   @db.Text
+  regionValues String   @db.Text
+  keywords     String?  @db.Text
+  active       Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([active, sortOrder])
+}
+
 model CircuitDuration {
   id            String        @id @default(cuid()) @db.VarChar(30)
   circuitSlug   String        @db.VarChar(191)

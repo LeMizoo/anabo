@@ -162,6 +162,79 @@ export async function saveCircuitDurations(formData: FormData) {
 }
 
 // ======================================================
+// RETOURS À VIDE (paramétrables)
+// ======================================================
+
+const slugifyValue = (v: string) =>
+  v
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+function readList(formData: FormData, checkboxKey: string, extraKey: string, mode: 'slug' | 'phrase') {
+  const values = [
+    ...formData.getAll(checkboxKey).map(String),
+    ...String(formData.get(extraKey) || '').split(/[,\n;]+/),
+  ]
+    .map((v) => v.trim())
+    .filter(Boolean)
+    .map((v) => (mode === 'slug' ? slugifyValue(v) : v.toLowerCase().slice(0, 120)))
+    .filter(Boolean)
+  return [...new Set(values)].slice(0, 100)
+}
+
+function readDays(raw: string, label: string, optional = false) {
+  if (!raw) {
+    if (optional) return null
+    throw new Error(`${label} : valeur obligatoire.`)
+  }
+  const n = Number(raw)
+  if (!Number.isSafeInteger(n) || n < 0 || n > 60) throw new Error(`${label} invalide (0 à 60 jours).`)
+  return n
+}
+
+export async function saveEmptyReturnRule(formData: FormData) {
+  await requireSuperAdmin()
+  const id = readText(formData, 'id')
+  const label = readText(formData, 'label').slice(0, 120)
+  if (!label) throw new Error('Nom de la règle obligatoire.')
+  const days = readDays(readText(formData, 'days'), 'Jours de retour à vide') as number
+  const ferryDays = readDays(readText(formData, 'ferryDays'), 'Jours si véhicule embarqué', true)
+  const circuitSlugs = readList(formData, 'circuitSlugs', 'circuitSlugsExtra', 'slug')
+  const regionValues = readList(formData, 'regionValues', 'regionValuesExtra', 'slug')
+  const keywords = readList(formData, 'keywordsList', 'keywords', 'phrase')
+  const sortOrderRaw = readText(formData, 'sortOrder')
+  const sortOrder = sortOrderRaw ? Math.max(0, Math.min(999, Math.trunc(Number(sortOrderRaw)) || 0)) : 0
+  const active = formData.get('active') === 'on'
+  if (!circuitSlugs.length && !regionValues.length && !keywords.length) {
+    throw new Error('Choisissez au moins un circuit, une région ou un mot-clé.')
+  }
+  const data = {
+    label,
+    days,
+    ferryDays,
+    circuitSlugs: circuitSlugs.join(','),
+    regionValues: regionValues.join(','),
+    keywords: keywords.length ? keywords.join(',') : null,
+    active,
+    sortOrder,
+  }
+  if (id) await prisma.emptyReturnRule.update({ where: { id }, data })
+  else await prisma.emptyReturnRule.create({ data })
+  revalidatePath('/admin/prix')
+}
+
+export async function deleteEmptyReturnRule(formData: FormData) {
+  await requireSuperAdmin()
+  const id = readText(formData, 'id')
+  if (!id) throw new Error('Règle introuvable.')
+  await prisma.emptyReturnRule.delete({ where: { id } })
+  revalidatePath('/admin/prix')
+}
+
+// ======================================================
 // ANCIENNES ACTIONS CONSERVÉES POUR COMPATIBILITÉ
 // ======================================================
 

@@ -6,10 +6,11 @@ import { Car, Fuel, Info, Loader2 } from 'lucide-react'
 import {
   calculateTripVehiclePriceAction,
   getPublicDepositInfoAction,
+  getVehicleShippingContextAction,
   listPublicVehiclesAction,
   type PublicVehicleOption,
 } from '@/lib/trip-pricing-actions'
-import { involvesNorth, NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
+import { involvesNorth, NOSY_BE_DEFAULT_OPTION, type NosyBeOption, type VehicleShippingContext } from '@/lib/nosy-be-option'
 
 export type QuoteEstimate = {
   totalMin: number
@@ -42,6 +43,8 @@ type Props = {
   regions?: string[] | null
   nosyBeOption?: NosyBeOption
   onNosyBeOptionChangeAction?: (option: NosyBeOption) => void
+  /** Signale au formulaire si l'option « véhicule embarqué » s'applique au voyage. */
+  onShippingApplicableChangeAction?: (applicable: boolean) => void
   onVehicleChangeAction?: (code: string, label: string) => void
   onVehicleCountChangeAction?: (count: number) => void
   onEstimateChangeAction?: (estimate: QuoteEstimate | null) => void
@@ -85,6 +88,7 @@ export function QuoteEstimatePanel({
   regions = null,
   nosyBeOption = NOSY_BE_DEFAULT_OPTION,
   onNosyBeOptionChangeAction,
+  onShippingApplicableChangeAction,
   onVehicleChangeAction,
   onVehicleCountChangeAction,
   onEstimateChangeAction,
@@ -99,7 +103,8 @@ export function QuoteEstimatePanel({
   const [estimate, setEstimate] = useState<QuoteEstimate | null>(null)
 
   const regionsKey = Array.isArray(regions) ? regions.join('|') : ''
-  const north = involvesNorth(circuitSlug, regions)
+  const [shippingContext, setShippingContext] = useState<VehicleShippingContext | null>(null)
+  const north = involvesNorth(circuitSlug, regions, shippingContext)
   const effectiveNosyBe: NosyBeOption | null = north ? nosyBeOption : null
 
   useEffect(() => {
@@ -110,10 +115,18 @@ export function QuoteEstimatePanel({
     void getPublicDepositInfoAction().then((info) => {
       if (active) setDepositInfo(info)
     })
+    void getVehicleShippingContextAction().then((context) => {
+      if (active) setShippingContext(context)
+    })
     return () => {
       active = false
     }
   }, [])
+
+  useEffect(() => {
+    onShippingApplicableChangeAction?.(north)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [north])
 
   useEffect(() => {
     let active = true
