@@ -10,6 +10,7 @@ import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/ty
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
 import { QuoteReceivedAt } from './QuoteReceivedAt'
+import { involvesNorth, NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
 
 type Circuit = {
   slug: string
@@ -147,6 +148,7 @@ export function ContactForm({
   const [error, setError] = useState('')
   const [reference, setReference] = useState('')
   const [receivedAt, setReceivedAt] = useState<string | null>(null)
+  const [nosyBeOption, setNosyBeOption] = useState<NosyBeOption>(NOSY_BE_DEFAULT_OPTION)
   const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitSlug)
   const [extraCircuits, setExtraCircuits] = useState<string[]>([])
   const [startDate, setStartDate] = useState('')
@@ -367,6 +369,7 @@ export function ContactForm({
       message: String(form.get('message') || '').trim(),
       website: String(form.get('website') || ''),
       ...(isQuote && vehicleCode ? { vehicleCode, vehicleLabel, vehicleCount } : {}),
+      ...(isQuote && involvesNorth(circuitSlug) ? { nosyBeOption } : {}),
     }
 
     try {
@@ -726,6 +729,8 @@ export function ContactForm({
               vehicleCount={vehicleCount}
               circuitSlug={selectedCircuit || null}
               circuitTitle={activeCircuitTitle || null}
+              nosyBeOption={nosyBeOption}
+              onNosyBeOptionChangeAction={setNosyBeOption}
               onVehicleChangeAction={(code, label) => {
                 setVehicleCode(code)
                 setVehicleLabel(label)

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import type { RoadCondition, TravelSeason } from '@/generated/prisma/enums'
+import { NORD_CIRCUIT_SLUG, NOSY_BE_FERRY_RETURN_DAYS, type NosyBeOption } from '@/lib/nosy-be-option'
 
 /**
  * Nouveau moteur tarifaire ANABO.
@@ -34,6 +35,10 @@ export type EmptyReturnBreakdown = {
   destinationLabel: string | null
   matchedSlug: string | null
   returnDays: number
+  /** Nord et Nosy Be : formule choisie (véhicule embarqué ou standard). */
+  nosyBeOption?: NosyBeOption | null
+  /** Véhicule embarqué en bac vers Nosy Be : transport à la charge du client, non inclus. */
+  vehicleFerryNotIncluded?: boolean
   vehicleCost: number
   driverCost: number
   total: number
@@ -202,10 +207,13 @@ export function resolveEmptyReturnDays(input?: {
   circuitSlug?: string | null
   circuitTitle?: string | null
   regions?: string[] | null
+  nosyBeOption?: NosyBeOption | null
 }): {
   destinationLabel: string | null
   matchedSlug: string | null
   returnDays: number
+  nosyBeOption: NosyBeOption | null
+  vehicleFerryNotIncluded: boolean
 } {
   let bestRule: EmptyReturnRule | null = null
 
@@ -261,15 +269,40 @@ export function resolveEmptyReturnDays(input?: {
       destinationLabel: null,
       matchedSlug: null,
       returnDays: 0,
+      nosyBeOption: null,
+      vehicleFerryNotIncluded: false,
     }
   }
 
   const resolvedRule = bestRule as EmptyReturnRule
 
+  // Nord et Nosy Be, formule « véhicule embarqué » : retour à vide de 5 jours,
+  // transport du véhicule en bac (Nosy Be ↔ Ankify) facturé en sus au client.
+  if (resolvedRule.slug === NORD_CIRCUIT_SLUG) {
+    if (input?.nosyBeOption === 'ferry') {
+      return {
+        destinationLabel: 'Nosy Be – véhicule embarqué (bac Nosy Be ↔ Ankify en sus)',
+        matchedSlug: resolvedRule.slug,
+        returnDays: NOSY_BE_FERRY_RETURN_DAYS,
+        nosyBeOption: 'ferry',
+        vehicleFerryNotIncluded: true,
+      }
+    }
+    return {
+      destinationLabel: resolvedRule.label,
+      matchedSlug: resolvedRule.slug,
+      returnDays: resolvedRule.days,
+      nosyBeOption: 'diego',
+      vehicleFerryNotIncluded: false,
+    }
+  }
+
   return {
     destinationLabel: resolvedRule.label,
     matchedSlug: resolvedRule.slug,
     returnDays: resolvedRule.days,
+    nosyBeOption: null,
+    vehicleFerryNotIncluded: false,
   }
 }
 
@@ -392,6 +425,7 @@ export async function calculateTripVehiclePrice(input: {
   circuitSlug?: string | null
   circuitTitle?: string | null
   regions?: string[] | null
+  nosyBeOption?: NosyBeOption | null
 }): Promise<TripVehiclePriceSnapshot | null> {
   const vehicleCode = input.vehicleCode.trim().toLowerCase()
 
@@ -436,6 +470,7 @@ export async function calculateTripVehiclePrice(input: {
     circuitSlug: input.circuitSlug,
     circuitTitle: input.circuitTitle,
     regions: input.regions,
+    nosyBeOption: input.nosyBeOption,
   })
 
   const vehicleCost = input.days * vehicle.pricePerDay * input.vehicleCount
@@ -477,6 +512,8 @@ export async function calculateTripVehiclePrice(input: {
       destinationLabel: returnInfo.destinationLabel,
       matchedSlug: returnInfo.matchedSlug,
       returnDays: returnInfo.returnDays,
+      nosyBeOption: returnInfo.nosyBeOption,
+      vehicleFerryNotIncluded: returnInfo.vehicleFerryNotIncluded,
       vehicleCost: returnVehicleCost,
       driverCost: returnDriverCost,
       total: returnTotal,

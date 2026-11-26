@@ -9,6 +9,7 @@ import {
   listPublicVehiclesAction,
   type PublicVehicleOption,
 } from '@/lib/trip-pricing-actions'
+import { involvesNorth, NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
 
 export type QuoteEstimate = {
   totalMin: number
@@ -21,6 +22,9 @@ export type QuoteEstimate = {
   indicativeOnly: boolean
   days: number | null
   vehicleName: string | null
+  /** Nord et Nosy Be : formule retenue et frais de bac du véhicule en sus. */
+  nosyBeOption: NosyBeOption | null
+  vehicleFerryNotIncluded: boolean
 }
 
 type Props = {
@@ -36,6 +40,8 @@ type Props = {
   circuitSlug?: string | null
   circuitTitle?: string | null
   regions?: string[] | null
+  nosyBeOption?: NosyBeOption
+  onNosyBeOptionChangeAction?: (option: NosyBeOption) => void
   onVehicleChangeAction?: (code: string, label: string) => void
   onVehicleCountChangeAction?: (count: number) => void
   onEstimateChangeAction?: (estimate: QuoteEstimate | null) => void
@@ -77,6 +83,8 @@ export function QuoteEstimatePanel({
   circuitSlug = null,
   circuitTitle = null,
   regions = null,
+  nosyBeOption = NOSY_BE_DEFAULT_OPTION,
+  onNosyBeOptionChangeAction,
   onVehicleChangeAction,
   onVehicleCountChangeAction,
   onEstimateChangeAction,
@@ -91,6 +99,8 @@ export function QuoteEstimatePanel({
   const [estimate, setEstimate] = useState<QuoteEstimate | null>(null)
 
   const regionsKey = Array.isArray(regions) ? regions.join('|') : ''
+  const north = involvesNorth(circuitSlug, regions)
+  const effectiveNosyBe: NosyBeOption | null = north ? nosyBeOption : null
 
   useEffect(() => {
     let active = true
@@ -133,6 +143,7 @@ export function QuoteEstimatePanel({
         circuitSlug,
         circuitTitle,
         regions: normalizedRegions,
+        nosyBeOption: effectiveNosyBe,
       })
 
     const hasExactDays = typeof days === 'number' && Number.isInteger(days) && days >= 1
@@ -175,6 +186,8 @@ export function QuoteEstimatePanel({
             indicativeOnly: res.indicativeOnly,
             days: res.days,
             vehicleName: res.vehicleName,
+            nosyBeOption: effectiveNosyBe,
+            vehicleFerryNotIncluded: res.vehicleFerryNotIncluded,
           })
           return
         }
@@ -201,6 +214,8 @@ export function QuoteEstimatePanel({
           indicativeOnly: low.indicativeOnly || high.indicativeOnly,
           days: null,
           vehicleName: low.vehicleName,
+          nosyBeOption: effectiveNosyBe,
+          vehicleFerryNotIncluded: low.vehicleFerryNotIncluded || high.vehicleFerryNotIncluded,
         })
       } catch {
         if (!active) return
@@ -224,6 +239,7 @@ export function QuoteEstimatePanel({
     circuitSlug,
     circuitTitle,
     regionsKey,
+    effectiveNosyBe,
     depositInfo.percent,
     depositInfo.method,
   ])
@@ -301,6 +317,30 @@ export function QuoteEstimatePanel({
         )}
       </div>
 
+      {north && onNosyBeOptionChangeAction && (
+        <fieldset className="rounded-xl border border-[#06245F]/10 bg-white p-4" data-testid="nosy-be-option">
+          <legend className="px-1 text-sm font-semibold text-[#06245F]">{t('nosyBeTitle')}</legend>
+          <div className="mt-2 space-y-3">
+            {(['diego', 'ferry'] as const).map((option) => (
+              <label key={option} className="flex cursor-pointer items-start gap-3 text-sm">
+                <input
+                  type="radio"
+                  name="nosyBeOption"
+                  value={option}
+                  checked={nosyBeOption === option}
+                  onChange={() => onNosyBeOptionChangeAction(option)}
+                  className="mt-1 h-4 w-4 text-[#06245F]"
+                />
+                <span>
+                  <span className="block font-medium text-gray-900">{t(option === 'ferry' ? 'nosyBeFerry' : 'nosyBeStandard')}</span>
+                  <span className="block text-xs leading-5 text-slate-600">{t(option === 'ferry' ? 'nosyBeFerryHelp' : 'nosyBeStandardHelp')}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
       {status === 'idle' && !vehicleCode && (
         <p className="text-sm text-slate-600">{t('needVehicle')}</p>
       )}
@@ -338,6 +378,9 @@ export function QuoteEstimatePanel({
           )}
 
           <p className="pt-1 text-xs text-slate-500">{t('includes')}</p>
+          {estimate.vehicleFerryNotIncluded && (
+            <p className="text-xs font-medium text-amber-800">{t('nosyBeFerryFees')}</p>
+          )}
           <p className="text-xs text-slate-500">{t('indicative')}</p>
         </div>
       )}

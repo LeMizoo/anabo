@@ -36,6 +36,8 @@ const quoteSchema = z.object({
   vehicleLabel: z.string().trim().max(120).optional().or(z.literal('')),
   consecutiveCircuits: z.coerce.number().int().min(1).max(20).default(1),
   vehicleCount: z.coerce.number().int().min(1).max(20).default(1),
+  // Nord et Nosy Be : véhicule embarqué vers Nosy Be (« ferry ») ou formule standard (« diego »).
+  nosyBeOption: z.enum(['ferry', 'diego']).optional(),
   message: z.string().trim().max(5000).optional().or(z.literal('')),
   // Champ piège anti-spam : invisible pour les humains, rempli par les robots.
   website: z.string().max(500).optional(),
@@ -134,6 +136,7 @@ export async function POST(request: Request) {
         circuitSlug: data.circuitSlug || null,
         circuitTitle: data.circuitTitle || null,
         regions: data.regions || null,
+        nosyBeOption: data.nosyBeOption ?? null,
       })
 
       if (estimate) {
@@ -155,8 +158,18 @@ export async function POST(request: Request) {
         indicativeOnly: estimateSnapshot.indicativeOnly,
         days: estimateSnapshot.days,
         vehicleName: estimateSnapshot.vehicleName,
+        vehicleFerryNotIncluded: !!estimateSnapshot.emptyReturn.vehicleFerryNotIncluded,
       }
     : null
+
+  // Formule Nosy Be conservée dans la demande, même sans estimation (aucun véhicule choisi).
+  const nosyBeNote =
+    data.nosyBeOption === 'ferry'
+      ? 'Formule Nosy Be : véhicule embarqué vers Nosy Be (bac Ankify ↔ Nosy Be à la charge du client, retour à vide 5 jours).'
+      : data.nosyBeOption === 'diego'
+        ? 'Formule Nosy Be : sans embarquer le véhicule (retour à vide 3 jours depuis Diego-Suarez).'
+        : ''
+  const fullMessage = [data.message || '', nosyBeNote].filter(Boolean).join('\n\n') || null
 
   const reference =
     `AR-${Date.now().toString(36).toUpperCase()}-` +
@@ -178,7 +191,7 @@ export async function POST(request: Request) {
         endDate,
         adults: data.adults,
         children: data.children,
-        message: data.message || null,
+        message: fullMessage,
         vehicleCode: data.vehicleCode || null,
         vehicleLabel: data.vehicleLabel || null,
         vehicleCount: data.vehicleCount,
@@ -211,7 +224,7 @@ export async function POST(request: Request) {
         endDate,
         adults: data.adults,
         children: data.children,
-        message: data.message || null,
+        message: fullMessage,
         vehicleCode: data.vehicleCode || null,
         vehicleLabel: data.vehicleLabel || null,
         vehicleCount: data.vehicleCount,

@@ -211,6 +211,12 @@
     "fuelNotice": "Rates include vehicle rental and the driver allowance. Fuel is paid by the client throughout the trip, including any empty-return days of the vehicle to Antananarivo.",
     "includes": "Includes vehicle rental, the driver allowance and, if the tour ends outside Antananarivo, the empty-return days. Fuel not included.",
     "timeNotice": "Dates and times are shown in Madagascar time (GMT+3).",
-    "receivedAt": "Request received on {date} at {time} (Madagascar time, GMT+3), i.e. {gmt} GMT."
+    "receivedAt": "Request received on {date} at {time} (Madagascar time, GMT+3), i.e. {gmt} GMT.",
+    "nosyBeTitle": "Your Nosy Be option",
+    "nosyBeStandard": "Without taking the vehicle",
+    "nosyBeStandardHelp": "Vehicle and driver for the whole tour, 3 empty-return days from Diego-Suarez.",
+    "nosyBeFerry": "Vehicle shipped to Nosy Be",
+    "nosyBeFerryHelp": "The vehicle and driver come with you to Nosy Be (ferry from Ankify). 5 empty-return days; the vehicle’s ferry crossing is paid by the client.",
+    "nosyBeFerryFees": "Vehicle ferry fees (Ankify ↔ Nosy Be) not included: they will be shown in your quote."
   }
 }

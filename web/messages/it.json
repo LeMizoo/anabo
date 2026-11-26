@@ -211,6 +211,12 @@
     "fuelNotice": "Le tariffe comprendono il noleggio del veicolo e l’indennità dell’autista. Il carburante è a carico del cliente per tutta la durata del viaggio, compresi gli eventuali giorni di rientro a vuoto del veicolo ad Antananarivo.",
     "includes": "Comprende il noleggio del veicolo, l’indennità dell’autista e, se il tour termina fuori da Antananarivo, i giorni di rientro a vuoto. Carburante non incluso.",
     "timeNotice": "Date e orari sono indicati nell’ora del Madagascar (GMT+3).",
-    "receivedAt": "Richiesta registrata il {date} alle {time} (ora del Madagascar, GMT+3), ossia alle {gmt} GMT."
+    "receivedAt": "Richiesta registrata il {date} alle {time} (ora del Madagascar, GMT+3), ossia alle {gmt} GMT.",
+    "nosyBeTitle": "La vostra formula per Nosy Be",
+    "nosyBeStandard": "Senza imbarcare il veicolo",
+    "nosyBeStandardHelp": "Veicolo e autista per tutta la durata del tour, 3 giorni di rientro a vuoto da Diego-Suarez.",
+    "nosyBeFerry": "Veicolo imbarcato per Nosy Be",
+    "nosyBeFerryHelp": "Il veicolo e l’autista vi accompagnano a Nosy Be (traghetto da Ankify). 5 giorni di rientro a vuoto; il trasporto del veicolo in traghetto è a carico del cliente.",
+    "nosyBeFerryFees": "Costi del traghetto per il veicolo (Ankify ↔ Nosy Be) non inclusi: saranno indicati nel preventivo."
   }
 }

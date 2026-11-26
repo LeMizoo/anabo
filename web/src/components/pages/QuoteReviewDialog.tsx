@@ -79,6 +79,12 @@ export function QuoteReviewDialog({
                 </p>
               )}
               <p className="text-xs text-slate-500">{t('includes')}</p>
+              {estimate?.nosyBeOption && (
+                <p className="text-xs text-slate-600">
+                  Nosy Be — {t(estimate.nosyBeOption === 'ferry' ? 'nosyBeFerry' : 'nosyBeStandard')}
+                </p>
+              )}
+              {estimate?.vehicleFerryNotIncluded && <p className="text-xs font-medium text-amber-800">{t('nosyBeFerryFees')}</p>}
               <p className="text-xs text-slate-500">{t('indicative')}</p>
             </>
           ) : (

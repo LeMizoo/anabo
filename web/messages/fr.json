@@ -211,6 +211,12 @@
     "fuelNotice": "Les tarifs comprennent la location du véhicule et l’indemnité chauffeur. Le carburant reste à la charge du client pendant toute la durée du voyage, y compris les éventuels jours de retour à vide du véhicule vers Antananarivo.",
     "includes": "Comprend la location du véhicule, l’indemnité chauffeur et, si le circuit se termine hors d’Antananarivo, les jours de retour à vide. Carburant non inclus.",
     "timeNotice": "Les dates et heures sont indiquées à l’heure de Madagascar (GMT+3).",
-    "receivedAt": "Demande enregistrée le {date} à {time} (heure de Madagascar, GMT+3), soit {gmt} GMT."
+    "receivedAt": "Demande enregistrée le {date} à {time} (heure de Madagascar, GMT+3), soit {gmt} GMT.",
+    "nosyBeTitle": "Votre formule pour Nosy Be",
+    "nosyBeStandard": "Sans embarquer le véhicule",
+    "nosyBeStandardHelp": "Véhicule et chauffeur pour toute la durée du circuit, retour à vide de 3 jours depuis Diego-Suarez.",
+    "nosyBeFerry": "Véhicule embarqué vers Nosy Be",
+    "nosyBeFerryHelp": "Le véhicule et le chauffeur vous accompagnent sur Nosy Be (bac depuis Ankify). Retour à vide de 5 jours ; transport du véhicule en bac à la charge du client.",
+    "nosyBeFerryFees": "Frais de bac du véhicule (Ankify ↔ Nosy Be) non inclus : ils seront indiqués dans votre devis."
   }
 }

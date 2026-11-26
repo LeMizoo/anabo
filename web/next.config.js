@@ -34,6 +34,12 @@ const nextConfig = {
     staticGenerationMaxConcurrency: 1,
   },
 
+  // Métadonnées (<title>, description, hreflang…) toujours rendues dans le <head>, jamais
+  // diffusées en streaming en fin de page : supprime les erreurs d'hydratation intermittentes
+  // (React #418) observées quand generateMetadata répondait après l'envoi de la page,
+  // et garantit des balises SEO présentes dès le premier octet pour tous les visiteurs.
+  htmlLimitedBots: /.*/,
+
   productionBrowserSourceMaps: false,
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },

@@ -559,6 +559,11 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                       <p className="text-xs text-green-800">
                         Véhicule ({emptyReturnDays} j) : {formatMoney(emptyReturnVehicleCost, vehicleEstimate.currency)} · Chauffeur ({emptyReturnDays} j) : {formatMoney(emptyReturnDriverCost, vehicleEstimate.currency)}
                       </p>
+                      {vehicleEstimate.emptyReturn?.vehicleFerryNotIncluded && (
+                        <p className="text-xs font-semibold text-amber-800">
+                          Véhicule embarqué vers Nosy Be : frais de bac du véhicule (Ankify ↔ Nosy Be) à ajouter au devis.
+                        </p>
+                      )}
                     </dd>
                   ) : (
                     <dd className="mt-1 text-xs text-green-800">

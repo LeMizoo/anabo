@@ -162,6 +162,7 @@ function buildAdminEmail(data: QuoteData) {
       <li>Retour à vide Antananarivo${emptyReturnDestination ? ` (${escapeHtml(emptyReturnDestination)})` : ''} — ${emptyReturnDays} j : <strong>${formatMoney(emptyReturnTotal, vehicleEstimate.currency)}</strong>${emptyReturnDays > 0 ? ` [Véhicule : ${formatMoney(emptyReturnVehicleCost, vehicleEstimate.currency)} · Chauffeur : ${formatMoney(emptyReturnDriverCost, vehicleEstimate.currency)}]` : ''}</li>
       ${vehicleEstimate.indicativeOnly ? '<li>Tarif indicatif : confirmer disponibilité et saison.</li>' : ''}
       <li>Carburant non inclus : à la charge du client (circuit, transferts et retour à vide).</li>
+      ${vehicleEstimate.emptyReturn?.vehicleFerryNotIncluded ? '<li><strong>Véhicule embarqué vers Nosy Be</strong> : frais de bac du véhicule (Ankify ↔ Nosy Be) à ajouter au devis.</li>' : ''}
     </ul>
   ` : estimate ? `
     <hr />

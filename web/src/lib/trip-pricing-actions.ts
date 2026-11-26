@@ -2,6 +2,7 @@
 
 import { calculateTripVehiclePrice, getPublicVehicleTypes } from '@/lib/trip-pricing'
 import { getPaymentSettings } from '@/lib/payment-settings'
+import { isNosyBeOption, type NosyBeOption } from '@/lib/nosy-be-option'
 
 type CalculateTripVehiclePriceInput = {
   vehicleCode: string
@@ -11,6 +12,7 @@ type CalculateTripVehiclePriceInput = {
   circuitSlug?: string | null
   circuitTitle?: string | null
   regions?: string[] | null
+  nosyBeOption?: NosyBeOption | null
 }
 
 export type PublicTripVehicleEstimate = {
@@ -19,6 +21,8 @@ export type PublicTripVehicleEstimate = {
   indicativeOnly: boolean
   days: number
   vehicleName: string
+  /** Formule « véhicule embarqué » vers Nosy Be : frais de bac du véhicule en sus. */
+  vehicleFerryNotIncluded: boolean
 }
 
 /**
@@ -69,6 +73,7 @@ export async function calculateTripVehiclePriceAction(
         ? input.circuitTitle.trim().slice(0, 191) || null
         : null,
     regions: safeRegions,
+    nosyBeOption: isNosyBeOption(input.nosyBeOption) ? input.nosyBeOption : null,
   })
 
   if (!result) return null
@@ -79,6 +84,7 @@ export async function calculateTripVehiclePriceAction(
     indicativeOnly: result.indicativeOnly,
     days: result.days,
     vehicleName: result.vehicleName,
+    vehicleFerryNotIncluded: !!result.emptyReturn.vehicleFerryNotIncluded,
   }
 }
 
