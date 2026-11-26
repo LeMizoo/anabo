@@ -1,5 +1,6 @@
 
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { sanityClient } from '@/lib/sanity'
@@ -38,7 +39,12 @@ const currencies = [
   { value: 'GBP', label: 'GBP — Livre sterling' },
 ]
 
-export default async function PricingPage() {
+type Tab = 'vehicules' | 'durees' | 'retours'
+type Props = { searchParams: Promise<{ onglet?: string; circuit?: string }> }
+
+export default async function PricingPage({ searchParams }: Props) {
+  const params = await searchParams
+  const tab: Tab = params.onglet === 'durees' || params.onglet === 'retours' ? params.onglet : 'vehicules'
   const session = await auth()
 
   if (
@@ -143,6 +149,16 @@ export default async function PricingPage() {
   }
   const circuitOptions = circuits.filter((c) => c.slug !== 'sur-mesure')
 
+  // Onglet « Durées » : un seul circuit affiché à la fois.
+  const durationCount = (slug: string) => durations.filter((d) => d.circuitSlug === slug).length
+  const selectedCircuit = circuits.find((c) => c.slug === params.circuit)?.slug || circuits[0]?.slug || ''
+  const configuredCircuits = circuits.filter((c) => durationCount(c.slug) > 0).length
+  const tabs: { key: Tab; label: string; count: string }[] = [
+    { key: 'vehicules', label: 'Véhicules', count: `${vehicles.filter((v) => v.active).length}` },
+    { key: 'durees', label: 'Durées des circuits', count: `${configuredCircuits}/${circuits.length}` },
+    { key: 'retours', label: 'Retours à vide', count: emptyReturnRules ? `${emptyReturnRules.filter((r) => r.active).length}` : '!' },
+  ]
+
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <header>
@@ -150,19 +166,37 @@ export default async function PricingPage() {
           Super-administration
         </p>
         <h1 className="mt-1 text-3xl font-bold text-gray-900">
-          Véhicules et durées des circuits
+          Prix et véhicules
         </h1>
         <p className="mt-2 max-w-3xl text-gray-600">
-          Gérez les catégories de véhicules et les durées indicatives
-          des circuits selon la saison et l’état des routes.
+          Véhicules et tarifs journaliers, durées indicatives des circuits, règles de retour à vide.
         </p>
       </header>
 
-      {/* SECTION 1 : VÉHICULES */}
+      <nav aria-label="Rubriques" className="sticky top-0 z-10 -mx-1 flex flex-wrap gap-2 border-b border-gray-200 bg-gray-50/95 px-1 pb-3 pt-1 backdrop-blur">
+        {tabs.map((t) => (
+          <Link
+            key={t.key}
+            href={`/admin/prix${t.key === 'vehicules' ? '' : `?onglet=${t.key}`}`}
+            aria-current={tab === t.key ? 'page' : undefined}
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              tab === t.key ? 'border-blue-900 bg-blue-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            {t.label}
+            <span className={`rounded-full px-2 py-0.5 text-xs ${tab === t.key ? 'bg-white/20 text-white' : t.count === '!' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'}`}>
+              {t.count}
+            </span>
+          </Link>
+        ))}
+      </nav>
+
+      {/* ONGLET : VÉHICULES */}
+      {tab === 'vehicules' && (
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-900">
-            1. Véhicules
+            Véhicules
           </h2>
           <p className="mt-1 text-sm text-gray-500">
             Les catégories sont communes à tous les circuits.
@@ -414,12 +448,14 @@ export default async function PricingPage() {
           </form>
         </div>
       </section>
+      )}
 
-      {/* SECTION 2 : DURÉES DES CIRCUITS */}
+      {/* ONGLET : DURÉES DES CIRCUITS */}
+      {tab === 'durees' && (
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-900">
-            2. Durées des circuits
+            Durées des circuits
           </h2>
           <p className="mt-1 text-sm text-gray-500">
             Configurez une durée minimale et maximale pour chaque
@@ -442,7 +478,27 @@ export default async function PricingPage() {
           </p>
         ) : (
           <div className="space-y-6">
-            {circuits.map((circuit) => (
+            <nav aria-label="Circuit" className="flex flex-wrap gap-2">
+              {circuits.map((c) => {
+                const n = durationCount(c.slug)
+                return (
+                  <Link
+                    key={c.slug}
+                    href={`/admin/prix?onglet=durees&circuit=${encodeURIComponent(c.slug)}`}
+                    aria-current={c.slug === selectedCircuit ? 'true' : undefined}
+                    className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition ${
+                      c.slug === selectedCircuit ? 'border-blue-900 bg-blue-50 font-semibold text-blue-900' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {c.title || c.slug}
+                    <span className={`rounded-full px-1.5 text-xs ${n === 6 ? 'bg-green-100 text-green-800' : n === 0 ? 'bg-gray-100 text-gray-500' : 'bg-amber-100 text-amber-800'}`}>
+                      {n}/6
+                    </span>
+                  </Link>
+                )
+              })}
+            </nav>
+            {circuits.filter((c) => c.slug === selectedCircuit).map((circuit) => (
               <article
                 key={circuit.slug}
                 className="overflow-hidden rounded-xl border border-gray-200"
@@ -544,11 +600,13 @@ export default async function PricingPage() {
           </div>
         )}
       </section>
+      )}
 
-      {/* SECTION 3 : RETOURS À VIDE */}
+      {/* ONGLET : RETOURS À VIDE */}
+      {tab === 'retours' && (
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" id="retours-a-vide">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900">3. Retours à vide</h2>
+          <h2 className="text-xl font-bold text-gray-900">Retours à vide</h2>
           <p className="mt-1 text-sm text-gray-500">
             Quand un voyage se termine hors d’Antananarivo, le client prend en charge les jours de retour du véhicule et du
             chauffeur (location + indemnité chauffeur). Une règle s’applique au circuit choisi, aux régions cochées dans le
@@ -581,14 +639,27 @@ export default async function PricingPage() {
               const extraCircuits = ruleCircuits.filter((c) => !circuitOptions.some((o) => o.slug === c))
               const extraRegions = ruleRegions.filter((r) => !regionOptions.has(r))
               return (
-                <article
+                <details
                   key={rule?.id || 'new'}
-                  className={`rounded-xl border p-5 ${rule ? (rule.active ? 'border-gray-200' : 'border-gray-200 bg-gray-50 opacity-80') : 'border-dashed border-blue-300 bg-blue-50/40'}`}
+                  className={`group rounded-xl border ${rule ? (rule.active ? 'border-gray-200' : 'border-gray-200 bg-gray-50 opacity-80') : 'border-dashed border-blue-300 bg-blue-50/40'}`}
                 >
+                  <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 px-5 py-4">
+                    <span className="font-semibold text-gray-900">{rule ? rule.label : '+ Ajouter une règle'}</span>
+                    {rule && (
+                      <span className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 font-semibold text-blue-900">{rule.days} j</span>
+                        {rule.ferryDays !== null && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-900">véhicule embarqué : {rule.ferryDays} j</span>}
+                        <span>{ruleCircuits.length} circuit(s) · {ruleRegions.length} région(s)</span>
+                        {!rule.active && <span className="rounded-full bg-gray-200 px-2 py-0.5">inactive</span>}
+                        <span className="text-gray-400 transition group-open:rotate-90">›</span>
+                      </span>
+                    )}
+                  </summary>
+                  <div className="border-t border-gray-100 p-5">
                   <form action={saveEmptyReturnRule} className="space-y-4">
                     {rule && <input type="hidden" name="id" value={rule.id} />}
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="font-semibold text-gray-900">{rule ? rule.label : 'Ajouter une règle'}</h3>
+                      <h3 className="text-sm font-medium text-gray-500">{rule ? 'Modifier la règle' : 'Nouvelle règle'}</h3>
                       <label className="inline-flex items-center gap-2 text-sm text-gray-700">
                         <input type="checkbox" name="active" defaultChecked={rule ? rule.active : true} className="h-4 w-4" /> Active
                       </label>
@@ -658,7 +729,8 @@ export default async function PricingPage() {
                       <button className="text-xs font-medium text-red-700 hover:underline">Supprimer cette règle</button>
                     </form>
                   )}
-                </article>
+                  </div>
+                </details>
               )
             })}
             <p className="text-xs text-gray-500">
@@ -667,6 +739,7 @@ export default async function PricingPage() {
           </div>
         )}
       </section>
+      )}
     </div>
   )
 }
