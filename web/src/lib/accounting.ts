@@ -8,6 +8,8 @@ export type AccountingTrip = {
   client: string
   circuit: string
   date: Date
+  /** true : pas de date de départ, la date affichée est celle de la confirmation */
+  dateIsConfirmation: boolean
   currency: string
   total: number | null
   deposit: number
@@ -59,6 +61,7 @@ export async function getAccounting(year: number) {
       client: `${q.firstName} ${q.lastName}`,
       circuit: q.circuitTitle || q.circuitSlug || 'Voyage sur mesure',
       date: q.startDate ?? q.confirmedAt ?? q.createdAt,
+      dateIsConfirmation: !q.startDate,
       currency: (q.quoteCurrency || 'EUR').toUpperCase(),
       total,
       deposit,
@@ -70,6 +73,8 @@ export async function getAccounting(year: number) {
       archived: Boolean(q.archivedAt),
     }
   })
+  // Ordre chronologique réel (départ, ou confirmation à défaut de date de départ).
+  trips.sort((a, b) => a.date.getTime() - b.date.getTime())
 
   const sum = (list: AccountingTrip[]): CurrencyTotals[] => {
     const map = new Map<string, CurrencyTotals>()

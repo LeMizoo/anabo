@@ -57,7 +57,7 @@ export default async function AccountingPage({ searchParams }: Props) {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-blue-800">Super-administration</p>
           <h1 className="mt-1 text-3xl font-bold text-gray-900">Comptabilité</h1>
-          <p className="mt-1 text-sm text-gray-500">Voyages confirmés de l’année (date de départ), montants des devis, acomptes et soldes encaissés.</p>
+          <p className="mt-1 text-sm text-gray-500">Voyages au statut « Confirmé » dont le départ a lieu dans l’année. Total = montant du devis ; acompte = {data.depositPercent} % du total ; solde = total − acompte ; encaissé = acomptes et soldes marqués reçus.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <form className="flex items-center gap-2">
@@ -137,7 +137,8 @@ export default async function AccountingPage({ searchParams }: Props) {
               <li key={t.id} className="flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0 text-sm">
                   <p>
-                    <span className="font-semibold text-gray-900">{fmtDate(t.date)}</span>{' '}
+                    <span className="font-semibold text-gray-900">{fmtDate(t.date)}</span>
+                    {t.dateIsConfirmation && <span className="ml-1 text-xs text-gray-500">(confirmé le, départ non renseigné)</span>}{' '}
                     <Link href={`/admin/demandes/${t.id}`} className="font-semibold text-blue-700 hover:underline">{t.reference}</Link>
                     {t.archived && <span className="ml-2 text-xs text-gray-400">archivé</span>}
                   </p>
@@ -146,7 +147,7 @@ export default async function AccountingPage({ searchParams }: Props) {
                     <p className="text-xs font-medium text-amber-700">Montant non saisi</p>
                   ) : (
                     <p className="text-xs text-gray-500">
-                      Total <strong className="text-gray-800">{money(t.total, t.currency)}</strong> · acompte {money(t.deposit, t.currency)} · solde {money(t.balance, t.currency)} · reste{' '}
+                      Total <strong className="text-gray-800">{money(t.total, t.currency)}</strong> · acompte ({data.depositPercent} %) {money(t.deposit, t.currency)} · solde {money(t.balance, t.currency)} · reste à encaisser{' '}
                       <strong className={t.remaining ? 'text-amber-700' : 'text-green-700'}>{money(t.remaining, t.currency)}</strong>
                     </p>
                   )}
