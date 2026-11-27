@@ -230,6 +230,36 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
       ? vehicleEstimate.emptyReturn.total
       : emptyReturnVehicleCost + emptyReturnDriverCost
 
+  // ---- Résumé du voyage (bandeau en tête de fiche) ----
+  const DAY_MS = 86_400_000
+  const tripStart = quote.acceptedStartDate || quote.startDate
+  const tripEndDate = quote.acceptedEndDate || quote.endDate
+  const datesDays = tripStart && tripEndDate && tripEndDate >= tripStart
+    ? Math.round((tripEndDate.getTime() - tripStart.getTime()) / DAY_MS) + 1
+    : null
+  const stayDays = datesDays ?? quote.selectedDurationDays ?? vehicleEstimate?.days ?? null
+  const stayBasis = datesDays
+    ? 'selon les dates'
+    : quote.selectedDurationDays
+      ? 'durée retenue dans la fiche'
+      : vehicleEstimate?.durationBasis === 'programme'
+        ? 'durée du programme (sans dates)'
+        : vehicleEstimate ? 'estimation' : null
+  const programmeRange = vehicleEstimate?.durationRange ?? null
+  const currencyCode = quote.quoteCurrency || vehicleEstimate?.currency || 'EUR'
+  const balanceAmount = quote.quoteTotalAmount !== null ? Math.max(quote.quoteTotalAmount - (deposit ?? 0), 0) : null
+  const collectedAmount = (quote.depositPaidAt && deposit ? deposit : 0) + (quote.balancePaidAt && balanceAmount ? balanceAmount : 0)
+  const remainingAmount = quote.quoteTotalAmount !== null ? Math.max(quote.quoteTotalAmount - collectedAmount, 0) : null
+  const estimateGap = vehicleEstimate && quote.quoteTotalAmount !== null && (quote.quoteCurrency || 'EUR') === vehicleEstimate.currency
+    ? quote.quoteTotalAmount - vehicleEstimate.total
+    : null
+  const summaryWarnings = [
+    !tripStart && 'date de départ non renseignée',
+    quote.quoteTotalAmount === null && 'montant du devis non saisi',
+    quote.status === 'CONFIRME' && !quote.assignedDriverId && 'aucun chauffeur affecté',
+    quote.status === 'CONFIRME' && quote.quoteTotalAmount !== null && !quote.depositPaidAt && 'acompte non reçu',
+  ].filter(Boolean) as string[]
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -290,6 +320,108 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
           les alertes ; elle redevient active si vous la désarchivez ou si le client accepte son devis.
         </div>
       )}
+
+      {/* Résumé du voyage : séjour, montants et paiements en un coup d'œil (évite les erreurs). */}
+      <section className="rounded-xl border-2 border-blue-900/20 bg-white p-5 shadow-sm" aria-labelledby="trip-summary-title">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h2 id="trip-summary-title" className="text-lg font-semibold text-gray-900">Résumé du voyage</h2>
+          <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${quoteStatusColor(quote.status)}`}>
+            {quoteStatusLabel(quote.status)}
+          </span>
+        </div>
+        {summaryWarnings.length > 0 && (
+          <p role="alert" className="mb-4 rounded-lg bg-red-50 p-2.5 text-sm font-medium text-red-800">
+            À compléter : {summaryWarnings.join(' · ')}.
+          </p>
+        )}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-lg bg-gray-50 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Séjour</p>
+            <p className="mt-1 font-semibold text-gray-900">{quote.circuitTitle || quote.circuitSlug || 'Circuit à définir'}</p>
+            <p className="mt-1 text-sm text-gray-800">
+              {tripStart ? formatTripDate(tripStart) : <span className="text-red-700">départ ?</span>}
+              {' → '}
+              {tripEndDate ? formatTripDate(tripEndDate) : <span className="text-gray-500">retour non précisé</span>}
+            </p>
+            <p className="mt-1 text-2xl font-bold text-blue-900">
+              {stayDays ? `${stayDays} jour${stayDays > 1 ? 's' : ''}` : '—'}
+            </p>
+            {stayBasis && <p className="text-xs text-gray-500">{stayBasis}</p>}
+            {programmeRange && !datesDays && programmeRange.max > programmeRange.min && (
+              <p className="text-xs text-gray-500">Fourchette du programme : {programmeRange.min} à {programmeRange.max} jours</p>
+            )}
+            {emptyReturnDays > 0 && (
+              <p className="mt-1 text-xs text-gray-700">+ {emptyReturnDays} j de retour à vide{emptyReturnDestination ? ` (${emptyReturnDestination})` : ''}</p>
+            )}
+          </div>
+
+          <div className="rounded-lg bg-gray-50 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Voyageurs et véhicule</p>
+            <p className="mt-1 text-sm text-gray-900">{quote.adults} adulte(s){quote.children ? `, ${quote.children} enfant(s)` : ''}</p>
+            <p className="mt-1 text-sm text-gray-900">
+              {quote.vehicleLabel || quote.vehicleCode || <span className="text-gray-500">véhicule non choisi</span>}
+              {quote.vehicleCount > 1 ? ` × ${quote.vehicleCount}` : ''}
+            </p>
+            <p className={`mt-1 text-sm ${assignedDriver ? 'text-gray-900' : 'text-orange-700'}`}>
+              Chauffeur : {assignedDriver ? assignedDriver.name : 'non affecté'}
+            </p>
+            {quote.clientAcceptedAt && (
+              <p className="mt-1 text-xs text-green-800">Devis accepté le {formatMgDateTime(quote.clientAcceptedAt)}</p>
+            )}
+          </div>
+
+          <div className="rounded-lg bg-blue-50 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-900">Montant du devis</p>
+            <p className="mt-1 text-2xl font-bold text-blue-900">
+              {quote.quoteTotalAmount !== null ? formatAmount(quote.quoteTotalAmount, currencyCode) : <span className="text-base text-red-700">non saisi</span>}
+            </p>
+            {hasSplit && quote.quoteTotalAmount !== null && (
+              <p className="text-xs text-gray-700">
+                Location {formatAmount(quote.vehicleAmount ?? 0, currencyCode)} · indemnité {formatAmount(quote.driverAmount ?? 0, currencyCode)}
+                {quote.otherAmount ? ` · autres ${formatAmount(quote.otherAmount, currencyCode)}` : ''}
+              </p>
+            )}
+            {vehicleEstimate && (
+              <p className="mt-1 text-xs text-gray-600">
+                Estimation vue par le client : {formatAmount(vehicleEstimate.total, vehicleEstimate.currency)} ({vehicleEstimate.days} j)
+              </p>
+            )}
+            {estimateGap !== null && estimateGap !== 0 && (
+              <p className="mt-1 text-xs font-semibold text-amber-800">
+                Écart avec l’estimation : {estimateGap > 0 ? '+' : ''}{formatAmount(estimateGap, currencyCode)}
+              </p>
+            )}
+          </div>
+
+          <div className="rounded-lg bg-gray-50 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Paiements</p>
+            <dl className="mt-1 space-y-1 text-sm">
+              <div className="flex justify-between gap-2">
+                <dt className="text-gray-600">Acompte ({payment.depositPercent} %)</dt>
+                <dd className="text-right font-semibold text-gray-900">{deposit !== null ? formatAmount(deposit, currencyCode) : '—'}</dd>
+              </div>
+              <div className="flex justify-end">
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${quote.depositPaidAt ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                  {quote.depositPaidAt ? `reçu le ${formatTripDate(quote.depositPaidAt)}` : 'en attente'}
+                </span>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-gray-600">Solde</dt>
+                <dd className="text-right font-semibold text-gray-900">{balanceAmount !== null ? formatAmount(balanceAmount, currencyCode) : '—'}</dd>
+              </div>
+              <div className="flex justify-end">
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${quote.balancePaidAt ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                  {quote.balancePaidAt ? `reçu le ${formatTripDate(quote.balancePaidAt)}` : 'en attente'}
+                </span>
+              </div>
+              <div className="flex justify-between gap-2 border-t border-gray-200 pt-1">
+                <dt className="font-medium text-gray-700">Reste à encaisser</dt>
+                <dd className={`text-right font-bold ${remainingAmount ? 'text-amber-800' : 'text-green-800'}`}>{remainingAmount !== null ? formatAmount(remainingAmount, currencyCode) : '—'}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">

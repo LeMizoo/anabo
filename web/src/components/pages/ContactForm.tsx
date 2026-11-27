@@ -1,6 +1,7 @@
 'use client'
 
 import { circuitDurationRange } from '@/lib/duration-range'
+import { ExtraDaysSuggestion } from './ExtraDaysSuggestion'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -675,6 +676,23 @@ export function ContactForm({
               />
             </div>
           </div>
+          )}
+
+          {/* Dates plus longues que le programme : circuit complémentaire ou retour ajusté, au choix du client. */}
+          {isQuote && (
+            <ExtraDaysSuggestion
+              locale={locale}
+              days={tripDays}
+              programme={combinedRange ? { min: combinedRange.minDays, max: combinedRange.maxDays } : null}
+              startDate={startDate}
+              season={detectedSeason ?? null}
+              candidates={circuitOptions.filter((c) => c.slug !== 'sur-mesure' && !selectedCircuitSlugs.includes(c.slug)).map((c) => ({ slug: c.slug, title: c.title }))}
+              onAddCircuitAction={(slug) => {
+                if (!selectedCircuit) setSelectedCircuit(slug)
+                else if (!extraCircuits.includes(slug)) toggleExtraCircuit(slug)
+              }}
+              onSetEndDateAction={setEndDate}
+            />
           )}
 
           {isQuote && (

@@ -12,6 +12,7 @@ import type { Locale } from '@/lib/i18n'
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
 import { QuoteReceivedAt } from './QuoteReceivedAt'
+import { ExtraDaysSuggestion } from './ExtraDaysSuggestion'
 import { NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
 
 type Props = { block: CustomQuoteBlock; locale: Locale; circuits?: Circuit[] }
@@ -441,6 +442,17 @@ export function CustomQuoteForm({ block, locale, circuits = [] }: Props) {
                   <input type="number" name="children" min={0} max={99} defaultValue={0} className={inputCls} />
                 </div>
               </div>
+
+              <ExtraDaysSuggestion
+                locale={locale}
+                days={tripDays}
+                programme={durationRange ? { min: durationRange.minDays, max: durationRange.maxDays } : null}
+                startDate={startDate}
+                season={seasonOf(startDate)}
+                candidates={circuitChoices.filter((c) => !selectedCircuits.includes(c.slug)).map((c) => ({ slug: c.slug, title: c.title }))}
+                onAddCircuitAction={(slug) => setSelectedCircuits((prev) => (prev.includes(slug) ? prev : [...prev, slug]))}
+                onSetEndDateAction={setEndDate}
+              />
 
               <QuoteEstimatePanel
                 locale={locale}

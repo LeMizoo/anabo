@@ -212,6 +212,12 @@
     "rangeNote": "Depending on the season and road conditions: {range} ({min} to {max} days).",
     "shortDates": "Your dates cover {days} day(s), while this programme takes at least {min} days: the amount above is based on your dates.",
     "combineTitle": "Tours to combine",
-    "combineHelp": "Optional: tick the tours that make up your trip. The length and amount are calculated by adding up their programmes."
+    "combineHelp": "Optional: tick the tours that make up your trip. The length and amount are calculated by adding up their programmes.",
+    "extraTitle": "You have {free} free day(s) left",
+    "extraIntro": "Your dates cover {days} days, while your programme takes {min} (up to {max} depending on season and roads). You can extend your trip or adjust your return date.",
+    "extraAddHelp": "Tours that fit into these days, to add to your trip:",
+    "extraNone": "No other tour fits into {free} day(s): you can adjust your return date or keep these days free.",
+    "extraAdjust": "Move my return to {date} ({days} days)",
+    "extraKeep": "or keep your dates: the extra days stay free, vehicle and driver included."
   }
 }

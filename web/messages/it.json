@@ -212,6 +212,12 @@
     "rangeNote": "A seconda della stagione e delle condizioni delle strade: {range} (da {min} a {max} giorni).",
     "shortDates": "Le tue date coprono {days} giorno/i, mentre questo programma richiede almeno {min} giorni: l’importo sopra si basa sulle tue date.",
     "combineTitle": "Tour da combinare",
-    "combineHelp": "Facoltativo: seleziona i tour che compongono il tuo viaggio. Durata e importo si calcolano sommando i loro programmi."
+    "combineHelp": "Facoltativo: seleziona i tour che compongono il tuo viaggio. Durata e importo si calcolano sommando i loro programmi.",
+    "extraTitle": "Ti restano {free} giorno/i libero/i",
+    "extraIntro": "Le tue date coprono {days} giorni, mentre il programma ne prevede {min} (fino a {max} secondo stagione e strade). Puoi completare il viaggio o modificare la data di ritorno.",
+    "extraAddHelp": "Tour che rientrano in questi giorni, da aggiungere al viaggio:",
+    "extraNone": "Nessun altro tour rientra in {free} giorno/i: puoi modificare la data di ritorno o tenere liberi questi giorni.",
+    "extraAdjust": "Anticipa il ritorno al {date} ({days} giorni)",
+    "extraKeep": "oppure mantieni le date: i giorni in più restano liberi, veicolo e autista inclusi."
   }
 }
