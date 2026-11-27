@@ -22,10 +22,13 @@ export async function GET(request: Request) {
   if (year < 2000 || year > 2100) return NextResponse.json({ error: 'Année invalide' }, { status: 400 })
   const data = await getAccounting(year)
 
-  const header = ['Date', 'Référence', 'Client', 'Circuit', 'Devise', 'Montant total', 'Acompte', 'Acompte reçu le', 'Solde', 'Solde reçu le', 'Encaissé', 'Reste à encaisser', 'Archivé']
+  const header = ['Date', 'Référence', 'Client', 'Circuit', 'Chauffeur', 'Devise', 'Montant total', 'Location véhicule', 'Indemnité chauffeur', 'Autres frais', 'Ventilé',
+    'Acompte', 'Acompte reçu le', 'Solde', 'Solde reçu le', 'Encaissé', 'Reste à encaisser', 'Indemnité versée le', 'Archivé']
   const rows = data.trips.map((t) => [
-    t.date, t.reference, t.client, t.circuit, t.currency, t.total, t.total === null ? null : t.deposit, t.depositPaidAt,
-    t.total === null ? null : t.balance, t.balancePaidAt, t.collected, t.remaining, t.archived ? 'oui' : 'non',
+    t.date, t.reference, t.client, t.circuit, t.driverName, t.currency, t.total,
+    t.split ? t.vehicle : null, t.split ? t.driverPart : null, t.split ? t.other : null, t.total === null ? null : t.split ? 'oui' : 'non',
+    t.total === null ? null : t.deposit, t.depositPaidAt, t.total === null ? null : t.balance, t.balancePaidAt,
+    t.collected, t.remaining, t.driverPaidAt, t.archived ? 'oui' : 'non',
   ])
   const csv = '﻿' + [header, ...rows].map((r) => r.map(csvCell).join(';')).join('\r\n')
   return new NextResponse(csv, {

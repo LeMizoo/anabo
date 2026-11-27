@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentAdmin } from '@/lib/admin-access'
+import { formatAmount } from '@/lib/payment-settings'
 import { prisma } from '@/lib/prisma'
 import { quoteStatusColor, quoteStatusLabel } from '@/lib/quote-status'
 import { getCapacityReport } from '@/lib/fleet-capacity'
@@ -22,6 +23,8 @@ type Trip = {
   vehicle: string
   driver: string | null
   phone: string
+  allowance: string | null
+  allowancePaidAt: Date | null
 }
 
 function tripEnd(start: Date, end: Date | null, duration: number | null) {
@@ -55,6 +58,7 @@ export default async function PlanningPage({ searchParams }: Props) {
       circuitTitle: true, circuitSlug: true, startDate: true, endDate: true,
       selectedDurationDays: true, adults: true, children: true,
       vehicleLabel: true, vehicleCount: true, assignedDriverId: true, phone: true,
+      driverAmount: true, driverPaidAt: true, quoteCurrency: true,
     },
   })
   const [report, drivers] = await Promise.all([
@@ -80,6 +84,8 @@ export default async function PlanningPage({ searchParams }: Props) {
         vehicle: q.vehicleLabel ? `${q.vehicleLabel}${q.vehicleCount > 1 ? ` ×${q.vehicleCount}` : ''}` : '—',
         driver: q.assignedDriverId ? driverName.get(q.assignedDriverId) || null : null,
         phone: q.phone,
+        allowance: q.driverAmount ? formatAmount(q.driverAmount, q.quoteCurrency) : null,
+        allowancePaidAt: q.driverPaidAt,
       }
     })
     .filter((t) => showPast || t.end >= today)
@@ -209,6 +215,14 @@ export default async function PlanningPage({ searchParams }: Props) {
                       <span className="text-gray-400">· {trip.reference}</span>
                       <p className="text-gray-600">{trip.circuit}</p>
                       <p className="text-xs text-gray-500">{trip.travellers} · {trip.vehicle}</p>
+                      {isDriver && trip.allowance && (
+                        <p className="text-xs text-gray-700">
+                          Votre indemnité : <strong>{trip.allowance}</strong>{' '}
+                          {trip.allowancePaidAt
+                            ? <span className="rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-800">versée le {fmt(trip.allowancePaidAt)}</span>
+                            : <span className="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-800">à verser</span>}
+                        </p>
+                      )}
                       {isDriver && trip.phone && (
                         <a href={`tel:${trip.phone.replace(/[^\d+]/g, '')}`} className="text-xs font-medium text-blue-700 hover:underline">Client : {trip.phone}</a>
                       )}

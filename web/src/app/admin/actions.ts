@@ -560,7 +560,19 @@ export async function saveQuotePayment(formData: FormData) {
   const currency = String(formData.get('quoteCurrency') || 'EUR').toUpperCase()
   if (!quoteId) throw new Error('Demande introuvable.')
 
-  const total = raw ? Number(raw) : null
+  const amount = (key: string, label: string) => {
+    const v = String(formData.get(key) || '').replace(/\s/g, '')
+    if (!v) return null
+    const n = Number(v)
+    if (!Number.isSafeInteger(n) || n < 0 || n > 1_000_000_000) throw new Error(`${label} invalide.`)
+    return n
+  }
+  // Ventilation (comptabilité) : si au moins une part est saisie, le total en est la somme.
+  const vehicleAmount = amount('vehicleAmount', 'Montant de la location')
+  const driverAmount = amount('driverAmount', 'Indemnité chauffeur')
+  const otherAmount = amount('otherAmount', 'Autres frais')
+  const hasSplit = vehicleAmount !== null || driverAmount !== null || otherAmount !== null
+  const total = hasSplit ? (vehicleAmount ?? 0) + (driverAmount ?? 0) + (otherAmount ?? 0) : raw ? Number(raw) : null
   if (total !== null && (!Number.isSafeInteger(total) || total < 0 || total > 1_000_000_000)) {
     throw new Error('Montant du devis invalide.')
   }
@@ -568,10 +580,33 @@ export async function saveQuotePayment(formData: FormData) {
 
   await prisma.quoteRequest.update({
     where: { id: quoteId },
-    data: { quoteTotalAmount: total, quoteCurrency: total === null ? null : currency },
+    data: {
+      quoteTotalAmount: total,
+      quoteCurrency: total === null ? null : currency,
+      vehicleAmount: hasSplit ? vehicleAmount ?? 0 : null,
+      driverAmount: hasSplit ? driverAmount ?? 0 : null,
+      otherAmount: hasSplit ? otherAmount ?? 0 : null,
+    },
   })
+  revalidatePath('/admin/comptabilite')
   revalidatePath(`/admin/demandes/${quoteId}`)
   redirect(`/admin/demandes/${quoteId}`)
+}
+
+/** Marque l'indemnité comme reversée au chauffeur (ou annule ce marquage). SUPER_ADMIN. */
+export async function toggleDriverPaid(formData: FormData) {
+  await requireSuperAdmin()
+  const quoteId = String(formData.get('quoteId') || '')
+  const quote = await prisma.quoteRequest.findUnique({ where: { id: quoteId }, select: { driverPaidAt: true } })
+  if (!quote) throw new Error('Demande introuvable.')
+  await prisma.quoteRequest.update({
+    where: { id: quoteId },
+    data: { driverPaidAt: quote.driverPaidAt ? null : new Date() },
+  })
+  revalidatePath(`/admin/demandes/${quoteId}`)
+  revalidatePath('/admin/comptabilite')
+  revalidatePath('/admin/planning')
+  redirect(safeReturnTo(formData.get('returnTo'), `/admin/demandes/${quoteId}`))
 }
 
 /** Marque le solde comme reçu (ou annule ce marquage). Retour vers la page d'origine. */

@@ -113,6 +113,12 @@ model QuoteRequest {
   depositPaidAt    DateTime?
   // Solde (reste du montant après l'acompte) encaissé
   balancePaidAt    DateTime?
+  // Ventilation du montant total (comptabilité) : location, indemnité chauffeur, autres frais
+  vehicleAmount    Int?
+  driverAmount     Int?
+  otherAmount      Int?
+  // Indemnité reversée au chauffeur affecté
+  driverPaidAt     DateTime?
 
   // Archivage : la demande sort des listes de travail et des alertes, sans être supprimée.
   archivedAt DateTime?

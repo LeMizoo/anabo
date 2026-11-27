@@ -21,7 +21,8 @@ import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
 import { getCancellationStatus } from '@/lib/cancellation'
 import { assignDriver } from '@/app/admin/(protected)/chauffeurs/actions'
 import { shortageForTrip } from '@/lib/fleet-capacity'
-import { archiveQuotes, saveQuotePayment, toggleBalancePaid, toggleDepositPaid, unarchiveQuotes } from '@/app/admin/actions'
+import { archiveQuotes, saveQuotePayment, toggleBalancePaid, toggleDepositPaid, toggleDriverPaid, unarchiveQuotes } from '@/app/admin/actions'
+import { estimateSplit } from '@/lib/accounting'
 import { getPaymentSettings, depositAmount, formatAmount } from '@/lib/payment-settings'
 
 export const dynamic = 'force-dynamic'
@@ -177,8 +178,18 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
     (quote.acceptedStartDate.getTime() !== quote.startDate?.getTime() ||
       (quote.acceptedEndDate?.getTime() ?? null) !== (quote.endDate?.getTime() ?? null))
 
+  // Ventilation comptable : saisie, sinon proposée d'après l'estimation.
+  const hasSplit = quote.vehicleAmount !== null || quote.driverAmount !== null || quote.otherAmount !== null
+  const proposedSplit = hasSplit ? null : estimateSplit(quote.estimateDetails)
+  const splitDefault = {
+    vehicle: quote.vehicleAmount ?? proposedSplit?.vehicle ?? '',
+    driver: quote.driverAmount ?? proposedSplit?.driver ?? '',
+    other: quote.otherAmount ?? (proposedSplit ? 0 : ''),
+  }
+
   const estimate = parseEstimate(quote.estimateDetails)
   const vehicleEstimate = parseVehicleEstimate(quote.estimateDetails)
+  const proposedCurrency = vehicleEstimate?.currency ?? null
   const season = getSeason(quote.startDate)
 
   const vehicleCost =
@@ -794,30 +805,56 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               {payment.method} · {payment.phoneNumber}
               {payment.accountHolder ? ` · ${payment.accountHolder}` : ' · titulaire à préciser'}
             </p>
-            <form action={saveQuotePayment} className="flex flex-wrap items-end gap-2 print:hidden">
+            {/* Montant du voyage, ventilé pour la comptabilité. Si une part est saisie, le total en est la somme. */}
+            <form action={saveQuotePayment} className="space-y-2 print:hidden">
               <input type="hidden" name="quoteId" value={quote.id} />
-              <label className="min-w-0 flex-1 text-xs font-medium text-gray-700">
-                Montant total du devis
-                <input
-                  name="quoteTotalAmount"
-                  type="number"
-                  min={0}
-                  step={1}
-                  defaultValue={quote.quoteTotalAmount ?? ''}
-                  className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm"
-                />
-              </label>
-              <select
-                name="quoteCurrency"
-                defaultValue={quote.quoteCurrency || 'EUR'}
-                aria-label="Devise"
-                className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm"
-              >
-                <option value="EUR">EUR</option>
-                <option value="MGA">MGA</option>
-                <option value="USD">USD</option>
-              </select>
-              <FormSubmitButton label="OK" pendingLabel="…" className="rounded-lg bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60" />
+              {!hasSplit && proposedSplit && (
+                <p className="rounded-lg bg-white/70 p-2 text-xs text-gray-600">
+                  Ventilation proposée d’après l’estimation (retours à vide compris) : vérifiez puis enregistrez.
+                </p>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                <label className="text-xs font-medium text-gray-700">
+                  Location véhicule
+                  <input name="vehicleAmount" type="number" min={0} step={1} defaultValue={splitDefault.vehicle}
+                    className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm" />
+                </label>
+                <label className="text-xs font-medium text-gray-700">
+                  Indemnité chauffeur
+                  <input name="driverAmount" type="number" min={0} step={1} defaultValue={splitDefault.driver}
+                    className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm" />
+                </label>
+                <label className="text-xs font-medium text-gray-700">
+                  Autres frais <span className="font-normal text-gray-500">(bac, extras…)</span>
+                  <input name="otherAmount" type="number" min={0} step={1} defaultValue={splitDefault.other}
+                    className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm" />
+                </label>
+                <label className="text-xs font-medium text-gray-700">
+                  Devise
+                  <select name="quoteCurrency" defaultValue={quote.quoteCurrency || proposedCurrency || 'EUR'}
+                    className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm">
+                    <option value="EUR">EUR</option>
+                    <option value="MGA">MGA</option>
+                    <option value="USD">USD</option>
+                  </select>
+                </label>
+              </div>
+              <details className="text-xs text-gray-600" open={!hasSplit && !proposedSplit && quote.quoteTotalAmount !== null}>
+                <summary className="cursor-pointer">Saisir seulement un total, sans ventilation</summary>
+                <label className="mt-1 block font-medium text-gray-700">
+                  Montant total du devis
+                  <input name="quoteTotalAmount" type="number" min={0} step={1} defaultValue={quote.quoteTotalAmount ?? ''}
+                    className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm" />
+                </label>
+                <span className="mt-1 block text-gray-500">Utilisé uniquement si les trois parts ci-dessus sont vides.</span>
+              </details>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs text-gray-700">
+                  Total : <strong>{quote.quoteTotalAmount !== null ? formatAmount(quote.quoteTotalAmount, quote.quoteCurrency) : 'non saisi'}</strong>
+                  {quote.quoteTotalAmount !== null && !hasSplit && <span className="text-amber-700"> · non ventilé</span>}
+                </p>
+                <FormSubmitButton label="Enregistrer" pendingLabel="…" className="rounded-lg bg-blue-900 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60" />
+              </div>
             </form>
             <p className="mt-3 text-gray-800">
               {deposit !== null
@@ -934,6 +971,23 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
               <p className="mb-3 rounded-lg bg-red-50 p-2.5 text-xs font-medium text-red-800">
                 Capacité insuffisante sur ces dates : {shortage.required} véhicule(s) requis pour {shortage.capacity} place(s)/capacité ({shortage.missing} manquant(s)). Pensez à affecter un chauffeur temporaire.
               </p>
+            )}
+            {isSuperAdmin && hasSplit && (quote.driverAmount ?? 0) > 0 && (
+              <form action={toggleDriverPaid} className="mb-3 print:hidden">
+                <input type="hidden" name="quoteId" value={quote.id} />
+                <input type="hidden" name="returnTo" value={`/admin/demandes/${quote.id}`} />
+                <p className="mb-1 text-gray-800">
+                  Indemnité à reverser : <strong>{formatAmount(quote.driverAmount ?? 0, quote.quoteCurrency)}</strong>
+                </p>
+                {quote.driverPaidAt ? (
+                  <p className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-semibold text-white">Versée le {formatMgDateTime(quote.driverPaidAt)}</span>
+                    <button className="text-xs text-gray-600 underline">Annuler</button>
+                  </p>
+                ) : (
+                  <button className="rounded-lg border border-green-600 bg-white px-3 py-1.5 text-xs font-semibold text-green-800 hover:bg-green-50">Marquer l’indemnité comme versée</button>
+                )}
+              </form>
             )}
             <form action={assignDriver} className="space-y-2 print:hidden">
               <input type="hidden" name="quoteId" value={quote.id} />
