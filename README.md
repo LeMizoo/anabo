@@ -10,7 +10,7 @@ Site web multilingue (FR / EN / IT) de **roadtrip.anabo.mg** : location de voitu
 - **Madagascar** : présentation de l’île (situation, relief, climat, histoire) et galerie de 79 photos légendées (`#photos`). L’ancienne page Galerie redirige ici (308).
 - **10 circuits** avec programme jour par jour, itinéraire et galerie légendée ; **voyage sur mesure**.
 - **FAQ** (`/faq`) : 30 questions en 6 thèmes, avec données structurées `FAQPage`.
-- **Demande de devis** : estimation en direct (véhicule, durée, retours à vide, option Nosy Be), récapitulatif avant envoi, e-mails Resend au client et à l’équipe, suivi client sur `/devis/[référence]`.
+- **Demande de devis** : montant exact affiché dès le choix du circuit (durée du programme), fourchette selon la saison et l’état des routes, cumul des circuits (extensions et « circuits à combiner » du sur mesure), retours à vide et option Nosy Be ; récapitulatif avant envoi, e-mails Resend au client et à l’équipe, suivi client sur `/devis/[référence]`.
 - **Conditions d’annulation** (`/annulation`), **politique de cookies**, bandeau de consentement.
 - Responsive de 320 px à l’écran large ; heures affichées en heure de Madagascar (GMT+3).
 
@@ -95,7 +95,7 @@ Les migrations sont dans `web/prisma/migrations/` (0001 à 0011). En production,
 
 - 0009 (règles de retour à vide paramétrables) : appliquée.
 - 0010 (rôle Chauffeur, `AdminUser.driverId`, `QuoteRequest.balancePaidAt`) : appliquée le 27/11/2026.
-- 0011 (ventilation comptable : `vehicleAmount`, `driverAmount`, `otherAmount`, `driverPaidAt`) : à exécuter avant le déploiement de la version « ventilation ». Sans elle, l’Admin et l’envoi des demandes de devis échouent.
+- 0011 (ventilation comptable : `vehicleAmount`, `driverAmount`, `otherAmount`, `driverPaidAt`) : appliquée le 27/11/2026.
 
 ## Déploiement (production)
 
