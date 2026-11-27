@@ -8,6 +8,7 @@ import {
   calculateTripVehiclePrice,
   type VehicleEstimateSnapshot,
 } from '@/lib/trip-pricing'
+import { circuitDurationRange, seasonOf, type DurationRow } from '@/lib/duration-range'
 
 export const runtime = 'nodejs'
 
@@ -28,6 +29,8 @@ const quoteSchema = z.object({
   circuitSlug: z.string().trim().max(191).optional().or(z.literal('')),
   circuitTitle: z.string().trim().max(191).optional().or(z.literal('')),
   regions: z.array(z.string().trim().max(120)).max(20).optional(),
+  // Circuits composant le voyage (circuit + extensions, ou circuits combinés en sur mesure).
+  circuitSlugs: z.array(z.string().trim().min(1).max(191)).max(20).optional(),
   startDate: optionalDate,
   endDate: optionalDate,
   adults: z.coerce.number().int().min(1).max(20).default(2),
@@ -126,24 +129,50 @@ export async function POST(request: Request) {
   // Estimation indicative complète calculée côté serveur (véhicule + chauffeur + retour à vide).
   // Le snapshot détaillé reste côté serveur/admin/e-mail ; seul le total consolidé est exposé.
   let estimateSnapshot: VehicleEstimateSnapshot | null = null
+  const circuitSlugs = [...new Set((data.circuitSlugs || []).map((s) => s.toLowerCase()))]
+  // Retours à vide et formule Nosy Be : tous les circuits du voyage comptent (règle la plus longue).
+  const pricingRegions = [...(data.regions || []), ...circuitSlugs]
 
-  if (data.vehicleCode && rentalDays > 0) {
+  // Sans dates : durée de référence recalculée ici à partir des durées configurées
+  // (même calcul que le formulaire), jamais à partir d'une durée envoyée par le navigateur.
+  let programmeRange: { min: number; max: number } | null = null
+  if (data.vehicleCode && rentalDays === 0 && circuitSlugs.length > 0) {
     try {
-      const estimate = await calculateTripVehiclePrice({
+      const rows = await prisma.circuitDuration.findMany({
+        where: { circuitSlug: { in: circuitSlugs } },
+        select: { circuitSlug: true, season: true, roadCondition: true, minDays: true, maxDays: true },
+      })
+      const range = circuitDurationRange(rows as DurationRow[], circuitSlugs, seasonOf(startDate))
+      if (range) programmeRange = { min: range.minDays, max: range.maxDays }
+    } catch (error) {
+      console.error('[api/quotes] Duration range failed:', error)
+    }
+  }
+
+  const estimateDays = rentalDays > 0 ? rentalDays : programmeRange?.min ?? 0
+  if (data.vehicleCode && estimateDays > 0) {
+    try {
+      const priceInput = {
         vehicleCode: data.vehicleCode,
-        days: rentalDays,
         vehicleCount: data.vehicleCount,
         circuitSlug: data.circuitSlug || null,
         circuitTitle: data.circuitTitle || null,
-        regions: data.regions || null,
+        regions: pricingRegions.length ? pricingRegions : null,
         nosyBeOption: data.nosyBeOption ?? null,
-      })
+      }
+      const estimate = await calculateTripVehiclePrice({ ...priceInput, days: estimateDays })
 
       if (estimate) {
+        let totalMax: number | undefined
+        if (rentalDays === 0 && programmeRange && programmeRange.max > programmeRange.min) {
+          totalMax = (await calculateTripVehiclePrice({ ...priceInput, days: programmeRange.max }))?.total
+        }
         estimateSnapshot = {
           version: 3,
           calculatedAt: new Date().toISOString(),
           ...estimate,
+          durationBasis: rentalDays > 0 ? 'dates' : 'programme',
+          ...(rentalDays === 0 && programmeRange ? { durationRange: programmeRange, totalMax: totalMax ?? estimate.total } : {}),
         }
       }
     } catch (error) {
@@ -157,6 +186,9 @@ export async function POST(request: Request) {
         currency: estimateSnapshot.currency,
         indicativeOnly: estimateSnapshot.indicativeOnly,
         days: estimateSnapshot.days,
+        durationBasis: estimateSnapshot.durationBasis ?? 'dates',
+        durationRange: estimateSnapshot.durationRange ?? null,
+        totalMax: estimateSnapshot.totalMax ?? estimateSnapshot.total,
         vehicleName: estimateSnapshot.vehicleName,
         vehicleFerryNotIncluded: !!estimateSnapshot.emptyReturn.vehicleFerryNotIncluded,
       }

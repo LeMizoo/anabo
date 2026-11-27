@@ -206,6 +206,12 @@
     "nosyBeStandardHelp": "Véhicule et chauffeur pour toute la durée du circuit, retour à vide de 3 jours depuis Diego-Suarez.",
     "nosyBeFerry": "Véhicule embarqué vers Nosy Be",
     "nosyBeFerryHelp": "Le véhicule et le chauffeur vous accompagnent sur Nosy Be (bac depuis Ankify). Retour à vide de 5 jours ; transport du véhicule en bac à la charge du client.",
-    "nosyBeFerryFees": "Frais de bac du véhicule (Ankify ↔ Nosy Be) non inclus : ils seront indiqués dans votre devis."
+    "nosyBeFerryFees": "Frais de bac du véhicule (Ankify ↔ Nosy Be) non inclus : ils seront indiqués dans votre devis.",
+    "needCircuitOrDates": "Choisissez un circuit ou indiquez vos dates de départ et de retour pour calculer le montant.",
+    "totalProgram": "Montant total estimé ({days} jours, durée du programme)",
+    "rangeNote": "Selon la saison et l’état des routes : {range} ({min} à {max} jours).",
+    "shortDates": "Vos dates couvrent {days} jour(s), alors que ce programme demande au moins {min} jours : le montant ci-dessus correspond à vos dates.",
+    "combineTitle": "Circuits à combiner",
+    "combineHelp": "Facultatif : cochez les circuits qui composent votre voyage. La durée et le montant sont calculés en additionnant leurs programmes."
   }
 }

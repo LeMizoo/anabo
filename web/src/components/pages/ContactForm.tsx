@@ -1,5 +1,6 @@
 'use client'
 
+import { circuitDurationRange } from '@/lib/duration-range'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -250,42 +251,27 @@ export function ContactForm({
     [startDate],
   )
 
-  const circuitRanges = useMemo<CircuitRange[]>(() => {
-    if (!detectedSeason || selectedCircuitSlugs.length === 0) return []
+  // Durées cumulées du circuit et de ses extensions (saison de la date de départ, sinon toute l'année).
+  const durationRange = useMemo(
+    () => circuitDurationRange(durationData, selectedCircuitSlugs, detectedSeason ?? null),
+    [durationData, selectedCircuitSlugs, detectedSeason],
+  )
 
-    const ranges: CircuitRange[] = []
+  const circuitRanges = useMemo<CircuitRange[]>(
+    () =>
+      (durationRange?.perCircuit ?? []).map((item) => ({
+        circuitSlug: item.circuitSlug,
+        circuitTitle: circuitOptions.find((c) => c.slug === item.circuitSlug)?.title || item.circuitSlug,
+        minDays: item.minDays,
+        maxDays: item.maxDays,
+      })),
+    [durationRange, circuitOptions],
+  )
 
-    for (const slug of selectedCircuitSlugs) {
-      const matchingRows = durationData.filter(
-        (row) => row.circuitSlug === slug && row.season === detectedSeason,
-      )
-
-      if (matchingRows.length === 0) continue
-
-      const minDays = Math.min(...matchingRows.map((row) => row.minDays))
-      const maxDays = Math.max(...matchingRows.map((row) => row.maxDays))
-      const circuitTitle =
-        circuitOptions.find((item) => item.slug === slug)?.title || slug
-
-      ranges.push({
-        circuitSlug: slug,
-        circuitTitle,
-        minDays,
-        maxDays,
-      })
-    }
-
-    return ranges
-  }, [detectedSeason, selectedCircuitSlugs, durationData, circuitOptions])
-
-  const combinedRange = useMemo(() => {
-    if (circuitRanges.length === 0) return null
-
-    return {
-      minDays: circuitRanges.reduce((sum, item) => sum + item.minDays, 0),
-      maxDays: circuitRanges.reduce((sum, item) => sum + item.maxDays, 0),
-    }
-  }, [circuitRanges])
+  const combinedRange = useMemo(
+    () => (durationRange ? { minDays: durationRange.minDays, maxDays: durationRange.maxDays } : null),
+    [durationRange],
+  )
 
   const availableRoadConditions = useMemo<RoadCondition[]>(() => {
     if (!detectedSeason || selectedCircuitSlugs.length === 0) return []
@@ -370,6 +356,8 @@ export function ContactForm({
       message: String(form.get('message') || '').trim(),
       website: String(form.get('website') || ''),
       ...(isQuote && vehicleCode ? { vehicleCode, vehicleLabel, vehicleCount } : {}),
+      // Circuits choisis (principal + extensions) : le serveur recalcule la même durée de référence.
+      ...(isQuote && selectedCircuitSlugs.length > 0 ? { circuitSlugs: selectedCircuitSlugs } : {}),
       ...(isQuote && shippingApplicable ? { nosyBeOption } : {}),
     }
 
@@ -567,6 +555,8 @@ export function ContactForm({
                     >
                       <input
                         type="checkbox"
+                        name="extraCircuits"
+                        value={c.slug}
                         checked={checked}
                         onChange={() => toggleExtraCircuit(c.slug)}
                         className="h-4 w-4 rounded border-gray-300 text-[#06245F] focus:ring-[#06245F]"
@@ -607,11 +597,13 @@ export function ContactForm({
                       ? 'Le durate indicative non sono momentaneamente disponibili.'
                       : 'Les durées indicatives sont momentanément indisponibles.'}
                 </p>
-              ) : !detectedSeason ? null : combinedRange ? (
+              ) : combinedRange ? (
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-gray-600">
-                    {getSeasonLabel(detectedSeason, locale)}
-                    {availableRoadConditions.length > 0 && (
+                    {detectedSeason
+                      ? getSeasonLabel(detectedSeason, locale)
+                      : locale === 'en' ? 'All seasons (add your departure date to refine)' : locale === 'it' ? 'Tutte le stagioni (indica la data di partenza per affinare)' : 'Toutes saisons (indiquez votre date de départ pour affiner)'}
+                    {detectedSeason && availableRoadConditions.length > 0 && (
                       <>
                         {' · '}
                         {locale === 'en'
@@ -725,11 +717,13 @@ export function ContactForm({
               days={tripDays}
               minDays={tripDays ? null : combinedRange?.minDays ?? null}
               maxDays={tripDays ? null : combinedRange?.maxDays ?? null}
+              programMinDays={combinedRange?.minDays ?? null}
               vehicleCode={vehicleCode}
               vehicleLabel={vehicleLabel}
               vehicleCount={vehicleCount}
               circuitSlug={selectedCircuit || null}
               circuitTitle={activeCircuitTitle || null}
+              regions={extraCircuits.length > 0 ? extraCircuits : null}
               nosyBeOption={nosyBeOption}
               onNosyBeOptionChangeAction={setNosyBeOption}
               onShippingApplicableChangeAction={setShippingApplicable}

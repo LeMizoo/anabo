@@ -106,7 +106,7 @@ export function PageRenderer({ modules, circuits = [], globalHeadingFont, global
             case 'contactFormBlock':
               return <ContactForm block={module} circuits={circuits} />
             case 'customQuoteBlock':
-              return <CustomQuoteForm block={module} locale={locale} />
+              return <CustomQuoteForm block={module} locale={locale} circuits={circuits} />
             case 'slider3dBlock':
               return <Slider3D block={module} locale={locale} />
             case 'puzzleGalleryBlock':

@@ -206,6 +206,12 @@
     "nosyBeStandardHelp": "Vehicle and driver for the whole tour, 3 empty-return days from Diego-Suarez.",
     "nosyBeFerry": "Vehicle shipped to Nosy Be",
     "nosyBeFerryHelp": "The vehicle and driver come with you to Nosy Be (ferry from Ankify). 5 empty-return days; the vehicle’s ferry crossing is paid by the client.",
-    "nosyBeFerryFees": "Vehicle ferry fees (Ankify ↔ Nosy Be) not included: they will be shown in your quote."
+    "nosyBeFerryFees": "Vehicle ferry fees (Ankify ↔ Nosy Be) not included: they will be shown in your quote.",
+    "needCircuitOrDates": "Choose a tour or enter your departure and return dates to calculate the amount.",
+    "totalProgram": "Estimated total ({days} days, programme length)",
+    "rangeNote": "Depending on the season and road conditions: {range} ({min} to {max} days).",
+    "shortDates": "Your dates cover {days} day(s), while this programme takes at least {min} days: the amount above is based on your dates.",
+    "combineTitle": "Tours to combine",
+    "combineHelp": "Optional: tick the tours that make up your trip. The length and amount are calculated by adding up their programmes."
   }
 }

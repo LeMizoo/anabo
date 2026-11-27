@@ -1,18 +1,20 @@
 'use client'
 
-import { useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { urlFor } from '@/lib/sanity'
 import { brandTextColor, titleCase, titleSizeClass, headingFont } from '@/lib/typography'
-import type { CustomQuoteBlock, CustomQuoteOption, SanityImage } from '@/lib/types'
+import type { Circuit, CustomQuoteBlock, CustomQuoteOption, SanityImage } from '@/lib/types'
+import { getPublicCircuitDurations } from '@/lib/circuit-duration-actions'
+import { circuitDurationRange, seasonOf, type DurationRow } from '@/lib/duration-range'
 import type { Locale } from '@/lib/i18n'
 import { QuoteEstimatePanel, type QuoteEstimate } from './QuoteEstimatePanel'
 import { QuoteReviewDialog } from './QuoteReviewDialog'
 import { QuoteReceivedAt } from './QuoteReceivedAt'
 import { NOSY_BE_DEFAULT_OPTION, type NosyBeOption } from '@/lib/nosy-be-option'
 
-type Props = { block: CustomQuoteBlock; locale: Locale }
+type Props = { block: CustomQuoteBlock; locale: Locale; circuits?: Circuit[] }
 
 function getOptionImageUrl(image?: SanityImage): string {
   if (!image) return ''
@@ -23,8 +25,13 @@ function getOptionImageUrl(image?: SanityImage): string {
   }
 }
 
-export function CustomQuoteForm({ block, locale }: Props) {
+export function CustomQuoteForm({ block, locale, circuits = [] }: Props) {
   const t = useTranslations('contactForm')
+  const te = useTranslations('quoteEstimate')
+  // Circuits à combiner : la durée et le montant du voyage sur mesure en sont le cumul.
+  const circuitChoices = circuits.filter((c) => c.slug && c.slug !== 'sur-mesure')
+  const [selectedCircuits, setSelectedCircuits] = useState<string[]>([])
+  const [durationRows, setDurationRows] = useState<DurationRow[]>([])
 
   const [regions, setRegions] = useState<string[]>([])
   const [experiences, setExperiences] = useState<string[]>([])
@@ -50,6 +57,24 @@ export function CustomQuoteForm({ block, locale }: Props) {
     if (!Number.isFinite(a) || !Number.isFinite(b) || b < a) return null
     return Math.round((b - a) / 86_400_000) + 1
   })()
+
+  useEffect(() => {
+    let active = true
+    if (selectedCircuits.length === 0) {
+      setDurationRows([])
+      return () => { active = false }
+    }
+    getPublicCircuitDurations(selectedCircuits)
+      .then((rows) => { if (active) setDurationRows(rows) })
+      .catch(() => { if (active) setDurationRows([]) })
+    return () => { active = false }
+  }, [selectedCircuits])
+
+  const durationRange = useMemo(
+    () => circuitDurationRange(durationRows, selectedCircuits, seasonOf(startDate)),
+    [durationRows, selectedCircuits, startDate],
+  )
+  const circuitTitle = (slug: string) => circuitChoices.find((c) => c.slug === slug)?.title || slug
 
   const toggle = (list: string[], setList: (v: string[]) => void, val: string) =>
     setList(list.includes(val) ? list.filter((x: string) => x !== val) : [...list, val])
@@ -130,6 +155,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
     const details = [
       `${labels.region}: ${chosenTitles(regionOptions, regions).join(', ') || '—'}`,
       `${labels.experience}: ${chosenTitles(experienceOptions, experiences).join(', ') || '—'}`,
+      ...(selectedCircuits.length ? [`${te('combineTitle')}: ${selectedCircuits.map(circuitTitle).join(', ')}`] : []),
       `${labels.vehicleLabel}: ${vehicleTitle || '—'}`,
       String(fd.get('message') || '').trim(),
     ]
@@ -143,8 +169,9 @@ export function CustomQuoteForm({ block, locale }: Props) {
         body: JSON.stringify({
           locale,
           circuitSlug: 'sur-mesure',
-          circuitTitle: labels.trip,
+          circuitTitle: selectedCircuits.length ? `${labels.trip} : ${selectedCircuits.map(circuitTitle).join(' + ')}` : labels.trip,
           regions,
+          ...(selectedCircuits.length ? { circuitSlugs: selectedCircuits } : {}),
           firstName,
           lastName,
           email,
@@ -175,6 +202,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
       setExperiences([])
       setVehicle('')
       setStartDate('')
+      setSelectedCircuits([])
       setEndDate('')
       setConsecutiveCircuits(1)
       setVehicleCount(1)
@@ -249,6 +277,19 @@ export function CustomQuoteForm({ block, locale }: Props) {
     </div>
   )
 
+  // Numérotation des étapes selon celles réellement affichées.
+  const stepNo = (() => {
+    let n = 0
+    const next = (shown: boolean) => (shown ? ++n : n)
+    return {
+      region: next(regionOptions.length > 0),
+      experience: next(experienceOptions.length > 0),
+      circuits: next(circuitChoices.length > 0),
+      vehicle: next(vehicleOptions.length > 0),
+      message: next(true),
+    }
+  })()
+
   const stepSection = (num: number, title: string | undefined, children: ReactNode) => {
     if (!title) return null
     return (
@@ -305,14 +346,59 @@ export function CustomQuoteForm({ block, locale }: Props) {
             <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
 
             {regionOptions.length > 0 &&
-              stepSection(1, block.regionHeading || labels.region, cardGrid(regionOptions, regions, (v: string) => toggle(regions, setRegions, v), 'checkbox', 'regions'))}
+              stepSection(stepNo.region, block.regionHeading || labels.region, cardGrid(regionOptions, regions, (v: string) => toggle(regions, setRegions, v), 'checkbox', 'regions'))}
 
             {experienceOptions.length > 0 &&
-              stepSection(2, block.experienceHeading || labels.experience, cardGrid(experienceOptions, experiences, (v: string) => toggle(experiences, setExperiences, v), 'checkbox', 'experiences'))}
+              stepSection(stepNo.experience, block.experienceHeading || labels.experience, cardGrid(experienceOptions, experiences, (v: string) => toggle(experiences, setExperiences, v), 'checkbox', 'experiences'))}
+
+            {circuitChoices.length > 0 &&
+              stepSection(
+                stepNo.circuits,
+                te('combineTitle'),
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">{te('combineHelp')}</p>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" data-testid="combine-circuits">
+                    {circuitChoices.map((c) => {
+                      const active = selectedCircuits.includes(c.slug)
+                      const range = durationRange?.perCircuit.find((x) => x.circuitSlug === c.slug)
+                      return (
+                        <label
+                          key={c.slug}
+                          className={`flex cursor-pointer items-start gap-3 rounded-xl border bg-white p-3 text-sm transition ${active ? 'border-[#06245F] ring-2 ring-[#06245F]/20' : 'border-gray-200 hover:border-[#06245F]/40'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            name="combineCircuits"
+                            value={c.slug}
+                            checked={active}
+                            onChange={() => toggle(selectedCircuits, setSelectedCircuits, c.slug)}
+                            className="mt-0.5 h-4 w-4 accent-[#06245F]"
+                          />
+                          <span>
+                            <span className="block font-medium text-gray-900">{c.title}</span>
+                            {range && (
+                              <span className="block text-xs text-gray-500">
+                                {range.minDays === range.maxDays ? te('days', { days: range.minDays }) : `${range.minDays}–${range.maxDays} j`}
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                  {durationRange && (
+                    <p className="text-sm font-semibold text-[#06245F]" data-testid="combine-total-days">
+                      {durationRange.minDays === durationRange.maxDays
+                        ? te('days', { days: durationRange.minDays })
+                        : `${durationRange.minDays} – ${durationRange.maxDays} ${locale === 'en' ? 'days' : locale === 'it' ? 'giorni' : 'jours'}`}
+                    </p>
+                  )}
+                </div>,
+              )}
 
             {vehicleOptions.length > 0 &&
               stepSection(
-                3,
+                stepNo.vehicle,
                 block.vehicleHeading || labels.vehicleLabel,
                 cardGrid(vehicleOptions, vehicle ? [vehicle] : [], (v: string) => setVehicle(vehicle === v ? '' : v), 'radio', 'vehicle'),
               )}
@@ -320,7 +406,7 @@ export function CustomQuoteForm({ block, locale }: Props) {
             <fieldset className="space-y-4">
               <legend className="flex items-center gap-3 text-lg font-semibold text-[#06245F]">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E0A01C] text-xs font-bold text-white">
-                  4
+                  {stepNo.message}
                 </span>
                 <span>{labels.message}</span>
               </legend>
@@ -359,12 +445,15 @@ export function CustomQuoteForm({ block, locale }: Props) {
               <QuoteEstimatePanel
                 locale={locale}
                 days={tripDays}
+                minDays={tripDays ? null : durationRange?.minDays ?? null}
+                maxDays={tripDays ? null : durationRange?.maxDays ?? null}
+                programMinDays={durationRange?.minDays ?? null}
                 vehicleCode={vehicle}
                 vehicleLabel={vehicleOptions.find((v) => v.value === vehicle)?.title || ''}
                 vehicleCount={vehicleCount}
                 circuitSlug="sur-mesure"
                 circuitTitle={labels.trip}
-                regions={regions}
+                regions={[...regions, ...selectedCircuits]}
                 nosyBeOption={nosyBeOption}
                 onNosyBeOptionChangeAction={setNosyBeOption}
                 onShippingApplicableChangeAction={setShippingApplicable}

@@ -43,7 +43,10 @@ export function QuoteReviewDialog({
 
   if (!open) return null
 
-  const total = estimate ? formatRange(estimate.totalMin, estimate.totalMax, estimate.currency, locale) : null
+  const total = estimate ? formatRange(estimate.referenceTotal, estimate.referenceTotal, estimate.currency, locale) : null
+  const range = estimate && estimate.rangeDays && estimate.totalMax > estimate.totalMin
+    ? formatRange(estimate.totalMin, estimate.totalMax, estimate.currency, locale)
+    : null
   const deposit = estimate ? formatRange(estimate.depositMin, estimate.depositMax, estimate.currency, locale) : null
   const percent = estimate?.depositPercent ?? 30
 
@@ -69,9 +72,14 @@ export function QuoteReviewDialog({
           {total ? (
             <>
               <p className="flex flex-wrap justify-between gap-2">
-                <span className="text-slate-600">{estimate?.days ? t('total') : t('totalRange')}</span>
+                <span className="text-slate-600">
+                  {estimate?.days ? `${t('total')} (${t('days', { days: estimate.days })})` : t('totalProgram', { days: estimate?.referenceDays ?? 0 })}
+                </span>
                 <strong className="text-lg text-[#06245F]">{total}</strong>
               </p>
+              {range && estimate?.rangeDays && (
+                <p className="text-xs text-slate-600">{t('rangeNote', { range, min: estimate.rangeDays.min, max: estimate.rangeDays.max })}</p>
+              )}
               {percent > 0 && deposit && (
                 <p className="flex flex-wrap justify-between gap-2">
                   <span className="text-slate-600">{t('deposit', { percent })}</span>

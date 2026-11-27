@@ -206,6 +206,12 @@
     "nosyBeStandardHelp": "Veicolo e autista per tutta la durata del tour, 3 giorni di rientro a vuoto da Diego-Suarez.",
     "nosyBeFerry": "Veicolo imbarcato per Nosy Be",
     "nosyBeFerryHelp": "Il veicolo e l’autista vi accompagnano a Nosy Be (traghetto da Ankify). 5 giorni di rientro a vuoto; il trasporto del veicolo in traghetto è a carico del cliente.",
-    "nosyBeFerryFees": "Costi del traghetto per il veicolo (Ankify ↔ Nosy Be) non inclusi: saranno indicati nel preventivo."
+    "nosyBeFerryFees": "Costi del traghetto per il veicolo (Ankify ↔ Nosy Be) non inclusi: saranno indicati nel preventivo.",
+    "needCircuitOrDates": "Scegli un tour o indica le date di partenza e di ritorno per calcolare l’importo.",
+    "totalProgram": "Importo totale stimato ({days} giorni, durata del programma)",
+    "rangeNote": "A seconda della stagione e delle condizioni delle strade: {range} (da {min} a {max} giorni).",
+    "shortDates": "Le tue date coprono {days} giorno/i, mentre questo programma richiede almeno {min} giorni: l’importo sopra si basa sulle tue date.",
+    "combineTitle": "Tour da combinare",
+    "combineHelp": "Facoltativo: seleziona i tour che compongono il tuo viaggio. Durata e importo si calcolano sommando i loro programmi."
   }
 }

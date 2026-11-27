@@ -22,6 +22,11 @@ export type QuoteEstimate = {
   currency: string
   indicativeOnly: boolean
   days: number | null
+  /** Montant affiché comme total : calculé sur les dates du client, sinon sur la durée du programme (durée minimale). */
+  referenceTotal: number
+  referenceDays: number | null
+  /** Fourchette de durée du programme (saison et état des routes), quand le calcul ne repose pas sur des dates. */
+  rangeDays: { min: number; max: number } | null
   vehicleName: string | null
   /** Nord et Nosy Be : formule retenue et frais de bac du véhicule en sus. */
   nosyBeOption: NosyBeOption | null
@@ -34,6 +39,8 @@ type Props = {
   days: number | null
   minDays?: number | null
   maxDays?: number | null
+  /** Durée minimale du programme choisi : avertit si les dates du client sont plus courtes. */
+  programMinDays?: number | null
   vehicleCode: string
   vehicleLabel?: string
   vehicleCount: number
@@ -79,6 +86,7 @@ export function QuoteEstimatePanel({
   days,
   minDays,
   maxDays,
+  programMinDays = null,
   vehicleCode,
   vehicleLabel,
   vehicleCount,
@@ -198,6 +206,9 @@ export function QuoteEstimatePanel({
             currency: res.currency,
             indicativeOnly: res.indicativeOnly,
             days: res.days,
+            referenceTotal: res.total,
+            referenceDays: res.days,
+            rangeDays: null,
             vehicleName: res.vehicleName,
             nosyBeOption: effectiveNosyBe,
             vehicleFerryNotIncluded: res.vehicleFerryNotIncluded,
@@ -215,12 +226,17 @@ export function QuoteEstimatePanel({
         const pct = depositInfo.percent
         const minTotal = Math.min(low.total, high.total)
         const maxTotal = Math.max(low.total, high.total)
+        // Montant exact affiché = durée du programme (durée minimale) ; fourchette en complément.
+        const refDeposit = Math.round((low.total * pct) / 100)
         setStatus('ready')
         publish({
           totalMin: minTotal,
           totalMax: maxTotal,
-          depositMin: Math.round((minTotal * pct) / 100),
-          depositMax: Math.round((maxTotal * pct) / 100),
+          referenceTotal: low.total,
+          referenceDays: minDays!,
+          rangeDays: { min: minDays!, max: maxDays! },
+          depositMin: refDeposit,
+          depositMax: refDeposit,
           depositPercent: pct,
           paymentMethod: depositInfo.method,
           currency: low.currency,
@@ -257,7 +273,11 @@ export function QuoteEstimatePanel({
     depositInfo.method,
   ])
 
-  const totalText = estimate ? formatRange(estimate.totalMin, estimate.totalMax, estimate.currency, locale) : null
+  const totalText = estimate ? formatMoney(estimate.referenceTotal, estimate.currency, locale) : null
+  const rangeText = estimate && estimate.rangeDays && estimate.totalMax > estimate.totalMin
+    ? formatRange(estimate.totalMin, estimate.totalMax, estimate.currency, locale)
+    : null
+  const shortDates = estimate && estimate.days && programMinDays && estimate.days < programMinDays
   const depositText = estimate ? formatRange(estimate.depositMin, estimate.depositMax, estimate.currency, locale) : null
 
   return (
@@ -358,7 +378,7 @@ export function QuoteEstimatePanel({
         <p className="text-sm text-slate-600">{t('needVehicle')}</p>
       )}
       {status === 'idle' && vehicleCode && (
-        <p className="text-sm text-slate-600">{t('needDates')}</p>
+        <p className="text-sm text-slate-600">{t('needCircuitOrDates')}</p>
       )}
       {status === 'loading' && (
         <p className="inline-flex items-center gap-2 text-sm text-slate-600">
@@ -377,11 +397,22 @@ export function QuoteEstimatePanel({
         <div className="space-y-2 rounded-xl border border-[#06245F]/10 bg-white p-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-sm text-slate-600">
-              {estimate.days ? t('total') : t('totalRange')}
-              {estimate.days ? ` (${t('days', { days: estimate.days })})` : ''}
+              {estimate.days
+                ? `${t('total')} (${t('days', { days: estimate.days })})`
+                : t('totalProgram', { days: estimate.referenceDays ?? 0 })}
             </span>
-            <strong className="text-lg font-bold text-[#06245F]">{totalText}</strong>
+            <strong className="text-lg font-bold text-[#06245F]" data-testid="estimate-total">{totalText}</strong>
           </div>
+          {rangeText && estimate.rangeDays && (
+            <p className="text-xs text-slate-600" data-testid="estimate-range">
+              {t('rangeNote', { range: rangeText, min: estimate.rangeDays.min, max: estimate.rangeDays.max })}
+            </p>
+          )}
+          {shortDates && (
+            <p className="rounded-lg bg-amber-50 p-2 text-xs font-medium text-amber-900" data-testid="estimate-short-dates">
+              {t('shortDates', { days: estimate.days ?? 0, min: programMinDays ?? 0 })}
+            </p>
+          )}
 
           {estimate.depositPercent > 0 && depositText && (
             <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-slate-100 pt-2">

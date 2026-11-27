@@ -69,6 +69,11 @@ export type TripVehiclePriceSnapshot = {
 export type VehicleEstimateSnapshot = TripVehiclePriceSnapshot & {
   version: 3
   calculatedAt: string
+  /** « dates » : durée = dates du client ; « programme » : durée de référence des circuits choisis (sans dates). */
+  durationBasis?: 'dates' | 'programme'
+  /** Fourchette de durée des circuits choisis (saison et état des routes) et montant pour la durée maximale. */
+  durationRange?: { min: number; max: number }
+  totalMax?: number
 }
 
 export function parseVehicleEstimateSnapshot(
