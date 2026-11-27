@@ -10,7 +10,7 @@ Site web multilingue (FR / EN / IT) de **roadtrip.anabo.mg** : location de voitu
 - **Madagascar** : présentation de l’île (situation, relief, climat, histoire) et galerie de 79 photos légendées (`#photos`). L’ancienne page Galerie redirige ici (308).
 - **10 circuits** avec programme jour par jour, itinéraire et galerie légendée ; **voyage sur mesure**.
 - **FAQ** (`/faq`) : 30 questions en 6 thèmes, avec données structurées `FAQPage`.
-- **Demande de devis** : montant exact affiché dès le choix du circuit (durée du programme), fourchette selon la saison et l’état des routes, cumul des circuits (extensions et « circuits à combiner » du sur mesure), retours à vide et option Nosy Be ; récapitulatif avant envoi, e-mails Resend au client et à l’équipe, suivi client sur `/devis/[référence]`.
+- **Demande de devis** : montant exact affiché dès le choix du circuit (durée du programme), fourchette selon la saison et l’état des routes, cumul des circuits (extensions et « circuits à combiner » du sur mesure), retours à vide et option Nosy Be, proposition d’un circuit complémentaire quand les dates dépassent le programme ; récapitulatif avant envoi, e-mails Resend au client et à l’équipe, suivi client sur `/devis/[référence]`.
 - **Conditions d’annulation** (`/annulation`), **politique de cookies**, bandeau de consentement.
 - Responsive de 320 px à l’écran large ; heures affichées en heure de Madagascar (GMT+3).
 
@@ -19,7 +19,7 @@ Site web multilingue (FR / EN / IT) de **roadtrip.anabo.mg** : location de voitu
 | Page | Rôle |
 |---|---|
 | Tableau de bord | Chiffres clés, alertes de capacité, dernières demandes |
-| Demandes de devis | Liste paginée (10 par page), filtres, archivage manuel ou par règle, fiche détaillée |
+| Demandes de devis | Liste paginée (10 par page), filtres, archivage manuel ou par règle, fiche détaillée avec « Résumé du voyage » (séjour, montant ventilé, écart avec l’estimation, acompte, solde, reste) |
 | Planning | Voyages confirmés et chevauchements véhicules/chauffeurs (« Mes voyages » pour un chauffeur) |
 | Chauffeurs | Équipe et renforts temporaires |
 | Prix et véhicules | Onglets **Véhicules**, **Durées des circuits**, **Retours à vide** (super-admin) |
