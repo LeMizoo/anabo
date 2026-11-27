@@ -1,14 +1,20 @@
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { getAdminAlerts } from '@/lib/admin-alerts'
+import { canAccessPath, getCurrentAdmin, isStaff } from '@/lib/admin-access'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
-  if (!session) redirect('/admin/login')
+  // Compte relu en base : un compte désactivé ou supprimé est déconnecté immédiatement.
+  const user = await getCurrentAdmin()
+  if (!user) redirect('/admin/login')
 
-  const userRole = (session.user as { role?: string })?.role || 'ADMIN'
-  const alerts = await getAdminAlerts()
+  // Un compte Chauffeur n'accède qu'à ses voyages et à son compte.
+  const pathname = (await headers()).get('x-admin-pathname') || ''
+  if (!canAccessPath(user.role, pathname)) redirect('/admin/planning')
+
+  const userRole = user.role
+  const alerts = isStaff(user.role) ? await getAdminAlerts() : null
 
   return (
     <div className="flex min-h-screen bg-gray-50">

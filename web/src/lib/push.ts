@@ -36,7 +36,7 @@ export async function sendPushToAdmins(payload: PushPayload): Promise<{ sent: nu
 
     const subscriptions = await prisma.adminPushSubscription.findMany()
     const activeAdmins = new Set(
-      (await prisma.adminUser.findMany({ where: { active: true }, select: { id: true } })).map((u) => u.id),
+      (await prisma.adminUser.findMany({ where: { active: true, role: { in: ['ADMIN', 'SUPER_ADMIN'] } }, select: { id: true } })).map((u) => u.id),
     )
     let sent = 0
     let failed = 0

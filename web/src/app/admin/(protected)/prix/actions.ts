@@ -2,7 +2,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { auth } from '@/lib/auth'
+import { requireSuperAdmin as requireSuperAdminAccess } from '@/lib/admin-access'
 import { prisma } from '@/lib/prisma'
 import type {
   PackagePricingScope,
@@ -11,10 +11,7 @@ import type {
 } from '@/generated/prisma/enums'
 
 async function requireSuperAdmin() {
-  const session = await auth()
-  if ((session?.user as { role?: string } | undefined)?.role !== 'SUPER_ADMIN') {
-    throw new Error('Accès réservé au super-administrateur.')
-  }
+  await requireSuperAdminAccess()
 }
 
 function readText(formData: FormData, key: string) {

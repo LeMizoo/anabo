@@ -2,13 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
+import { requireStaff } from '@/lib/admin-access'
 import { prisma } from '@/lib/prisma'
 
 async function requireSession() {
-  const session = await auth()
-  if (!session?.user) throw new Error('Non autorisé')
-  return session
+  return { user: await requireStaff() }
 }
 
 const text = (formData: FormData, key: string, max: number) => {

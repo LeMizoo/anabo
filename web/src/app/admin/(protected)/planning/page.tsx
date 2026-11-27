@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
+import { getCurrentAdmin } from '@/lib/admin-access'
 import { prisma } from '@/lib/prisma'
 import { quoteStatusColor, quoteStatusLabel } from '@/lib/quote-status'
 import { getCapacityReport } from '@/lib/fleet-capacity'
@@ -21,6 +21,7 @@ type Trip = {
   travellers: string
   vehicle: string
   driver: string | null
+  phone: string
 }
 
 function tripEnd(start: Date, end: Date | null, duration: number | null) {
@@ -35,28 +36,29 @@ const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: '2-digit', month: 
 type Props = { searchParams: Promise<{ passes?: string }> }
 
 export default async function PlanningPage({ searchParams }: Props) {
-  const session = await auth()
-  if (!session) redirect('/admin/login')
+  const user = await getCurrentAdmin()
+  if (!user) redirect('/admin/login')
+  // Compte Chauffeur : uniquement ses voyages confirmés, sans accès aux fiches ni aux alertes.
+  const isDriver = user.role === 'CHAUFFEUR'
 
   const { passes } = await searchParams
   const showPast = passes === '1'
   const today = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00.000Z')
 
   const quotes = await prisma.quoteRequest.findMany({
-    where: {
-      status: { in: ['CONFIRME', 'DEVIS_ENVOYE'] },
-      startDate: { not: null },
-    },
+    where: isDriver
+      ? { status: 'CONFIRME', startDate: { not: null }, archivedAt: null, assignedDriverId: user.driverId ?? '__aucun__' }
+      : { status: { in: ['CONFIRME', 'DEVIS_ENVOYE'] }, startDate: { not: null } },
     orderBy: { startDate: 'asc' },
     select: {
       id: true, reference: true, status: true, firstName: true, lastName: true,
       circuitTitle: true, circuitSlug: true, startDate: true, endDate: true,
       selectedDurationDays: true, adults: true, children: true,
-      vehicleLabel: true, vehicleCount: true, assignedDriverId: true,
+      vehicleLabel: true, vehicleCount: true, assignedDriverId: true, phone: true,
     },
   })
   const [report, drivers] = await Promise.all([
-    getCapacityReport(),
+    isDriver ? Promise.resolve({ shortages: [], driverConflicts: [], capacity: 0, activeDrivers: 0 } as unknown as Awaited<ReturnType<typeof getCapacityReport>>) : getCapacityReport(),
     prisma.driver.findMany({ select: { id: true, name: true } }),
   ])
   const driverName = new Map(drivers.map((d) => [d.id, d.name]))
@@ -77,6 +79,7 @@ export default async function PlanningPage({ searchParams }: Props) {
         travellers: `${q.adults} ad.${q.children ? ` / ${q.children} enf.` : ''}`,
         vehicle: q.vehicleLabel ? `${q.vehicleLabel}${q.vehicleCount > 1 ? ` ×${q.vehicleCount}` : ''}` : '—',
         driver: q.assignedDriverId ? driverName.get(q.assignedDriverId) || null : null,
+        phone: q.phone,
       }
     })
     .filter((t) => showPast || t.end >= today)
@@ -105,9 +108,9 @@ export default async function PlanningPage({ searchParams }: Props) {
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Planning des voyages</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{isDriver ? 'Mes voyages' : 'Planning des voyages'}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Voyages confirmés et devis envoyés ayant une date de départ.
+            {isDriver ? `Voyages confirmés qui vous sont affectés, ${user.name}.` : 'Voyages confirmés et devis envoyés ayant une date de départ.'}
           </p>
         </div>
         <Link
@@ -134,6 +137,12 @@ export default async function PlanningPage({ searchParams }: Props) {
           </p>
         </div>
       </div>
+
+      {isDriver && !user.driverId && (
+        <p role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          Votre compte n’est relié à aucune fiche chauffeur : demandez à l’administrateur de le relier depuis la page Utilisateurs pour voir vos voyages.
+        </p>
+      )}
 
       {report.shortages.length > 0 && (
         <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-950">
@@ -190,12 +199,19 @@ export default async function PlanningPage({ searchParams }: Props) {
                       <p className="text-xs text-gray-500">{trip.days} jour{trip.days > 1 ? 's' : ''}</p>
                     </div>
                     <div className="text-sm">
-                      <Link href={`/admin/demandes/${trip.id}`} className="font-semibold text-blue-700 hover:underline">
-                        {trip.client}
-                      </Link>{' '}
+                      {isDriver ? (
+                        <span className="font-semibold text-gray-900">{trip.client}</span>
+                      ) : (
+                        <Link href={`/admin/demandes/${trip.id}`} className="font-semibold text-blue-700 hover:underline">
+                          {trip.client}
+                        </Link>
+                      )}{' '}
                       <span className="text-gray-400">· {trip.reference}</span>
                       <p className="text-gray-600">{trip.circuit}</p>
                       <p className="text-xs text-gray-500">{trip.travellers} · {trip.vehicle}</p>
+                      {isDriver && trip.phone && (
+                        <a href={`tel:${trip.phone.replace(/[^\d+]/g, '')}`} className="text-xs font-medium text-blue-700 hover:underline">Client : {trip.phone}</a>
+                      )}
                       <p className={`text-xs ${trip.driver ? 'text-gray-600' : 'text-orange-700'}`}>
                         Chauffeur : {trip.driver || 'non affecté'}
                       </p>

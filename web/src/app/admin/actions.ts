@@ -12,6 +12,7 @@ import {
 } from '@/generated/prisma/enums'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { requireStaff, requireSuperAdmin as requireSuperAdminAccess } from '@/lib/admin-access'
 import { sendQuoteStatusEmail, sendNewUserEmail, sendDepositReceivedEmail } from '@/lib/email'
 import { signQuoteToken } from '@/lib/quote-token'
 import { notifyIfShortage } from '@/lib/capacity-alerts'
@@ -20,28 +21,18 @@ import { redirect } from 'next/navigation'
 import { archiveRuleWhere, isArchiveRule } from '@/lib/quote-archive'
 
 const MAX_TEXT = 20000
-const ROLES = ['ADMIN', 'SUPER_ADMIN'] as const
+const ROLES = ['ADMIN', 'SUPER_ADMIN', 'CHAUFFEUR'] as const
 
 type Role = (typeof ROLES)[number]
 
+// Compte relu en base à chaque action : rôle et activation toujours à jour.
+// Un compte Chauffeur ne peut appeler aucune de ces actions.
 async function requireSession() {
-  const session = await auth()
-
-  if (!session?.user) {
-    throw new Error('Non autorisé')
-  }
-
-  return session
+  return { user: await requireStaff() }
 }
 
 async function requireSuperAdmin() {
-  const session = await requireSession()
-
-  if ((session.user as { role?: string }).role !== 'SUPER_ADMIN') {
-    throw new Error('Seul un SUPER_ADMIN peut effectuer cette action.')
-  }
-
-  return session
+  return { user: await requireSuperAdminAccess() }
 }
 
 export async function updateQuoteStatus(
@@ -282,6 +273,7 @@ export async function createAdminUser(data: {
   email: string
   role: string
   password?: string
+  driverId?: string | null
 }) {
   await requireSuperAdmin()
 
@@ -319,6 +311,8 @@ export async function createAdminUser(data: {
     throw new Error('Un utilisateur avec cet e-mail existe déjà.')
   }
 
+  const driverId = role === 'CHAUFFEUR' ? await validDriverId(data.driverId) : null
+
   await prisma.adminUser.create({
     data: {
       name,
@@ -326,6 +320,7 @@ export async function createAdminUser(data: {
       passwordHash: await bcrypt.hash(password, 10),
       role,
       active: true,
+      driverId,
     },
   })
 
@@ -353,6 +348,13 @@ export async function toggleAdminUserStatus(
 
   if (session?.user?.id === userId && !active) {
     throw new Error('Vous ne pouvez pas désactiver votre propre compte.')
+  }
+
+  if (!active) {
+    const target = await prisma.adminUser.findUnique({ where: { id: userId }, select: { role: true, active: true } })
+    if (target?.role === 'SUPER_ADMIN' && target.active && (await activeSuperAdmins()) <= 1) {
+      throw new Error('Il doit rester au moins un super-administrateur actif.')
+    }
   }
 
   await prisma.adminUser.update({
@@ -404,6 +406,77 @@ export async function resendAdminUserInvitation(userId: string) {
   revalidatePath('/admin/utilisateurs')
 
   return { success: true, tempPassword }
+}
+
+/** Fiche chauffeur existante (ou null) : un compte Chauffeur ne peut être relié qu'à une vraie fiche. */
+async function validDriverId(value: unknown) {
+  const id = typeof value === 'string' ? value.trim() : ''
+  if (!id) return null
+  const driver = await prisma.driver.findUnique({ where: { id }, select: { id: true } })
+  if (!driver) throw new Error('Fiche chauffeur introuvable.')
+  return driver.id
+}
+
+/** Nombre de SUPER_ADMIN actifs (on ne retire jamais le dernier). */
+async function activeSuperAdmins() {
+  return prisma.adminUser.count({ where: { role: 'SUPER_ADMIN', active: true } })
+}
+
+function backToUsers(message: string, isError = false): never {
+  redirect(`/admin/utilisateurs?${isError ? 'erreur' : 'ok'}=${encodeURIComponent(message)}`)
+}
+
+/** Modifie un compte : nom, e-mail, rôle, fiche chauffeur liée. */
+export async function updateAdminUser(formData: FormData) {
+  const me = (await requireSuperAdmin()).user
+  const id = String(formData.get('id') || '')
+  const name = String(formData.get('name') || '').trim().slice(0, 150)
+  const email = String(formData.get('email') || '').trim().toLowerCase().slice(0, 191)
+  const role = String(formData.get('role') || '') as Role
+
+  const user = await prisma.adminUser.findUnique({ where: { id } })
+  if (!user) backToUsers('Utilisateur introuvable.', true)
+  if (!name) backToUsers('Nom requis.', true)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) backToUsers('E-mail invalide.', true)
+  if (!ROLES.includes(role)) backToUsers('Rôle invalide.', true)
+  if (id === me.id && role !== 'SUPER_ADMIN') backToUsers('Vous ne pouvez pas retirer vos propres droits de super-administrateur.', true)
+  if (user.role === 'SUPER_ADMIN' && role !== 'SUPER_ADMIN' && user.active && (await activeSuperAdmins()) <= 1) {
+    backToUsers('Il doit rester au moins un super-administrateur actif.', true)
+  }
+  if (email !== user.email && (await prisma.adminUser.findUnique({ where: { email } }))) {
+    backToUsers('Un utilisateur avec cet e-mail existe déjà.', true)
+  }
+
+  let driverId: string | null = null
+  try {
+    driverId = role === 'CHAUFFEUR' ? await validDriverId(formData.get('driverId')) : null
+  } catch (error) {
+    backToUsers(error instanceof Error ? error.message : 'Fiche chauffeur invalide.', true)
+  }
+
+  await prisma.adminUser.update({ where: { id }, data: { name, email, role, driverId } })
+  revalidatePath('/admin/utilisateurs')
+  backToUsers(`Compte de ${name} mis à jour.`)
+}
+
+/** Supprime définitivement un compte (jamais le sien, jamais le dernier super-administrateur). */
+export async function deleteAdminUser(formData: FormData) {
+  const me = (await requireSuperAdmin()).user
+  const id = String(formData.get('id') || '')
+  if (id === me.id) backToUsers('Vous ne pouvez pas supprimer votre propre compte.', true)
+
+  const user = await prisma.adminUser.findUnique({ where: { id } })
+  if (!user) backToUsers('Utilisateur introuvable.', true)
+  if (user.role === 'SUPER_ADMIN' && user.active && (await activeSuperAdmins()) <= 1) {
+    backToUsers('Impossible de supprimer le dernier super-administrateur actif.', true)
+  }
+
+  await prisma.$transaction([
+    prisma.adminPushSubscription.deleteMany({ where: { adminUserId: id } }),
+    prisma.adminUser.delete({ where: { id } }),
+  ])
+  revalidatePath('/admin/utilisateurs')
+  backToUsers(`Compte de ${user.name} supprimé.`)
 }
 
 export async function changePassword(
@@ -499,6 +572,21 @@ export async function saveQuotePayment(formData: FormData) {
   })
   revalidatePath(`/admin/demandes/${quoteId}`)
   redirect(`/admin/demandes/${quoteId}`)
+}
+
+/** Marque le solde comme reçu (ou annule ce marquage). Retour vers la page d'origine. */
+export async function toggleBalancePaid(formData: FormData) {
+  await requireSession()
+  const quoteId = String(formData.get('quoteId') || '')
+  const quote = await prisma.quoteRequest.findUnique({ where: { id: quoteId }, select: { balancePaidAt: true } })
+  if (!quote) throw new Error('Demande introuvable.')
+  await prisma.quoteRequest.update({
+    where: { id: quoteId },
+    data: { balancePaidAt: quote.balancePaidAt ? null : new Date() },
+  })
+  revalidatePath(`/admin/demandes/${quoteId}`)
+  revalidatePath('/admin/comptabilite')
+  redirect(safeReturnTo(formData.get('returnTo'), `/admin/demandes/${quoteId}`))
 }
 
 /** Marque l'acompte comme reçu (ou annule ce marquage). */

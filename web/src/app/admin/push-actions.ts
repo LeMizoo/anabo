@@ -1,6 +1,6 @@
 'use server'
 
-import { auth } from '@/lib/auth'
+import { requireStaff } from '@/lib/admin-access'
 import { prisma } from '@/lib/prisma'
 import { endpointHash, isPushConfigured, sendPushToAdmins } from '@/lib/push'
 
@@ -10,9 +10,7 @@ type BrowserSubscription = {
 }
 
 async function requireAdmin() {
-  const session = await auth()
-  if (!session?.user?.id) throw new Error('Non autorisé')
-  return session.user.id
+  return (await requireStaff()).id
 }
 
 export async function savePushSubscription(subscription: BrowserSubscription, userAgent?: string) {

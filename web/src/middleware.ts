@@ -24,7 +24,13 @@ export default function middleware(request: NextRequest) {
 
   // L'administration et l'API ne passent pas par la gestion des langues.
   const { pathname } = request.nextUrl
-  if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+  if (pathname.startsWith('/admin')) {
+    // Chemin transmis à la mise en page de l'administration (contrôle d'accès par rôle).
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-admin-pathname', pathname)
+    return NextResponse.next({ request: { headers: requestHeaders } })
+  }
+  if (pathname.startsWith('/api')) {
     return NextResponse.next()
   }
 

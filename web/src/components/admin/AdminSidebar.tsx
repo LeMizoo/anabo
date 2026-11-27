@@ -3,23 +3,28 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, CalendarDays, Car, Wallet, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, FileText, LogOut, Home, Server, Database, ExternalLink, Users, Mail, Menu, X, UserCircle, CircleDollarSign, CalendarDays, Car, Wallet, Calculator, type LucideIcon } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { AlertBell } from './AlertBell'
 import type { AdminAlerts } from '@/lib/admin-alerts'
 
-export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: AdminAlerts }) {
+export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: AdminAlerts | null }) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  const primaryItems = [
-    { label: 'Tableau de bord', href: '/admin/dashboard', icon: LayoutDashboard },
-    { label: 'Demandes de devis', href: '/admin/demandes', icon: FileText },
-    { label: 'Planning', href: '/admin/planning', icon: CalendarDays },
-    { label: 'Chauffeurs', href: '/admin/chauffeurs', icon: Car },
-  ]
+  // Un compte Chauffeur ne voit que ses voyages et son compte.
+  const isDriver = userRole === 'CHAUFFEUR'
+  const primaryItems = isDriver
+    ? [{ label: 'Mes voyages', href: '/admin/planning', icon: CalendarDays }]
+    : [
+        { label: 'Tableau de bord', href: '/admin/dashboard', icon: LayoutDashboard },
+        { label: 'Demandes de devis', href: '/admin/demandes', icon: FileText },
+        { label: 'Planning', href: '/admin/planning', icon: CalendarDays },
+        { label: 'Chauffeurs', href: '/admin/chauffeurs', icon: Car },
+      ]
 
   const adminItems = userRole === 'SUPER_ADMIN' ? [
+    { label: 'Comptabilité', href: '/admin/comptabilite', icon: Calculator },
     { label: 'Prix et véhicules', href: '/admin/prix', icon: CircleDollarSign },
     { label: 'Paiement et acompte', href: '/admin/paiement', icon: Wallet },
     { label: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users },
@@ -78,9 +83,9 @@ export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: A
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold tracking-tight text-white">ANABO</h2>
-              <AlertBell initial={alerts} />
+              {alerts && <AlertBell initial={alerts} />}
             </div>
-            <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">Administration</p>
+            <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">{isDriver ? 'Espace chauffeur' : 'Administration'}</p>
           </div>
           <button onClick={closeMenu} className="md:hidden text-gray-400 hover:text-white">
             <X className="w-6 h-6" />
@@ -103,6 +108,7 @@ export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: A
             {renderItems(accountItems)}
           </section>
 
+          {!isDriver && <>
           <div className="border-t border-gray-800 pt-4 pb-2">
             <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Outils externes</p>
           </div>
@@ -124,6 +130,7 @@ export function AdminSidebar({ userRole, alerts }: { userRole: string; alerts: A
             <span className="font-medium flex-1">Sanity Studio</span>
             <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
           </a>
+          </>}
         </nav>
 
         <div className="p-4 border-t border-gray-800 space-y-2 mt-auto">

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { getCurrentAdmin, isStaff } from '@/lib/admin-access'
 import { prisma } from '@/lib/prisma'
 import type { Prisma } from '@/generated/prisma/client'
 import { isQuoteStatus, quoteStatusLabel } from '@/lib/quote-status'
@@ -16,8 +16,8 @@ function csvCell(value: unknown) {
 }
 
 export async function GET(request: Request) {
-  const session = await auth()
-  if (!session?.user) {
+  const user = await getCurrentAdmin()
+  if (!user || !isStaff(user.role)) {
     return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
   }
 

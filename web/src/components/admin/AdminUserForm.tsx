@@ -5,11 +5,12 @@ import { createAdminUser } from '@/app/admin/actions'
 import { Loader2, UserPlus, CheckCircle2 } from 'lucide-react'
 import { PasswordField } from './PasswordField'
 
-export function AdminUserForm() {
+export function AdminUserForm({ drivers = [] }: { drivers?: { id: string; name: string }[] }) {
   const [isPending, startTransition] = useTransition()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('ADMIN')
+  const [driverId, setDriverId] = useState('')
   const [success, setSuccess] = useState<{
     email: string
     password: string
@@ -23,7 +24,7 @@ export function AdminUserForm() {
 
     startTransition(async () => {
       try {
-        const result = await createAdminUser({ name, email, role })
+        const result = await createAdminUser({ name, email, role, driverId: role === 'CHAUFFEUR' ? driverId : null })
 
         if (result.success && result.tempPassword) {
           setSuccess({ email, password: result.tempPassword })
@@ -131,8 +132,28 @@ export function AdminUserForm() {
         >
           <option value="ADMIN">Administrateur (gère les demandes)</option>
           <option value="SUPER_ADMIN">Super Administrateur (accès total)</option>
+          <option value="CHAUFFEUR">Chauffeur (voit uniquement ses voyages)</option>
         </select>
       </div>
+
+      {role === 'CHAUFFEUR' && (
+        <div>
+          <label htmlFor="admin-user-driver" className="block text-sm font-medium text-gray-700 mb-1">
+            Fiche chauffeur liée
+          </label>
+          <select
+            id="admin-user-driver"
+            value={driverId}
+            onChange={e => setDriverId(e.target.value)}
+            disabled={isPending}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+          >
+            <option value="">— Aucune (à relier plus tard) —</option>
+            {drivers.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+          </select>
+          <p className="mt-1 text-xs text-gray-500">Le chauffeur verra les voyages affectés à cette fiche (page Chauffeurs).</p>
+        </div>
+      )}
 
       <button
         type="submit"

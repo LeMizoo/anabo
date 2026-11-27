@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
+import { getCurrentAdmin } from '@/lib/admin-access'
 import { prisma } from '@/lib/prisma'
 
 function back(message: string, isError = false): never {
@@ -11,8 +11,9 @@ function back(message: string, isError = false): never {
 
 /** Paramètres de paiement de l'acompte : réservé au SUPER_ADMIN. */
 export async function savePaymentSettings(formData: FormData) {
-  const session = await auth()
-  if ((session?.user as { role?: string } | undefined)?.role !== 'SUPER_ADMIN') {
+  const user = await getCurrentAdmin()
+  const session = user ? { user } : null
+  if (user?.role !== 'SUPER_ADMIN') {
     back('Seul un SUPER_ADMIN peut modifier les paramètres de paiement.', true)
   }
 

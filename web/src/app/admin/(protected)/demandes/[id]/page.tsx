@@ -21,7 +21,7 @@ import { DeleteQuoteForm } from '@/components/admin/DeleteQuoteForm'
 import { getCancellationStatus } from '@/lib/cancellation'
 import { assignDriver } from '@/app/admin/(protected)/chauffeurs/actions'
 import { shortageForTrip } from '@/lib/fleet-capacity'
-import { archiveQuotes, saveQuotePayment, toggleDepositPaid, unarchiveQuotes } from '@/app/admin/actions'
+import { archiveQuotes, saveQuotePayment, toggleBalancePaid, toggleDepositPaid, unarchiveQuotes } from '@/app/admin/actions'
 import { getPaymentSettings, depositAmount, formatAmount } from '@/lib/payment-settings'
 
 export const dynamic = 'force-dynamic'
@@ -839,6 +839,28 @@ export default async function AdminDemandeDetailPage({ params }: Props) {
                 </button>
               )}
             </form>
+            {/* Solde (reste après l'acompte) : suivi pour la comptabilité. */}
+            {quote.quoteTotalAmount ? (
+              <form action={toggleBalancePaid} className="mt-3 print:hidden">
+                <input type="hidden" name="quoteId" value={quote.id} />
+                <input type="hidden" name="returnTo" value={`/admin/demandes/${quote.id}`} />
+                <p className="mb-1 text-gray-800">
+                  Solde : <strong>{formatAmount(Math.max(quote.quoteTotalAmount - (deposit ?? 0), 0), quote.quoteCurrency)}</strong>
+                </p>
+                {quote.balancePaidAt ? (
+                  <p className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-green-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                      Solde reçu le {formatMgDateTime(quote.balancePaidAt)} (GMT+3)
+                    </span>
+                    <button className="text-xs text-gray-600 underline">Annuler</button>
+                  </p>
+                ) : (
+                  <button className="rounded-lg border border-green-600 bg-white px-3 py-1.5 text-xs font-semibold text-green-800 hover:bg-green-50">
+                    Marquer le solde comme reçu
+                  </button>
+                )}
+              </form>
+            ) : null}
           </section>
 
           {quote.status === 'CONFIRME' && (
