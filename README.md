@@ -20,12 +20,23 @@ Site web multilingue (FR / EN / IT) de **roadtrip.anabo.mg** : location de voitu
 |---|---|
 | Tableau de bord | Chiffres clés, alertes de capacité, dernières demandes |
 | Demandes de devis | Liste paginée (10 par page), filtres, archivage manuel ou par règle, fiche détaillée |
-| Planning | Voyages confirmés et chevauchements véhicules/chauffeurs |
+| Planning | Voyages confirmés et chevauchements véhicules/chauffeurs (« Mes voyages » pour un chauffeur) |
 | Chauffeurs | Équipe et renforts temporaires |
 | Prix et véhicules | Onglets **Véhicules**, **Durées des circuits**, **Retours à vide** (super-admin) |
+| Comptabilité | Chiffre d’affaires, encaissé, reste à encaisser par mois et par voyage, solde reçu, export CSV (super-admin) |
 | Paiement et acompte | Taux d’acompte et instructions de paiement (super-admin) |
-| Utilisateurs | Invitation et activation des comptes (super-admin) |
+| Utilisateurs | Invitation, modification, activation et suppression des comptes, fiche chauffeur liée (super-admin) |
 | Mon compte | Profil, mot de passe, notifications push |
+
+### Rôles
+
+| Rôle | Accès |
+|---|---|
+| Super-administrateur | Tout, y compris Comptabilité, Prix et véhicules, Paiement et acompte, Utilisateurs |
+| Administrateur | Tableau de bord, Demandes, Planning, Chauffeurs, Mon compte |
+| Chauffeur | « Mes voyages » (ses voyages confirmés, relié à une fiche chauffeur) et Mon compte |
+
+Le contrôle d’accès est centralisé dans `web/src/lib/admin-access.ts` : le compte est relu en base à chaque requête (un changement de rôle ou une désactivation s’applique immédiatement), la mise en page de l’Admin refuse les pages non autorisées et chaque action serveur vérifie le rôle. Un utilisateur ne peut ni supprimer ni rétrograder son propre compte ; le dernier super-administrateur actif ne peut pas être retiré.
 
 ## Stack technique
 
@@ -80,7 +91,10 @@ npm run build
 
 ## Base de données
 
-Les migrations sont dans `web/prisma/migrations/` (0001 à 0009). En production, la base est modifiée **uniquement** en exécutant dans phpMyAdmin, après sauvegarde, le script correspondant de `web/prisma/deploy/` (tables préfixées `anabomg1_anabo_roadtrip`). La migration 0009 (règles de retour à vide paramétrables) est appliquée.
+Les migrations sont dans `web/prisma/migrations/` (0001 à 0010). En production, la base est modifiée **uniquement** en exécutant dans phpMyAdmin, après sauvegarde, le script correspondant de `web/prisma/deploy/` (tables préfixées `anabomg1_anabo_roadtrip`), **avant** de déployer la version qui l’utilise.
+
+- 0009 (règles de retour à vide paramétrables) : appliquée.
+- 0010 (rôle Chauffeur, `AdminUser.driverId`, `QuoteRequest.balancePaidAt`) : à exécuter avant le déploiement de la version « rôle Chauffeur et comptabilité ». Sans elle, la connexion à l’Admin et l’envoi des demandes de devis échouent.
 
 ## Déploiement (production)
 
