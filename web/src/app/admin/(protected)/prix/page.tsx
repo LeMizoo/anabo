@@ -153,10 +153,10 @@ export default async function PricingPage({ searchParams }: Props) {
   const durationCount = (slug: string) => durations.filter((d) => d.circuitSlug === slug).length
   const selectedCircuit = circuits.find((c) => c.slug === params.circuit)?.slug || circuits[0]?.slug || ''
   const configuredCircuits = circuits.filter((c) => durationCount(c.slug) > 0).length
-  const tabs: { key: Tab; label: string; count: string }[] = [
-    { key: 'vehicules', label: 'Véhicules', count: `${vehicles.filter((v) => v.active).length}` },
-    { key: 'durees', label: 'Durées des circuits', count: `${configuredCircuits}/${circuits.length}` },
-    { key: 'retours', label: 'Retours à vide', count: emptyReturnRules ? `${emptyReturnRules.filter((r) => r.active).length}` : '!' },
+  const tabs: { key: Tab; label: string; short: string; count: string }[] = [
+    { key: 'vehicules', label: 'Véhicules', short: 'Véhicules', count: `${vehicles.filter((v) => v.active).length}` },
+    { key: 'durees', label: 'Durées des circuits', short: 'Durées', count: `${configuredCircuits}/${circuits.length}` },
+    { key: 'retours', label: 'Retours à vide', short: 'Retours', count: emptyReturnRules ? `${emptyReturnRules.filter((r) => r.active).length}` : '!' },
   ]
 
   return (
@@ -173,22 +173,27 @@ export default async function PricingPage({ searchParams }: Props) {
         </p>
       </header>
 
-      <nav aria-label="Rubriques" className="sticky top-0 z-10 -mx-1 flex flex-wrap gap-2 border-b border-gray-200 bg-gray-50/95 px-1 pb-3 pt-1 backdrop-blur">
-        {tabs.map((t) => (
-          <Link
-            key={t.key}
-            href={`/admin/prix${t.key === 'vehicules' ? '' : `?onglet=${t.key}`}`}
-            aria-current={tab === t.key ? 'page' : undefined}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              tab === t.key ? 'border-blue-900 bg-blue-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            {t.label}
-            <span className={`rounded-full px-2 py-0.5 text-xs ${tab === t.key ? 'bg-white/20 text-white' : t.count === '!' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'}`}>
-              {t.count}
-            </span>
-          </Link>
-        ))}
+      {/* Onglets : barre segmentée de 3 colonnes égales, toujours sur une ligne (libellés courts sur mobile). */}
+      <nav aria-label="Rubriques" className="sticky top-0 z-10 -mx-4 border-b border-gray-200 bg-gray-50/95 px-4 py-2 backdrop-blur sm:mx-0 sm:px-0">
+        <div className="grid grid-cols-3 gap-1 rounded-xl bg-gray-200/70 p-1 sm:gap-1.5">
+          {tabs.map((t) => (
+            <Link
+              key={t.key}
+              href={`/admin/prix${t.key === 'vehicules' ? '' : `?onglet=${t.key}`}`}
+              aria-current={tab === t.key ? 'page' : undefined}
+              title={t.label}
+              className={`flex min-h-11 min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg px-1.5 py-1.5 text-center text-xs font-semibold leading-tight transition sm:flex-row sm:gap-2 sm:px-4 sm:py-2 sm:text-sm ${
+                tab === t.key ? 'bg-blue-900 text-white shadow-sm' : 'text-gray-700 hover:bg-white'
+              }`}
+            >
+              <span className="truncate lg:hidden">{t.short}</span>
+              <span className="hidden truncate lg:inline">{t.label}</span>
+              <span className={`rounded-full px-1.5 py-0.5 text-[11px] leading-none sm:px-2 sm:text-xs ${tab === t.key ? 'bg-white/20 text-white' : t.count === '!' ? 'bg-amber-100 text-amber-800' : 'bg-white text-gray-600'}`}>
+                {t.count}
+              </span>
+            </Link>
+          ))}
+        </div>
       </nav>
 
       {/* ONGLET : VÉHICULES */}
@@ -528,7 +533,7 @@ export default async function PricingPage({ searchParams }: Props) {
                         {season.label}
                       </h4>
 
-                      <div className="grid gap-3 md:grid-cols-3">
+                      <div className="grid gap-3 lg:grid-cols-3">
                         {roadConditions.map((condition) => {
                           const duration = durations.find(
                             (item) =>
@@ -682,7 +687,7 @@ export default async function PricingPage({ searchParams }: Props) {
 
                     <fieldset>
                       <legend className="text-sm font-medium text-gray-700">Circuits concernés</legend>
-                      <div className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="mt-2 grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
                         {circuitOptions.map((c) => (
                           <label key={c.slug} className="inline-flex items-center gap-2 text-sm text-gray-700">
                             <input type="checkbox" name="circuitSlugs" value={c.slug} defaultChecked={ruleCircuits.includes(c.slug)} className="h-4 w-4" />
@@ -695,7 +700,7 @@ export default async function PricingPage({ searchParams }: Props) {
 
                     <fieldset>
                       <legend className="text-sm font-medium text-gray-700">Régions du voyage sur mesure</legend>
-                      <div className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="mt-2 grid gap-1.5 sm:grid-cols-2 xl:grid-cols-3">
                         {[...regionOptions.entries()].map(([value, labels]) => (
                           <label key={value} className="inline-flex items-start gap-2 text-sm text-gray-700" title={labels.join(' · ')}>
                             <input type="checkbox" name="regionValues" value={value} defaultChecked={ruleRegions.includes(value)} className="mt-0.5 h-4 w-4" />

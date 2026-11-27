@@ -105,7 +105,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {capacity.shortages.length > 0 && (
-        <div role="alert" className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-950 sm:flex-row sm:items-center sm:justify-between">
+        <div role="alert" className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-950 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="font-semibold">
               {capacity.shortages.length} période(s) où des voyages confirmés se chevauchent
@@ -115,7 +115,7 @@ export default async function AdminDashboardPage() {
               ajoutez-en temporairement pour honorer toutes les demandes.
             </p>
           </div>
-          <div className="flex shrink-0 gap-2">
+          <div className="flex flex-wrap gap-2 lg:shrink-0">
             <Link href="/admin/planning" className="rounded-lg border border-red-300 bg-white px-3 py-2 font-semibold text-red-800 hover:bg-red-100">Voir le planning</Link>
             <Link href="/admin/chauffeurs?new=1&temporaire=1" className="rounded-lg bg-red-700 px-3 py-2 font-semibold text-white hover:bg-red-800">Ajouter un renfort</Link>
           </div>
@@ -213,38 +213,56 @@ export default async function AdminDashboardPage() {
       <DashboardCharts data={chartData} statusData={statusData} />
 
       <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-gray-100 p-6">
+        <div className="flex items-center justify-between gap-3 border-b border-gray-100 p-4 md:p-6">
           <h2 className="text-lg font-semibold text-gray-900">Dernières demandes reçues</h2>
           <Link href="/admin/demandes" className="text-sm font-medium text-blue-600 hover:underline">Tout voir</Link>
         </div>
-        <div className="w-full overflow-x-auto">
-          <table className="w-full min-w-[700px] text-left text-sm text-gray-600">
+        {/* Mobile : une carte par demande (pas de défilement horizontal). */}
+        <ul className="divide-y divide-gray-100 lg:hidden">
+          {recentQuotes.map((quote) => (
+            <li key={quote.id}>
+              <Link href={`/admin/demandes/${quote.id}`} className="block px-4 py-3 hover:bg-gray-50">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-gray-900">{quote.reference}</span>
+                  <span className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${quoteStatusColor(quote.status)}`}>
+                    {quoteStatusLabel(quote.status)}
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-gray-700">{quote.firstName} {quote.lastName}{quote.country ? ` · ${quote.country}` : ''}</div>
+                <div className="mt-0.5 text-xs text-gray-500">{formatMgDateTime(quote.createdAt)}</div>
+              </Link>
+            </li>
+          ))}
+          {recentQuotes.length === 0 && <li className="px-4 py-6 text-center text-sm text-gray-500">Aucune demande pour le moment.</li>}
+        </ul>
+        <div className="hidden w-full overflow-x-auto lg:block">
+          <table className="w-full text-left text-sm text-gray-600">
             <thead className="bg-gray-50 text-xs uppercase text-gray-500">
               <tr>
-                <th className="px-6 py-4 font-medium whitespace-nowrap">Référence</th>
-                <th className="px-6 py-4 font-medium">Client</th>
-                <th className="px-6 py-4 font-medium">Statut</th>
-                <th className="px-6 py-4 font-medium whitespace-nowrap">Date</th>
-                <th className="px-6 py-4 font-medium text-right">Action</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Référence</th>
+                <th className="px-4 py-3 font-medium">Client</th>
+                <th className="px-4 py-3 font-medium">Statut</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Date</th>
+                <th className="px-4 py-3 font-medium text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {recentQuotes.map((quote) => (
                 <tr key={quote.id} className="transition-colors hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{quote.reference}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{quote.reference}</td>
+                  <td className="px-4 py-3">
                     <div className="font-medium text-gray-900">{quote.firstName} {quote.lastName}</div>
                     <div className="text-xs text-gray-500">{quote.country || '—'}</div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${quoteStatusColor(quote.status)}`}>
                       {quoteStatusLabel(quote.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-500">
                     {formatMgDateTime(quote.createdAt)}
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-4 py-3 text-right">
                     <Link
                       href={`/admin/demandes/${quote.id}`}
                       className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-800"

@@ -259,7 +259,7 @@ export default async function AdminDemandesPage({ searchParams }: Props) {
             </span>
             <ChevronRight className="h-4 w-4 text-gray-400 transition group-open:rotate-90" aria-hidden="true" />
           </summary>
-          <div className="grid gap-3 border-t border-gray-100 p-4 md:grid-cols-3">
+          <div className="grid gap-3 border-t border-gray-100 p-4 lg:grid-cols-3">
             {ARCHIVE_RULES.map((rule, i) => (
               <form key={rule.value} action={archiveQuotes} className="flex flex-col justify-between gap-3 rounded-lg bg-gray-50 p-3">
                 <div>
