@@ -174,7 +174,7 @@ export default async function PricingPage({ searchParams }: Props) {
       </header>
 
       {/* Onglets : barre segmentée de 3 colonnes égales, toujours sur une ligne (libellés courts sur mobile). */}
-      <nav aria-label="Rubriques" className="sticky top-0 z-10 -mx-4 border-b border-gray-200 bg-gray-50/95 px-4 py-2 backdrop-blur sm:mx-0 sm:px-0">
+      <nav aria-label="Rubriques" className="sticky top-0 z-30 -mx-4 border-b border-gray-200 bg-gray-50/95 py-2 pl-16 pr-4 shadow-sm backdrop-blur md:mx-0 md:px-0 md:shadow-none">
         <div className="grid grid-cols-3 gap-1 rounded-xl bg-gray-200/70 p-1 sm:gap-1.5">
           {tabs.map((t) => (
             <Link

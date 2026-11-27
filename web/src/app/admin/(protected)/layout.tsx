@@ -13,8 +13,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar userRole={userRole} alerts={alerts} />
-      {/* pt-16 sur mobile pour laisser passer le bouton menu, p-4, puis md:p-8 sur grand écran */}
-      <main className="flex-1 overflow-y-auto w-full p-4 pt-20 md:pt-8 md:p-8">
+      {/* pt-20 sur mobile pour laisser passer le bouton menu. Pas d’overflow ici : c’est la fenêtre qui défile, ce qui permet aux barres « sticky » de rester visibles. */}
+      <main className="min-w-0 flex-1 w-full p-4 pt-20 md:pt-8 md:p-8">
         {children}
       </main>
     </div>
