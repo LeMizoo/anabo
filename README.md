@@ -94,7 +94,7 @@ npm run build
 Les migrations sont dans `web/prisma/migrations/` (0001 à 0010). En production, la base est modifiée **uniquement** en exécutant dans phpMyAdmin, après sauvegarde, le script correspondant de `web/prisma/deploy/` (tables préfixées `anabomg1_anabo_roadtrip`), **avant** de déployer la version qui l’utilise.
 
 - 0009 (règles de retour à vide paramétrables) : appliquée.
-- 0010 (rôle Chauffeur, `AdminUser.driverId`, `QuoteRequest.balancePaidAt`) : à exécuter avant le déploiement de la version « rôle Chauffeur et comptabilité ». Sans elle, la connexion à l’Admin et l’envoi des demandes de devis échouent.
+- 0010 (rôle Chauffeur, `AdminUser.driverId`, `QuoteRequest.balancePaidAt`) : appliquée le 27/11/2026.
 
 ## Déploiement (production)
 
