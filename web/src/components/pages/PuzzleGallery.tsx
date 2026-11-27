@@ -148,9 +148,10 @@ export function PuzzleGallery({ block, locale }: Props) {
                     className={`pointer-events-none absolute inset-0 rounded-xl ${overlayClasses[item.overlay]}`}
                   />
                 )}
-                <div className="absolute inset-0 flex items-end rounded-xl bg-black/40 p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                {/* Légende : toujours visible sur mobile (pas de survol), au survol sur ordinateur. */}
+                <div className="pointer-events-none absolute inset-0 flex items-end rounded-xl bg-gradient-to-t from-black/65 via-black/10 to-transparent p-3 transition-opacity duration-300 md:bg-black/40 md:bg-none md:p-4 md:opacity-0 md:group-hover:opacity-100">
                   {item.caption && (
-                    <p className="text-white font-medium text-sm md:text-base translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <p className="text-sm font-medium text-white transition-transform duration-300 md:translate-y-4 md:text-base md:group-hover:translate-y-0">
                       {item.caption}
                     </p>
                   )}
