@@ -434,11 +434,11 @@ export function CustomQuoteForm({ block, locale, circuits = [] }: Props) {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-gray-600">{labels.adults}</label>
-                  <input type="number" name="adults" min={1} max={30} defaultValue={2} className={inputCls} />
+                  <input type="number" name="adults" min={1} max={99} defaultValue={2} className={inputCls} />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-gray-600">{labels.children}</label>
-                  <input type="number" name="children" min={0} max={20} defaultValue={0} className={inputCls} />
+                  <input type="number" name="children" min={0} max={99} defaultValue={0} className={inputCls} />
                 </div>
               </div>
 

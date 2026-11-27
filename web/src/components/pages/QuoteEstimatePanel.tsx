@@ -150,7 +150,7 @@ export function QuoteEstimatePanel({
       return
     }
 
-    const safeCount = Number.isFinite(vehicleCount) && vehicleCount >= 1 ? Math.min(20, Math.floor(vehicleCount)) : 1
+    const safeCount = Number.isFinite(vehicleCount) && vehicleCount >= 1 ? Math.min(99, Math.floor(vehicleCount)) : 1
     const normalizedRegions = Array.isArray(regions)
       ? regions.map((r) => r.trim()).filter(Boolean)
       : null
@@ -338,11 +338,11 @@ export function QuoteEstimatePanel({
               id="quote-vehicle-count"
               type="number"
               min={1}
-              max={20}
+              max={99}
               value={vehicleCount}
               onChange={(e) => {
                 const n = parseInt(e.target.value, 10)
-                onVehicleCountChangeAction(Number.isFinite(n) && n >= 1 ? Math.min(20, n) : 1)
+                onVehicleCountChangeAction(Number.isFinite(n) && n >= 1 ? Math.min(99, n) : 1)
               }}
               className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-800 focus:border-[#06245F] focus:outline-none"
             />

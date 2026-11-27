@@ -688,7 +688,7 @@ export function ContactForm({
                   name="adults"
                   type="number"
                   min={1}
-                  max={20}
+                  max={99}
                   defaultValue={2}
                   className={inputClass}
                 />
@@ -703,7 +703,7 @@ export function ContactForm({
                   name="children"
                   type="number"
                   min={0}
-                  max={20}
+                  max={99}
                   defaultValue={0}
                   className={inputClass}
                 />

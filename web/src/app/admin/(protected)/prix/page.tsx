@@ -204,9 +204,9 @@ export default async function PricingPage({ searchParams }: Props) {
             Véhicules
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Les catégories sont communes à tous les circuits.
-            La capacité est informative : le nombre de véhicules
-            reste choisi manuellement lors du traitement du devis.
+            Une ligne par <strong>modèle</strong> de véhicule (aujourd’hui : 4x4 Prado et Hyundai Grand Starex), commune à tous les circuits.
+            Le <strong>nombre</strong> de véhicules n’est pas limité : le client indique combien il en veut, et les véhicules de renfort
+            du même modèle se gèrent dans la page Chauffeurs. Ne créez pas de deuxième ligne pour un même modèle.
           </p>
         </div>
 

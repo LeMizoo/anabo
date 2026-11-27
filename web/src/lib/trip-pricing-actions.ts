@@ -43,7 +43,7 @@ export async function calculateTripVehiclePriceAction(
     input.days > 365 ||
     !Number.isSafeInteger(input.vehicleCount) ||
     input.vehicleCount < 1 ||
-    input.vehicleCount > 20
+    input.vehicleCount > 99
   ) {
     return null
   }

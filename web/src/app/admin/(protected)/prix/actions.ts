@@ -54,6 +54,18 @@ export async function saveVehicleType(formData: FormData) {
     throw new Error('Informations du véhicule invalides.')
   }
 
+  // Un modèle par ligne : le nombre de véhicules d'un même modèle n'est pas limité (renforts),
+  // inutile de créer un doublon pour un second véhicule.
+  if (active) {
+    const sameName = await prisma.vehicleType.findMany({
+      where: { active: true, ...(id ? { NOT: { id } } : {}) },
+      select: { name: true },
+    })
+    if (sameName.some((v) => v.name.trim().toLowerCase() === name.trim().toLowerCase())) {
+      throw new Error(`Le modèle « ${name} » existe déjà. Le nombre de véhicules n’est pas limité : inutile de créer une deuxième ligne pour un véhicule de renfort.`)
+    }
+  }
+
   const data = {
     code,
     name,

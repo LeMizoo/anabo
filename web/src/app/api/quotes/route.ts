@@ -33,12 +33,13 @@ const quoteSchema = z.object({
   circuitSlugs: z.array(z.string().trim().min(1).max(191)).max(20).optional(),
   startDate: optionalDate,
   endDate: optionalDate,
-  adults: z.coerce.number().int().min(1).max(20).default(2),
-  children: z.coerce.number().int().min(0).max(20).default(0),
+  adults: z.coerce.number().int().min(1).max(99).default(2),
+  children: z.coerce.number().int().min(0).max(99).default(0),
   vehicleCode: z.string().trim().max(120).optional().or(z.literal('')),
   vehicleLabel: z.string().trim().max(120).optional().or(z.literal('')),
   consecutiveCircuits: z.coerce.number().int().min(1).max(20).default(1),
-  vehicleCount: z.coerce.number().int().min(1).max(20).default(1),
+  // Nombre de véhicules non limité en pratique : autant de véhicules du même modèle que nécessaire (renforts).
+  vehicleCount: z.coerce.number().int().min(1).max(99).default(1),
   // Nord et Nosy Be : véhicule embarqué vers Nosy Be (« ferry ») ou formule standard (« diego »).
   nosyBeOption: z.enum(['ferry', 'diego']).optional(),
   message: z.string().trim().max(5000).optional().or(z.literal('')),
