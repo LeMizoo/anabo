@@ -44,6 +44,14 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
 
+  // La galerie est fusionnée dans la page Madagascar (section « photos »).
+  async redirects() {
+    return [
+      { source: '/:locale(fr|en|it)/gallery', destination: '/:locale/madagascar#photos', permanent: true },
+      { source: '/gallery', destination: '/fr/madagascar#photos', permanent: true },
+    ]
+  },
+
   async headers() {
     return [
       {

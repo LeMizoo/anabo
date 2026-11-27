@@ -6,7 +6,6 @@ import { pageBySlugQuery, circuitsQuery } from '@/lib/queries'
 import { locales, type Locale } from '@/lib/i18n'
 import type { Page, Circuit } from '@/lib/types'
 import { PageRenderer } from '@/components/pages/PageRenderer'
-import { ImagePlaceholderGallery } from '@/components/pages/ImagePlaceholderGallery'
 import { getTourRouteStops } from '@/lib/tour-routes'
 import { titleCase, titleSizeClass } from '@/lib/typography'
 import { MapPinned } from 'lucide-react'
@@ -150,10 +149,6 @@ export default async function PageBySlug({ params }: Props) {
           .join('\n'),
       },
     }))
-  const hasGalleryBlock = page.modules?.some(
-    (module) =>
-      module._type === 'galleryBlock' || module._type === 'puzzleGalleryBlock',
-  ) ?? false
 
   return (
     <>
@@ -193,9 +188,6 @@ export default async function PageBySlug({ params }: Props) {
             __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities }).replace(/</g, '\\u003c'),
           }}
         />
-      )}
-      {slug === 'gallery' && !hasGalleryBlock && (
-        <ImagePlaceholderGallery locale={locale} />
       )}
     </>
   )

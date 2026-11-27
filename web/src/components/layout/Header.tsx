@@ -14,7 +14,6 @@ import { SITE_NAME } from '@/lib/site'
 const navigation = [
   { key: 'madagascar', href: '/madagascar' },
   { key: 'tourIdeas', href: '/tour-ideas' },
-  { key: 'gallery', href: '/gallery' },
   { key: 'tripGuidelines', href: '/trip-guidelines' },
   { key: 'aboutUs', href: '/about-us' },
   { key: 'contact', href: '/contact' },

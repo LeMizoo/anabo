@@ -14,6 +14,9 @@ type SitemapPage = {
 
 export const revalidate = 300
 
+// Pages qui redirigent ailleurs : jamais dans le sitemap (Search Console signalerait des redirections).
+const EXCLUDED_SLUGS = new Set(['gallery'])
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
   const pages = await sanityClient.fetch<SitemapPage[]>(`
@@ -42,6 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       translations.find((page) => page.language === 'fr')?.slug ||
       translations[0]?.slug
     if (!slug && !translations.some((page) => page.pageType === 'home')) continue
+    if (slug && EXCLUDED_SLUGS.has(slug)) continue
 
     const routeFor = (page: SitemapPage) =>
       page.pageType === 'home' ? `/${page.language}` : `/${page.language}/${slug}`

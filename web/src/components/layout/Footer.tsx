@@ -10,7 +10,6 @@ const navigation = [
   { key: 'home', href: '' },
   { key: 'madagascar', href: '/madagascar' },
   { key: 'tourIdeas', href: '/tour-ideas' },
-  { key: 'gallery', href: '/gallery' },
   { key: 'tripGuidelines', href: '/trip-guidelines' },
   { key: 'aboutUs', href: '/about-us' },
   { key: 'contact', href: '/contact' },
